@@ -1,0 +1,270 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+  
+	<parent>
+		<groupId>it.maggioli.eldasoft</groupId>
+		<artifactId>eldasoft-base</artifactId>
+		<version>1.1.0</version>
+	</parent>
+	<groupId>it.maggioli.eldasoft.sil</groupId>
+	<artifactId>wsappalti</artifactId>
+	<version>3.13.0</version>
+  	<packaging>war</packaging>
+	
+	<name>Webapp Servizi Appalti</name>
+  	
+	<organization>
+		<name>Maggioli S.p.A.</name>
+	</organization>
+
+	<dependencies>
+		<dependency>
+			<groupId>it.maggioli.eldasoft.commons</groupId>
+			<artifactId>wsgene-webapp</artifactId>
+			<version>${wsgene.version}</version>
+			<type>war</type>
+		</dependency>
+		<dependency>
+			<groupId>it.maggioli.eldasoft.commons</groupId>
+			<artifactId>wsgene-engine</artifactId>
+			<version>${wsgene.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>it.maggioli.eldasoft.portal</groupId>
+			<artifactId>eldasoft-portgare-datatypes</artifactId>
+			<version>3.13.0</version>
+		</dependency>
+  	</dependencies>
+	
+	<properties>
+		<project.build.sourceEncoding>Cp1252</project.build.sourceEncoding>
+		<java.version>1.6</java.version>
+		<wsgene.version>1.9.0</wsgene.version>
+	</properties>
+
+	<profiles>
+         <profile>
+            <id>env-dev</id>
+            <activation>
+				<activeByDefault>true</activeByDefault>
+                <property>
+					<!-- Activate: mvn -Denv=dev <phase> -->
+                    <name>env</name>
+                    <value>dev</value>
+                </property>
+            </activation>
+			<build>
+				<filters>
+					<filter>src/main/filters/sviluppo.properties</filter>
+				</filters>
+			</build>
+         </profile>
+         <profile>
+            <id>env-prod</id>
+            <activation>
+                <property>
+					<!-- Activate: mvn -Denv=prod <phase> -->
+                    <name>env</name>
+                    <value>prod</value>
+                </property>
+            </activation>
+			<build>
+				<filters>
+					<filter>src/main/filters/rilascio.properties</filter>
+				</filters>
+			</build>
+         </profile>
+	</profiles>
+
+	<build>
+  		<finalName>WSAppalti</finalName>
+		
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>${java.version}</source>
+					<target>${java.version}</target>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<!-- espande in una cartella di appoggio alcuni file presenti in wsgene per le successive elaborazioni -->
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<version>2.3</version>
+				<executions>
+					<execution>
+						<id>unpack-wsgene-dependencies</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>unpack-dependencies</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${project.build.directory}/dependencies-unpacked/wsgene-webapp</outputDirectory>
+							<verbose>true</verbose>
+							<overWriteReleases>true</overWriteReleases>
+							<overWriteSnapshots>true</overWriteSnapshots>
+							<appendOutput>true</appendOutput>
+							<includeGroupIds>it.maggioli.eldasoft.commons</includeGroupIds>
+							<includeArtifactIds>wsgene-webapp</includeArtifactIds>
+							<includes>configuration/*,WEB-INF/classes/*.properties,WEB-INF/xml/ibatis/*.xml,META-INF/context*.xml,wsdl/*.wsdl</includes>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<version>1.7</version>
+				<executions>                   	   
+					<execution>
+						<id>context-antrun</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>                        
+						<!-- task di generazione file di context -->
+						<configuration>
+							<target>
+								<echo>Generazione ${build.finalName}.xml in corso...</echo>
+								<copy file="${project.build.directory}/war/work/resources/context.xml" tofile="${project.build.directory}/${build.finalName}.xml" />
+								<copy file="${project.build.directory}/war/work/resources/context-tomcat8.xml" tofile="${project.build.directory}/${build.finalName}-tomcat8.xml" />
+								<echo>Generazione ${build.finalName}.xml effettuato...</echo>
+							</target>
+						</configuration>
+					</execution>    
+				</executions>
+			</plugin>
+
+			<plugin>
+				<!-- effettua l'iniezione dei global forward nei file di struts -->
+				<groupId>com.google.code.maven-config-processor-plugin</groupId>
+				<artifactId>maven-config-processor-plugin</artifactId>
+				<version>2.0</version>			
+				<executions>
+					<execution>
+						<id>xml-ibatis</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>process</goal>
+						</goals>
+						<configuration>
+							<encoding>UTF-8</encoding>
+							<outputDirectory>${project.build.directory}/war/work/xml-ibatis</outputDirectory>
+							<transformations>
+								<transformation>
+									<input>${project.build.directory}/dependencies-unpacked/wsgene-webapp/WEB-INF/xml/ibatis/sql-map-config.xml</input>
+									<output>sql-map-config.xml</output>
+									<config>${project.build.directory}/dependencies-unpacked/wsgene-webapp/configuration/ibatis-transformation.xml</config>
+								</transformation>
+							</transformations>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>2.5</version>
+				<executions>
+					<!-- copia i file di geneweb per i quali si richiede il filtraggio con le sostituzioni -->
+					<execution>
+						<id>filter-resources</id>
+						<phase>process-sources</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${project.build.directory}/war/work/resources</outputDirectory>
+							<resources>          
+								<resource>
+									<directory>${project.build.directory}/dependencies-unpacked/wsgene-webapp/WEB-INF</directory>
+									<includes>
+										<include>**/*.properties</include>
+									</includes>
+									<filtering>true</filtering> <!-- si mantiene per webconsole -->
+								</resource>
+								<resource>
+									<directory>${project.build.directory}/dependencies-unpacked/wsgene-webapp/META-INF</directory>
+									<filtering>true</filtering>
+								</resource>
+							</resources>              
+						</configuration>            
+					</execution>
+				</executions>
+			</plugin>
+			
+			<plugin>
+				<!-- build con i file di struts e ibatis corretti, un unico file di resources, e properties filtrate o eliminate -->
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+				<version>2.1.1</version>
+				<configuration>
+					<overlays>
+						<overlay>
+							<groupId>it.maggioli.eldasoft.commons</groupId>
+							<artifactId>wsgene-webapp</artifactId>
+							<excludes>
+								<exclude>META-INF/context*.xml</exclude>
+								<exclude>WEB-INF/classes/*.properties</exclude>
+								<exclude>configuration/**</exclude>
+							</excludes>
+						</overlay>
+					</overlays>
+					<warSourceExcludes>WEB-INF/xml/ibatis/add.xml</warSourceExcludes>
+					<webResources>
+						<resource>
+							<!-- "touch" del web.xml inserito nell'artefatto -->
+							<directory>src/main/webapp/WEB-INF</directory>
+							<targetPath>WEB-INF</targetPath>
+							<includes>
+								<include>web.xml</include>
+							</includes>
+							<filtering>true</filtering>
+						</resource>												
+						<resource>
+							<!-- gareAppalto.xml, aste.xml 	-->		
+							<directory>src/main/webapp/WEB-INF/xml/spring</directory>
+							<targetPath>WEB-INF/xml/spring</targetPath>
+							<includes>
+								<include>*.xml</include>
+							</includes>
+						</resource>											
+						<resource>
+						    <!-- WSGareAppaltoSOAP.wsdl, WSAsteSOAP.wsdl -->		
+							<directory>src/main/webapp/wsdl</directory>
+							<targetPath>wsdl</targetPath>
+							<includes>
+								<include>*.wsdl</include>
+							</includes>
+						</resource>
+						<resource>
+							<!-- risorse filtrate derivate dalla webapp geneweb-webapp -->
+							<!-- NOTA BENE: MAI METTERE QUESTA RISORSA PER ULTIMA NELLA SEZIONE, ALTRIMENTI PER UN BACO DI MAVEN NON SI COPIANO I FILE! -->
+							<directory>${project.build.directory}/war/work/resources</directory>
+							<targetPath>WEB-INF</targetPath>
+							<excludes>
+								<exclude>**/context*.xml</exclude>
+							</excludes>
+						</resource>
+						<resource>
+							<directory>${project.build.directory}/war/work/xml-ibatis</directory>
+							<targetPath>WEB-INF/xml/ibatis</targetPath>
+							<includes>
+								<include>*</include>
+							</includes>
+						</resource>
+					</webResources>
+				</configuration>
+			</plugin>
+
+		</plugins>
+
+	</build>
+  
+</project>

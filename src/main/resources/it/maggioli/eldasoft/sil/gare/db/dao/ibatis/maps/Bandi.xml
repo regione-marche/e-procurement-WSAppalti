@@ -1,0 +1,1986 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="Bandi">
+
+	<resultMap id="resultBando" class="it.maggioli.eldasoft.sil.gare.ws.GaraType">
+		<result property="stazioneAppaltante" column="sa" />
+		<result property="codice" column="codice" />
+		<result property="oggetto" column="oggetto" />
+		<result property="tipoAppalto" column="tipoapp" />
+		<result property="tipoProcedura" column="tipogar" />
+		<result property="tipoAggiudicazione" column="criagg" />
+		<result property="modalitaAggiudicazione" column="codmodagg" />
+		<result property="importo" column="importo" />
+		<result property="importoNonSoggettoRibasso" column="impnoribasso" />
+		<result property="importoSicurezza" column="impsicurezza" />
+		<result property="richiestaManodopera" column="ricmano" />
+		<result property="modalitaManodopera" column="modmano" />
+		<result property="importoOneriProgettazione" column="imponeriprogett" />
+		<result property="dataPubblicazione" column="datpub" />
+		<result property="dataTermine" column="dattermine" />
+		<result property="oraTermine" column="oratermine" />
+		<result property="stato" column="stato" />
+		<result property="cig" column="codcig" />
+		<result property="cup" column="codcupprg" />
+		<result property="tipologia" column="tipologia" />
+		<result property="busteDistinte" column="bustedistinte" />
+		<result property="dataTerminePresentazioneDomanda" column="datterminepar" />
+		<result property="oraTerminePresentazioneDomanda" column="oraterminepar" />
+		<result property="dataTerminePresentazioneOfferta" column="dattermineoff" />
+		<result property="oraTerminePresentazioneOfferta" column="oratermineoff" />
+		<result property="dataEsito" column="dataesito" />
+		<result property="esito" column="esito" />
+		<result property="proceduraTelematica" column="gartel" />
+		<result property="offertaTelematica" column="offtel" />
+		<result property="tipoRibasso" column="ribcal" />
+		<result property="ammessaOffertaInAumento" column="offaum" />
+		<result property="offertaComprensivaSicurezza" column="sicinc" />
+		<result property="oneriSoggettiRibasso" column="onsogrib" />
+		<result property="offertaPerPermuta" column="isoffpermuta" />
+		<result property="offertaPerCanoneAssistenza" column="isoffcanoneass" />
+		<result property="numGiorniValiditaOfferta" column="valoff" />
+		<result property="iterGara" column="coditergara" />
+		<result property="astaElettronica" column="ricastae" />
+		<result property="dataInvitoAsta" column="aedinvit" />
+		<result property="faseGara" column="fasgar" />
+		<result property="dataUltimoAggiornamento" column="dultagg" />
+		<result property="costoFisso" column="costofisso" />
+		<result property="garaRilancio" column="rilancio" />
+		<result property="proceduraInversa" column="inversa" />
+		<result property="accordoQuadro" column="isaccordoquadro" />
+		<result property="garaPrivatistica" column="garpriv" />
+		<result property="numDecimaliRibasso" column="prerib" />
+		<!-- ottimizzazione per getDettaglioGara()  -->
+		<result property="SACodice" column="codstazione" />
+		<result property="SADescrizione" column="descstazione" />
+		<result property="SARup" column="descrup" />
+	</resultMap>
+
+	<resultMap id="resultBandoIscrizione" class="it.maggioli.eldasoft.sil.gare.ws.BandoIscrizioneType">
+		<result property="stazioneAppaltante" column="stazione" columnIndex="1" />
+		<result property="codice" column="codice" columnIndex="2" />
+		<result property="oggetto" column="oggetto" columnIndex="3" />
+		<result property="tipoElenco" column="tipo" columnIndex="4" />
+		<result property="dataPubblicazione" column="datpub" columnIndex="5" />
+		<result property="dataInizioValidita" column="datinival" columnIndex="6" />
+		<result property="dataFineValidita" column="datfinval" columnIndex="7" />
+		<result property="dataInizioIscrizione" column="datiniisc" columnIndex="8" />
+		<result property="oraInizioIscrizione" column="orainiisc" columnIndex="9" />
+		<result property="dataFineIscrizione" column="datfinisc" columnIndex="10" />
+		<result property="oraFineIscrizione" column="orafinisc" columnIndex="11" />
+		<result property="stato" column="stato" columnIndex="12" />
+		<result property="fase" column="fase" columnIndex="13" />
+		<result property="tipoClassifica" column="tipoclass" columnIndex="14" />
+		<result property="maxNumProdottiPerArticolo" column="numprodart" columnIndex="15" />
+		<result property="prezziVisibili" column="visprezzioe" columnIndex="16" />
+		<result property="ammesseRTI" column="iscrirt" columnIndex="17" />
+		<result property="dataUltimoAggiornamento" column="dultagg" columnIndex="18"  />
+		<result property="pubblicaOperatori" column="pubope" columnIndex="19" />
+		<result property="coordinatoreSicurezza" column="coordsic" columnIndex="20" />
+	</resultMap>
+	
+	<resultMap id="resultStazioneAppaltanteBando" class="it.maggioli.eldasoft.sil.gare.ws.StazioneAppaltanteBandoType">
+		<result property="codice" column="codstazione" />
+		<result property="denominazione" column="descstazione" />
+		<result property="rup" column="descrup"/>
+<!-- 		<result property="puntoOrdinante" column="puntoord" /> -->
+	</resultMap>
+	
+	<resultMap id="resultDocumentoBando" class="it.maggioli.eldasoft.sil.gare.ws.DocumentoAllegatoType">
+		<result property="id" column="iddoc"  />
+		<result property="url" column="urldoc"  />
+		<result property="descrizione" column="descdoc" />
+		<result property="nomefile" column="filedoc" />
+		<result property="dataPubblicazione" column="datpub" />
+	</resultMap>
+	
+	<resultMap id="resultDocumentoLottoBando" class="it.maggioli.eldasoft.sil.gare.db.vo.DocumentoAllegatoLotto">	
+		<result property="gruppo" column="gruppo" />
+		<!-- LottoGaraType -->
+		<result property="idComunicazione" column="idcom" />
+		<result property="codiceLotto" column="ngara" />
+		<result property="codiceInterno" column="codiceinterno" />
+		<result property="oggetto" column="oggetto" />
+		<result property="costoFisso" column="costofisso" />
+		<!-- DocumentoAllegatoType -->
+		<result property="id" column="iddoc" />
+		<result property="url" column="urldoc" />
+		<result property="descrizione" column="descdoc" />
+		<result property="nomefile" column="filedoc" />
+		<result property="dataPubblicazione" column="datpub" />
+	</resultMap>
+		
+	<resultMap id="resultDocumentoBandoInfo" 
+		extends="resultDocumentoLottoBando" class="it.maggioli.eldasoft.sil.gare.db.vo.DocumentoAllegatoLotto">
+		<result property="dimensione" column="docsize" />
+		<result property="uuid" column="uuid" />
+	</resultMap>
+		
+	<resultMap id="resultLottoGara" class="it.maggioli.eldasoft.sil.gare.ws.LottoGaraType">
+		<result property="codiceGara" column="codice" />
+		<result property="codiceLotto" column="ngara" />
+		<result property="codiceInterno" column="codiceinterno" />
+		<result property="oggetto" column="oggetto" />
+		<result property="cig" column="codcig" />
+		<result property="cup" column="codcupprg" />
+		<result property="importo" column="importo" />
+		<result property="stato" column="stato" />
+		<result property="esito" column="esito" />
+		<result property="costoFisso" column="costofisso" />
+		<result property="progressivoOfferta" column="progofferta" />
+	</resultMap>
+	
+	<resultMap id="resultDocumentiGara" class="it.maggioli.eldasoft.sil.gare.db.vo.DocumentoAllegatoLotto">
+		<result property="gruppo" column="gruppo" />
+		<!-- LottoGaraType -->
+		<result property="codiceLotto" column="ngara" />
+		<result property="codiceInterno" column="codiceinterno" />
+		<result property="oggetto" column="oggetto" />
+		<result property="costoFisso" column="costofisso" />
+<!-- 		<result property="progressivoOfferta" column="progofferta" /> -->
+		<!-- DocumentoAllegatoType -->
+		<result property="id" column="iddoc" />
+		<result property="url" column="urldoc" />
+		<result property="descrizione" column="descdoc" />
+		<result property="nomefile" column="filedoc" />
+		<result property="dataPubblicazione" column="datpub" />		
+	</resultMap>
+	
+	<resultMap id="resultCategoriaGara" class="it.maggioli.eldasoft.sil.gare.ws.CategoriaGaraType">
+		<result property="codice" column="codice" columnIndex="1" />
+		<result property="descrizione" column="descrizione" columnIndex="2" />
+		<result property="prevalente" column="prevalente" columnIndex="3" />
+		<result property="classe" column="descclassifica" columnIndex="4" />
+		<result property="lavori" column="perlavori" columnIndex="5" />
+	</resultMap>
+	
+	<resultMap id="resultCategoriaBandoIscrizione" class="it.maggioli.eldasoft.sil.gare.ws.CategoriaBandoIscrizioneType">
+		<result property="codice" column="codice" columnIndex="1" />
+		<result property="descrizione" column="descrizione" columnIndex="2" />
+		<result property="tipoAppalto" column="tipoappalto" columnIndex="3" />
+		<result property="titolo" column="titolo" columnIndex="4" />
+		<result property="codiceLivello1" column="codliv1" columnIndex="5" />
+		<result property="codiceLivello2" column="codliv2" columnIndex="6" />
+		<result property="codiceLivello3" column="codliv3" columnIndex="7" />
+		<result property="codiceLivello4" column="codliv4" columnIndex="8" />
+		<result property="livello" column="livello" columnIndex="9" />
+		<result property="foglia" column="foglia" columnIndex="10" />
+	</resultMap>
+	
+	<resultMap id="resultRequisitoRichiestoBando" class="it.maggioli.eldasoft.sil.gare.ws.RequisitoRichiestoType">
+		<result property="nome" column="nome" columnIndex="1" />
+		<result property="obbligatorio" column="obbligatorio" columnIndex="2" />
+		<result property="id" column="ordine" columnIndex="3" />
+	</resultMap>
+	
+	<resultMap id="resultRequisitoRichiestoLottoBando" class="it.maggioli.eldasoft.sil.gare.db.vo.RequisitoRichiestoLotto">
+		<result property="codiceLotto" column="ngara" />
+		<!-- RequisitoRichiestoLottiType -->
+		<result property="nome" column="nome" />
+		<result property="obbligatorio" column="obbligatorio" />
+		<result property="id" column="ordine" />
+	</resultMap>
+
+	<resultMap id="resultComunicazione" class="it.maggioli.eldasoft.sil.gare.ws.ComunicazioneType">
+		<result property="idComunicazione" column="idcom" />
+		<result property="idDestinatario" column="idcomdes" />
+		<result property="codice" column="codice" />
+		<result property="oggetto" column="oggetto" />
+		<result property="testo" column="testo" />
+		<result property="dataInvio" column="dataorainvio" />
+		<result property="dataLettura" column="dataoralettura" />
+		<result property="dataProtocollo" column="dataoraprotocollo" />
+		<result property="numeroProtocollo" column="numprotocollo" />
+		<result property="bloccaRispondi" column="bloccarispondi" />
+		<result property="dataInserimento" column="comdatins" />
+		<result property="genere" column="genere" />
+		<result property="titolo" column="titolo" />
+		<result property="tipologia" column="tipologia" />
+		<result property="stazioneAppaltante" column="idcfg" />
+		<!-- <result property="idComunicazioneRisposta" column="idcomris" /> SERVE??? -->
+		<result property="destinatario" column="desintest" />
+		<result property="mittente" column="committ" />
+		<result property="modello" column="commodello" />
+		<result property="tipoBusta" column="comtipma" />
+		<result property="dataScadenza" column="comdatsca" />
+		<result property="oraScadenza" column="comorasca" />
+	</resultMap>
+	
+	<resultMap id="resultComunicazioneLotto" class="it.maggioli.eldasoft.sil.gare.db.vo.ComunicazioneLotto">
+		<result property="codiceLotto" column="ngara" />
+		<!-- LottiComunicazioneType -->
+		<result property="idComunicazione" column="idcom" />
+		<result property="idDestinatario" column="idcomdes" />
+		<result property="codice" column="codice" />
+		<result property="oggetto" column="oggetto" />
+		<result property="testo" column="testo" />
+		<result property="dataInvio" column="dataorainvio" />
+		<result property="dataLettura" column="dataoralettura" />
+		<result property="dataProtocollo" column="dataoraprotocollo" />
+		<result property="numeroProtocollo" column="numprotocollo" />
+		<result property="bloccaRispondi" column="bloccarispondi" />
+		<result property="dataInserimento" column="comdatins" />
+		<result property="genere" column="genere" />
+	</resultMap>
+	
+	<resultMap id="resultInvio" class="it.maggioli.eldasoft.sil.gare.ws.InvioType">
+		<result property="id" column="idcom" />
+		<result property="tipo" column="comtipo" />
+		<result property="stato" column="comstato" />
+		<result property="dataAggStato" column="comdatastato" />
+	</resultMap>
+	
+	<resultMap id="resultDocumentoRichiestoBando" class="it.maggioli.eldasoft.sil.gare.ws.DocumentazioneRichiestaType">
+		<result property="nome" column="nome" />
+		<result property="obbligatorio" column="obbligatorio" />
+		<result property="id" column="ordine" />
+		<result property="idfacsimile" column="iddoc" />
+		<result property="nomefilefacsimile" column="filedoc" /> 
+		<result property="formato" column="codformato" />
+		<result property="generato" column="gentel" />
+	</resultMap>
+	
+	<resultMap id="resultDocumentoRichiestoLottoBando" class="it.maggioli.eldasoft.sil.gare.db.vo.DocumentazioneRichiestaLotto">
+		<result property="tipoBusta" column="busta" />
+		<result property="codiceLotto" column="ngara" />
+		<!-- DocumentazioneRichiestaType -->
+		<result property="nome" column="nome" />
+		<result property="obbligatorio" column="obbligatorio" />
+		<result property="id" column="ordine" />
+		<result property="idfacsimile" column="iddoc" />
+		<result property="nomefilefacsimile" column="filedoc" /> 
+		<result property="formato" column="codformato" />				
+	</resultMap>
+
+	<resultMap id="resultTipoPartecipazione" class="it.maggioli.eldasoft.sil.gare.ws.TipoPartecipazioneType">
+		<result property="denominazioneRti" column="denrti" columnIndex="1" />
+	</resultMap>
+	
+	<resultMap id="resultCategoriaImpresa" class="it.maggioli.eldasoft.sil.gare.ws.CategoriaImpresaType">
+		<result property="categoria" column="categoria" />
+		<result property="classificaMinima" column="clasmin" />
+		<result property="classificaMassima" column="clasmax" />
+		<result property="nota" column="nota" />
+	</resultMap>
+	
+	<resultMap id="resultVociDettaglioOfferta" class="it.maggioli.eldasoft.sil.gare.ws.VoceDettaglioOffertaType">
+		<result property="id" column="progressivo" />
+		<result property="codice" column="codvoc" />
+		<result property="voce" column="voce" />
+		<result property="descrizione" column="desest" />
+		<result property="tipoClassificazione" column="descclasi1" />
+		<result property="soloSicurezza" column="solsic" />
+		<result property="nonSoggettoRibasso" column="sogrib" />
+		<result property="unitaMisura" column="unimis" />
+		<result property="quantita" column="quanti" />
+		<result property="prezzoUnitarioBaseGara" column="prezun" />
+		<result property="peso" column="peso" />
+		<result property="prezzoUnitario" column="prezun" />
+	</resultMap>
+	
+	<resultMap id="resultAttributiAggiuntiviOfferta" class="it.maggioli.eldasoft.sil.gare.db.vo.AttributoAggiuntivoOfferta">
+		<result property="codice" column="nome" />
+		<result property="descrizione" column="descrizione" />
+		<result property="tipo" column="tipo" />
+		<result property="formato" column="formato" />
+		<result property="tabellato" column="tabellato" />
+		<result property="obbligatorio" column="obbligatorio" />
+	</resultMap>
+	
+	<resultMap id="resultDettaglioStazioneAppaltante" class="it.maggioli.eldasoft.sil.gare.ws.DettaglioStazioneAppaltanteType">
+		<result property="codice" column="codice" />
+		<result property="denominazione" column="denominazione" />
+		<result property="codiceFiscale" column="codfiscale" />
+		<result property="indirizzo" column="indirizzo" />
+		<result property="numCivico" column="numcivico" />
+		<result property="cap" column="cap" />
+		<result property="comune" column="comune" />
+		<result property="provincia" column="provincia" />
+		<result property="telefono" column="telefono" />
+		<result property="fax" column="fax" />
+		<result property="email" column="email" />
+		<result property="pec" column="pec" />
+	</resultMap>
+	
+	<resultMap id="resultMandantiRTI" class="it.maggioli.eldasoft.sil.gare.ws.MandanteRTIType">
+		<result property="ragioneSociale" column="nomimp" />
+		<result property="tipologia" column="tipimp" />
+		<result property="nazione" column="nazione" />
+		<result property="codiceFiscale" column="cfimp" />
+		<result property="partitaIVA" column="pivimp" />
+		<result property="quotaPartecipazione" column="quodic" />
+	</resultMap>
+	
+	<resultMap id="resultFascicoloProtocollo" class="it.maggioli.eldasoft.sil.gare.ws.FascicoloProtocolloType">
+		<result property="codice" column="codicefascicolo" />
+		<result property="anno" column="annofascicolo" />
+		<result property="numero" column="numerofascicolo" />
+		<result property="classifica" column="classificafascicolo" />
+		<result property="codiceAoo" column="codaoofascicolo" />
+		<result property="codiceUfficio" column="codufffascicolo" />
+		<result property="strutturaCompetente" column="strutturafascicolo" />
+		<result property="riservatezza" column="riservatezzafascicolo" />
+	</resultMap>
+	
+	<resultMap id="resultEspletGaraOperEcoDocAmm" class="it.maggioli.eldasoft.sil.gare.ws.EspletGaraOperatoreType">
+		<result property="numeroPlico" column="numplico" />
+		<result property="codiceOperatore" column="codopeconomico" />
+		<result property="codiceFiscale" column="cfopeconomico" />
+		<result property="ragioneSociale" column="denopeconomico" />
+		<result property="statoBusta" column="statobusta" />
+		<result property="codiceAmmissione" column="ammissione" />
+		<result property="ammissione" column="descammissione" />
+		<result property="rti" column="rti" />
+	</resultMap>
+	
+	<resultMap id="resultEspletGaraOperEcoValTec" class="it.maggioli.eldasoft.sil.gare.ws.EspletGaraOperatoreType">
+		<result property="numeroPlico" column="numplico" />
+		<result property="codiceOperatore" column="codopeconomico" />
+		<result property="codiceFiscale" column="cfopeconomico" />
+		<result property="ragioneSociale" column="denopeconomico" />
+		<result property="statoBusta" column="statobusta" />
+		<result property="codiceAmmissione" column="ammissione" />
+		<result property="ammissione" column="descammissione" />
+		<result property="rti" column="rti" />
+		<result property="codiceModAgg" column="codmodagg" />
+		<result property="punteggioTecnico" column="puntec" />
+		<result property="punteggioTecnicoRiparametrato" column="puntecrip" />
+		<result property="riparametrazioneTecnica" column="riptec" />
+	</resultMap>
+	
+	<resultMap id="resultEspletGaraOperEcoValTecLotto" class="it.maggioli.eldasoft.sil.gare.db.vo.EspletGaraOperatoreLotto">
+		<result property="codiceLotto" column="codice" />
+		<!-- EspletGaraOperatoreType -->
+		<result property="numeroPlico" column="numplico" />
+		<result property="codiceOperatore" column="codopeconomico" />
+		<result property="codiceFiscale" column="cfopeconomico" />
+		<result property="ragioneSociale" column="denopeconomico" />
+		<result property="statoBusta" column="statobusta" />
+		<result property="codiceAmmissione" column="ammissione" />
+		<result property="ammissione" column="descammissione" />
+		<result property="rti" column="rti" />
+		<result property="codiceModAgg" column="codmodagg" />
+		<result property="punteggioTecnico" column="puntec" />
+		<result property="punteggioTecnicoRiparametrato" column="puntecrip" />
+		<result property="riparametrazioneTecnica" column="riptec" />
+	</resultMap>
+	
+	<resultMap id="resultEspletGaraOperEcoOffEco" class="it.maggioli.eldasoft.sil.gare.ws.EspletGaraOperatoreType">
+		<result property="numeroPlico" column="numplico" />
+		<result property="codiceOperatore" column="codopeconomico" />
+		<result property="codiceFiscale" column="cfopeconomico" />
+		<result property="ragioneSociale" column="denopeconomico" />
+		<result property="statoBusta" column="statobusta" />
+		<result property="codiceAmmissione" column="ammissione" />
+		<result property="ammissione" column="descammissione" />
+		<result property="rti" column="rti" />
+		<result property="codiceModAgg" column="codmodagg" />
+		<result property="tipoRibasso" column="ribcal" />
+		<result property="importoOfferto" column="impoff" />
+		<result property="ribassoOfferto" column="ribauo" />
+		<result property="punteggioEconomico" column="puneco" />
+		<result property="punteggioEconomicoRiparametrato" column="punecorip" />
+		<result property="riparametrazioneEconomica" column="ripeco" />
+	</resultMap>
+	
+	<resultMap id="resultEspletGaraOperEcoOffEcoLotto" class="it.maggioli.eldasoft.sil.gare.db.vo.EspletGaraOperatoreLotto">
+		<result property="codiceLotto" column="codice" />
+		<!-- EspletGaraOperatoreType -->
+		<result property="numeroPlico" column="numplico" />
+		<result property="codiceOperatore" column="codopeconomico" />
+		<result property="codiceFiscale" column="cfopeconomico" />
+		<result property="ragioneSociale" column="denopeconomico" />
+		<result property="statoBusta" column="statobusta" />
+		<result property="codiceAmmissione" column="ammissione" />
+		<result property="ammissione" column="descammissione" />
+		<result property="rti" column="rti" />
+		<result property="codiceModAgg" column="codmodagg" />
+		<result property="tipoRibasso" column="ribcal" />
+		<result property="importoOfferto" column="impoff" />
+		<result property="ribassoOfferto" column="ribauo" />
+		<result property="punteggioEconomico" column="puneco" />
+		<result property="punteggioEconomicoRiparametrato" column="punecorip" />
+		<result property="riparametrazioneEconomica" column="ripeco" />
+	</resultMap>
+	
+	<resultMap id="resultEspletGaraOperEcoGraduatoria" class="it.maggioli.eldasoft.sil.gare.ws.EspletGaraOperatoreType">
+		<result property="numeroPlico" column="numplico" />
+		<result property="codiceOperatore" column="codopeconomico" />
+		<result property="codiceFiscale" column="cfopeconomico" />
+		<result property="ragioneSociale" column="denopeconomico" />
+		<result property="rti" column="rti" />
+		<result property="codiceModAgg" column="codmodagg" />
+		<result property="tipoRibasso" column="ribcal" />
+		<result property="importoOfferto" column="impoff" />
+		<result property="ribassoOfferto" column="ribauo" />
+		<result property="punteggioTotale" column="puntot" />
+		<result property="graduatoria" column="descgraduatoria" />
+		<result property="proceduraInversa" column="inversa" />
+		<result property="esitoProceduraInversa" column="amminversa" />
+		<result property="codiceAmmissione" column="ammissione" />
+	</resultMap>
+	
+	<resultMap id="resultEspletGaraLotti" class="it.maggioli.eldasoft.sil.gare.ws.EspletGaraLottoType">
+		<result property="lotto" column="lotto" />
+		<result property="codiceInterno" column="codinternolotto" />
+		<result property="oggetto" column="oggettolotto" />
+		<result property="ammissione" column="descammissione" />
+	</resultMap>
+	
+	<resultMap id="resultEspletGaraDocumenti" class="it.maggioli.eldasoft.sil.gare.ws.EspletGaraDocumentoType">
+		<result property="busta" column="busta" />
+		<result property="posizione" column="bustaord" />
+		<result property="descrizione" column="descrizione" />
+		<result property="filename" column="nomefile" />
+		<result property="dataLettura" column="datalettura" />
+	</resultMap>
+	
+	<resultMap id="resultEspletGaraComponentiRti" class="it.maggioli.eldasoft.sil.gare.ws.EspletGaraComponenteRtiType">
+		<result property="codice" column="codimprti" />
+		<result property="ragioneSociale" column="ragsoc" />
+		<result property="codiceFiscale" column="codfisc" />
+		<result property="partitaIva" column="partiva" />
+		<result property="mandataria" column="mandataria" />
+	</resultMap>
+
+	<resultMap id="resultSoggettoAderente" class="it.maggioli.eldasoft.sil.gare.ws.SoggettoAderenteType">
+		<result property="codiceFiscale" column="cfein" />
+		<result property="denominazione" column="nomein" />
+	</resultMap>
+
+	<resultMap id="resultSoggettoAderenteLotto" class="it.maggioli.eldasoft.sil.gare.db.vo.SoggettoAderenteLotto">
+		<result property="codiceLotto" column="ngara" />
+		<!-- SoggettoAderenteLottiType -->
+		<result property="codiceFiscale" column="cfein" />
+		<result property="denominazione" column="nomein" />
+	</resultMap>
+
+	<resultMap id="resultOperatoriIscritti" class="it.maggioli.eldasoft.sil.gare.ws.OperatoreIscrittoType">
+		<result property="ditta" column="codimp" />
+		<result property="denominazione" column="nomimp" />
+		<result property="codiceFiscale" column="cfimp" />
+		<result property="partitaIva" column="pivimp" />
+		<result property="localita" column="locimp" />
+		<result property="provincia" column="proimp" />
+	</resultMap>
+	
+	<resultMap id="resultCategorieOperatoriIscritti" class="it.maggioli.eldasoft.sil.gare.ws.CategoriaOperatoreIscrittoType">
+		<result property="ditta" column="codimp" />
+		<result property="codice" column="categoria" />
+		<result property="descrizione" column="descrizione" />
+		<result property="tipoAppalto" column="tipocategoria" />
+		<result property="classificaMinima" column="clasmin" />
+		<result property="classificaMassima" column="clasmax" />
+		<result property="livello" column="livello" />
+		<result property="foglia" column="foglia" />
+	</resultMap>
+	
+	<resultMap id="resultRettifichePresentazione" class="it.maggioli.eldasoft.sil.gare.ws.RettificaGaraType">
+		<result property="dataTermine" column="datter" />
+		<result property="oraTermine" column="orater" />
+		<result property="dataRettifica" column="drettif" />
+	</resultMap>
+
+	<resultMap id="resultCriteriValutazione" class="it.maggioli.eldasoft.sil.gare.ws.CriterioValutazioneOffertaType">
+		<result property="codice" column="codice" />
+		<result property="descrizione" column="despar" />
+		<result property="tipo" column="tippar" />
+		<result property="formato" column="formato" />
+		<result property="valore" column="puntuale" />
+		<result property="valoreMin" column="valmin" />
+		<result property="valoreMax" column="valmax" />
+		<result property="numeroDecimali" column="numdeci" />
+	</resultMap>
+ 	
+	<resultMap id="resultCriteriValutazioneLotto" class="it.maggioli.eldasoft.sil.gare.db.vo.CriterioValutazioneOffertaLotto">	
+		<result property="codiceLotto" column="ngara" />
+		<!-- CriterioValutazioneOffertaType -->
+		<result property="codice" column="codice" />
+		<result property="descrizione" column="despar" />
+		<result property="tipo" column="tippar" />
+		<result property="formato" column="formato" />
+		<result property="valore" column="puntuale" />
+		<result property="valoreMin" column="valmin" />
+		<result property="valoreMax" column="valmax" />
+		<result property="numeroDecimali" column="numdeci" />
+	</resultMap>
+	
+	<resultMap id="resultImpresaIscrizione" class="it.maggioli.eldasoft.sil.gare.ws.ImpresaIscrizioneType">
+		<result property="coordinatoreSicurezza" column="coordsic" />
+		<!-- <result ...> -->
+		<!-- <result ...> -->
+		<!-- <result ...> -->
+	</resultMap>
+
+	<resultMap id="resultDelibera" class="it.maggioli.eldasoft.sil.gare.ws.DeliberaType">
+  		<result property="codice" column="codice" />
+		<result property="stazioneAppaltante" column="nomein" />
+		<result property="oggetto" column="oggetto" />
+		<result property="cig" column="codcig" />
+		<result property="dataPubblicazione" column="datpub" />
+		<result property="dataAtto" column="dataatto" />
+		<result property="numeroAtto" column="numatto" />
+		<result property="idDoc" column="iddoc" />
+		<result property="descrizioneDoc" column="descdoc" />
+		<result property="urlDoc" column="urldoc" />
+		<result property="fileDoc" column="filedoc" />
+	</resultMap>
+	
+	<resultMap id="resultSommaUrgenza" class="it.maggioli.eldasoft.sil.gare.ws.SommaUrgenzaType">
+  		<result property="codice" column="codgara" />
+  		<result property="oggetto" column="not_gar" />
+		<result property="dataEsito" column="dt_primo_esito" />
+		<result property="dataPubblicazione" column="dt_prima_pubb" />
+		<result property="dataProcedura" column="data" />
+		<result property="cig" column="codcig" />
+		<result property="stato" column="stato" />
+		<result property="tipoProcedura" column="tipo_procedura" />
+		<result property="importo" column="imp_base_gara" />
+	</resultMap>
+	
+	<resultMap id="resultWSDMConfig" class="it.maggioli.eldasoft.sil.gare.ws.WSDMConfigType">
+  		<result property="id" column="idconfi" />
+		<result property="codice" column="chiave" />
+		<result property="valore" column="valore" />
+		<result property="descrizione" column="descri" />
+	</resultMap>
+
+	<resultMap id="resultElencoInviti" class="it.maggioli.eldasoft.sil.gare.ws.InvitoGaraType">
+		<result property="codice" column="codgar5" />
+		<result property="codiceLotto" column="ngara5" />
+		<result property="progressivoOfferta" column="ncomope" />
+		<result property="usernome" column="usernome" />
+	</resultMap>
+	
+  <select id="getAppaltiVersion" resultClass="java.lang.String" >
+  SELECT numver FROM eldaver WHERE codapp='PG'
+  </select>	
+
+  <select id="getElencoStazioniAppaltanti" resultMap="DatiCodificati.resultDatoCodificato" >
+  SELECT codice, denominazione as descrizione
+    FROM v_ws_stazioni_app
+   ORDER BY denominazione asc
+  </select>
+  
+    <select id="getElencoStazioniAppaltantiL190" resultMap="DatiCodificati.resultDatoCodificato" >
+    SELECT DISTINCT DENOMPROP as codice, CODFISCPROP as descrizione
+    FROM v_ws_gare_anticor 
+    WHERE CODFISCPROP IS NOT NULL ORDER BY DENOMPROP
+  </select>
+
+  <select id="getStatiGara" resultMap="DatiCodificati.resultDatoCodificato" >
+  SELECT codstato as codice, descstato as descrizione
+    FROM v_ws_stati_bandi
+   ORDER BY codstato asc
+  </select>
+
+  <select id="getEsitiGara" resultMap="DatiCodificati.resultDatoCodificato" >
+  SELECT esito codice, esito descrizione
+	FROM v_gare_statoesito 
+   WHERE esito is not null AND genere NOT IN (100, 300) 
+GROUP BY esito, esito 
+   ORDER BY esito asc
+  </select>
+
+  <sql id="selectListaBandi">
+  SELECT descsa as sa, codice, oggetto, desctipoapp as tipoapp, desctipogar as tipogar, desccriagg as criagg, 
+        codmodagg, importo, impnoribasso, impsicurezza, ricmano, modmano, imponeriprogett, datpub, dattermine, oratermine, 
+        descstatogara as stato, codcig, codcupprg, tipologia, bustedistinte, datterminepar, oraterminepar, 
+        dattermineoff, oratermineoff, dataesito, descstatoesito esito, gartel, offtel, ribcal, offaum, sicinc, 
+        onsogrib, isoffpermuta, isoffcanoneass, valoff,
+    	coditergara,  
+    	ricastae, 		<!-- AND EXISTS (SELECT f.ngara FROM aefasi f WHERE f.ngara = b.ngara)) -->
+    	aedinvit, 
+    	fasgar,
+    	dultagg,
+    	costofisso,
+    	rilancio,
+    	inversa,
+    	sommaur,
+    	isaccordoquadro,
+    	altrisog,
+    	garpriv,
+    	<!-- ottimizzazione per getDettaglioGara() -->
+    	NULL as codstazione, NULL as descstazione, NULL as descrup,
+    	prerib
+  </sql>
+  
+  <sql id="selectDettaglioBando">
+  SELECT DISTINCT codsa as sa, codice, oggetto, codtipoapp as tipoapp, codtipogar as tipogar, codcriagg as criagg, 
+  		codmodagg, importo, impnoribasso, impsicurezza, ricmano, modmano, imponeriprogett, datpub, dattermine, oratermine, 
+  		codstatogara as stato, codcig, codcupprg, tipologia, bustedistinte, datterminepar, oraterminepar, 
+  		dattermineoff, oratermineoff, dataesito, descstatoesito as esito, gartel, offtel, ribcal, offaum, sicinc, 
+  		onsogrib, isoffpermuta, isoffcanoneass, valoff,
+  		coditergara, 
+  		ricastae, 		<!-- AND EXISTS (SELECT f.ngara FROM aefasi f WHERE f.ngara = b.ngara)) -->
+  		aedinvit,
+  		fasgar,
+  		dultagg,
+  		costofisso,
+  		rilancio,
+  		inversa,
+  		sommaur,
+  		isaccordoquadro,
+  		altrisog,
+  		garpriv,
+  		<!-- ottimizzazione per getDettaglioGara() -->
+  		codsa as codstazione, descsa as descstazione, descrup,
+  		prerib
+  </sql>
+  
+  <sql id="selectCampiElenchi">
+  SELECT descsa as stazione, codice, oggetto, desctipoelenco as tipo, datpub, datinival, datfinval, datiniisc, orainiisc,  datfinisc, orafinisc, descstato as stato, fase, tipoclass, numprodart, visprezzioe, iscrirt, 
+  		dultagg, pubope, coordsic
+  </sql>
+  
+  <sql id="selectComunicazioneRicevutaSelect">
+  SELECT c.idcom, idcomdes, codice, commsgogg oggetto, commsgtes testo, dataorainvio, dataoralettura, dataoraprotocollo, numprotocollo, bloccarispondi, comdatins,
+         t.cenint codsa, g.ngara, null genere, 
+         null titolo, null tipologia, idcfg,
+         idcomris, desintest, committ, commodello, comtipma, comdatsca, comorasca
+  </sql>
+  
+  <sql id="selectComunicazioneRicevutaFrom">
+    FROM v_ws_comunicazioni_da_sa c
+    	 INNER JOIN gare g ON (g.ngara = c.codice)
+	 	 INNER JOIN torn t ON (t.codgar = g.codgar1)
+  </sql>
+  
+  <sql id="selectComunicazioneRicevuta">
+  	<include refid="selectComunicazioneRicevutaSelect"/>
+  	<include refid="selectComunicazioneRicevutaFrom"/>
+  </sql>
+    
+  <sql id="selectComunicazioneInviata">
+  SELECT idcom, null idcomdes, codice, oggetto, testo, dataorainvio, dataoralettura, dataoraprotocollo, numprotocollo, 0 bloccarispondi, dataorainvio comdatins,
+         t.cenint codsa, g.ngara, null genere,
+         null titolo, null tipologia, idcfg,
+         null idcomris, null desintest, committ, commodello, comtipma, comdatsca, comorasca
+    FROM v_ws_comunicazioni_per_sa c 
+    	 INNER JOIN gare g ON (g.ngara = c.codice)
+    	 INNER JOIN torn t ON (t.codgar = g.codgar1)
+  </sql>
+
+  <sql id="fromWhereNews">
+    FROM v_ws_comunicazioni_da_sa c
+         INNER JOIN v_gare_genere gg ON c.codice = gg.codice
+         INNER JOIN gare g ON (g.ngara = c.codice)
+    	 INNER JOIN torn t ON (t.codgar = g.codgar1)
+    	 INNER JOIN pubbli p ON (p.codgar9 = t.codgar)
+		 LEFT OUTER JOIN garealbo ga ON (ga.ngara = gg.codice)
+   WHERE idcomdes IS NULL 
+     AND <![CDATA[gg.genere <> 4]]>
+     AND p.tippub = 11
+    <isNotEmpty property="dataInvioDa" prepend="AND"><![CDATA[ comdatins >= #dataInvioDa#]]></isNotEmpty>
+ 	<isNotEmpty property="dataInvioA" prepend="AND"><![CDATA[ comdatins < #dataInvioA#]]></isNotEmpty>         
+	<isNotEmpty property="stazioneAppaltante" prepend="AND"> 
+     (t.cenint = #stazioneAppaltante# 
+      OR EXISTS (SELECT cenint FROM v_ws_aderente_lotto l WHERE l.ngara = gg.codice AND l.cenint = #stazioneAppaltante#) )
+    </isNotEmpty>
+  </sql>
+
+  <sql id="fromWhereDelibere">
+  	  FROM v_gare_torn g
+	       INNER JOIN torn t on g.codgar = t.codgar
+		   INNER JOIN uffint sa on t.cenint = sa.codein
+		   INNER JOIN v_ws_gare_documenti d on g.codgar = d.codgar
+	 WHERE d.gruppo=15
+	<isNotEmpty property="annoInizio" prepend="AND"> annoinizioperscadenza >= #annoInizio#</isNotEmpty>
+	<isNotEmpty property="stazioneAppaltante" prepend="AND"> g.cenint = #stazioneAppaltante#</isNotEmpty>
+	<isNotEmpty property="tipoAppalto" prepend="AND"> g.tipgen = #tipoAppalto#</isNotEmpty>	
+	<isNotEmpty property="oggetto" prepend="AND"> $operatoreUpper$(oggetto) like #oggetto#</isNotEmpty>
+    <isNotEmpty property="cig" prepend="AND"> $operatoreUpper$(codcig) like #cig#</isNotEmpty>
+    <isNotEmpty property="dataPubblicazioneDa" prepend="AND"><![CDATA[ d.datpub >= #dataPubblicazioneDa#]]></isNotEmpty> 
+    <isNotEmpty property="dataPubblicazioneA" prepend="AND"><![CDATA[ d.datpub <= #dataPubblicazioneA#]]></isNotEmpty>	
+	<isNotEmpty property="sommaUrgenza" prepend="AND"> (case when t.sommaur='1' then 1 else 0 end) = #sommaUrgenza# </isNotEmpty>
+  </sql>
+  
+  <sql id="fromWhereElencoSommaUrgenza">
+  	FROM v_ws_sommaurgenza 
+<!--  
+	<isNotEmpty property="stazioneAppaltante" prepend="AND"> g.cenint = #stazioneAppaltante#</isNotEmpty>
+	<isNotEmpty property="tipoAppalto" prepend="AND"> g.tipgen = #tipoAppalto#</isNotEmpty>	
+	<isNotEmpty property="oggetto" prepend="AND"> $operatoreUpper$(oggetto) like #oggetto#</isNotEmpty>
+    <isNotEmpty property="cig" prepend="AND"> $operatoreUpper$(codcig) like #cig#</isNotEmpty>
+    <isNotEmpty property="dataPubblicazioneDa" prepend="AND"><![CDATA[ d.datpub >= #dataPubblicazioneDa#]]></isNotEmpty> 
+    <isNotEmpty property="dataPubblicazioneA" prepend="AND"><![CDATA[ d.datpub <= #dataPubblicazioneA#]]></isNotEmpty>
+-->
+  </sql>
+  
+  <sql id="whereBandi">
+   WHERE <![CDATA[#annoMinimoPubblicazione# <= annoinizioperscadenza]]>
+     AND NOT(coditergara in (3,5,6) AND codstatogara=1)
+     <isNotEmpty property="stazioneAppaltante" prepend="AND"> 
+     (codsa = #stazioneAppaltante# 
+      OR EXISTS (SELECT cenint FROM v_ws_aderente_lotto l WHERE v_ws_bandi.codice = l.codice AND l.cenint = #stazioneAppaltante#) )
+     </isNotEmpty> 
+     <isNotEmpty property="oggetto" prepend="AND"> $operatoreUpper$(oggetto) like #oggetto#</isNotEmpty>
+     <isNotEmpty property="cig" prepend="AND"> $operatoreUpper$(codcigall) like #cig#</isNotEmpty> 
+     <isNotEmpty property="tipoAppalto" prepend="AND"> codtipoapp = #tipoAppalto#</isNotEmpty> 
+     <isNotEmpty property="dataPubblicazioneDa" prepend="AND"><![CDATA[ datpub >= #dataPubblicazioneDa#]]></isNotEmpty> 
+     <isNotEmpty property="dataPubblicazioneA" prepend="AND"><![CDATA[ datpub <= #dataPubblicazioneA#]]></isNotEmpty> 
+     <isNotEmpty property="dataScadenzaDa" prepend="AND"><![CDATA[ dattermine >= #dataScadenzaDa#]]></isNotEmpty> 
+     <isNotEmpty property="dataScadenzaA" prepend="AND"><![CDATA[ dattermine <= #dataScadenzaA#]]></isNotEmpty>
+     <isNotEmpty property="proceduraTelematica" prepend="AND"> gartel = #proceduraTelematica#</isNotEmpty> 
+     <isNotEmpty property="stato" prepend="AND"> codstatogara = #stato#</isNotEmpty>
+     <isNotEmpty property="altriSoggetti" prepend="AND"> altrisog = #altriSoggetti#</isNotEmpty>
+     <isNotEmpty property="sommaUrgenza" prepend="AND"> sommaur = #sommaUrgenza#</isNotEmpty>
+  </sql>
+
+  <select id="searchBandi" parameterClass="java.util.HashMap" resultMap="resultBando">
+    <include refid="selectListaBandi"/>
+    FROM v_ws_bandi
+    <include refid="whereBandi"/>
+   ORDER BY dattermine DESC, oratermine DESC
+  </select>
+  
+  <select id="countBandi" parameterClass="java.util.HashMap" resultClass="java.lang.Integer">
+  SELECT count(1)
+    FROM v_ws_bandi
+    <include refid="whereBandi"/>
+  </select>
+
+  <sql id="whereElencoBandi">
+   WHERE codstatogara = 1 AND coditergara not in (3,5,6)
+     <isNotEmpty property="stazioneAppaltante" prepend="AND"> 
+     (codsa = #stazioneAppaltante# 
+      OR EXISTS (SELECT cenint FROM v_ws_aderente_lotto l WHERE v_ws_bandi.codice = l.codice AND l.cenint = #stazioneAppaltante#) )
+     </isNotEmpty> 
+     <isNotEmpty property="oggetto" prepend="AND"> $operatoreUpper$(oggetto) like #oggetto#</isNotEmpty> 
+     <isNotEmpty property="cig" prepend="AND"> $operatoreUpper$(codcigall) like #cig#</isNotEmpty>  
+     <isNotEmpty property="tipoAppalto" prepend="AND"> codtipoapp = #tipoAppalto#</isNotEmpty> 
+     <isNotEmpty property="dataPubblicazioneDa" prepend="AND"><![CDATA[ datpub >= #dataPubblicazioneDa#]]></isNotEmpty> 
+     <isNotEmpty property="dataPubblicazioneA" prepend="AND"><![CDATA[ datpub <= #dataPubblicazioneA#]]></isNotEmpty> 
+     <isNotEmpty property="dataScadenzaDa" prepend="AND"><![CDATA[ dattermine >= #dataScadenzaDa#]]></isNotEmpty> 
+     <isNotEmpty property="dataScadenzaA" prepend="AND"><![CDATA[ dattermine <= #dataScadenzaA#]]></isNotEmpty>
+     <isNotEmpty property="proceduraTelematica" prepend="AND"> gartel = #proceduraTelematica#</isNotEmpty> 
+     <isNotEmpty property="stato" prepend="AND"> codstatogara = #stato#</isNotEmpty>
+     <isNotEmpty property="altriSoggetti" prepend="AND"> altrisog = #altriSoggetti#</isNotEmpty>
+     <isNotEmpty property="sommaUrgenza" prepend="AND"> sommaur = #sommaUrgenza#</isNotEmpty>
+     <isEmpty property="garaPrivatistica" prepend="AND"> garpriv IS NULL</isEmpty>
+     <isNotEmpty property="garaPrivatistica" prepend="AND"> garpriv = #garaPrivatistica#</isNotEmpty>
+  </sql>
+  
+  <select id="getElencoBandi" resultMap="resultBando">
+    <include refid="selectListaBandi"/>
+    FROM v_ws_bandi
+    <include refid="whereElencoBandi"/>
+   ORDER BY dattermine ASC, oratermine ASC
+  </select>
+  
+  <select id="countElencoBandi" parameterClass="java.util.HashMap" resultClass="java.lang.Integer">
+  SELECT count(1)
+    FROM v_ws_bandi
+    <include refid="whereElencoBandi"/>
+  </select>
+
+  <sql id="whereElencoBandiScaduti">
+   WHERE <![CDATA[codstatogara <> 1 ]]>
+     AND <![CDATA[#annoMinimoPubblicazione# <= annoinizioperscadenza]]>
+     <isNotEmpty property="stazioneAppaltante" prepend="AND"> 
+     (codsa = #stazioneAppaltante# 
+      OR EXISTS (SELECT cenint FROM v_ws_aderente_lotto l WHERE v_ws_bandi.codice = l.codice AND l.cenint = #stazioneAppaltante#) )
+     </isNotEmpty> 
+     <isNotEmpty property="oggetto" prepend="AND"> $operatoreUpper$(oggetto) like #oggetto#</isNotEmpty>
+     <isNotEmpty property="cig" prepend="AND"> $operatoreUpper$(codcigall) like #cig#</isNotEmpty> 
+     <isNotEmpty property="tipoAppalto" prepend="AND"> codtipoapp = #tipoAppalto#</isNotEmpty> 
+     <isNotEmpty property="dataPubblicazioneDa" prepend="AND"><![CDATA[ datpub >= #dataPubblicazioneDa#]]></isNotEmpty> 
+     <isNotEmpty property="dataPubblicazioneA" prepend="AND"><![CDATA[ datpub <= #dataPubblicazioneA#]]></isNotEmpty> 
+     <isNotEmpty property="dataScadenzaDa" prepend="AND"><![CDATA[ dattermine >= #dataScadenzaDa#]]></isNotEmpty> 
+     <isNotEmpty property="dataScadenzaA" prepend="AND"><![CDATA[ dattermine <= #dataScadenzaA#]]></isNotEmpty>
+     <isNotEmpty property="proceduraTelematica" prepend="AND"> gartel = #proceduraTelematica#</isNotEmpty> 
+     <isNotEmpty property="stato" prepend="AND"> codstatogara = #stato#</isNotEmpty> 
+     <isNotEmpty property="esito" prepend="AND"> descstatoesito = #esito#</isNotEmpty>  
+     <isNotEmpty property="altriSoggetti" prepend="AND"> altrisog = #altriSoggetti#</isNotEmpty>
+     <isNotEmpty property="sommaUrgenza" prepend="AND"> sommaur = #sommaUrgenza#</isNotEmpty>
+     <isEmpty property="garaPrivatistica" prepend="AND"> garpriv IS NULL</isEmpty>
+     <isNotEmpty property="garaPrivatistica" prepend="AND"> garpriv = #garaPrivatistica#</isNotEmpty> 
+  </sql>
+  
+  <select id="getElencoBandiScaduti" resultMap="resultBando">
+    <include refid="selectListaBandi"/>
+    FROM v_ws_bandi
+    <include refid="whereElencoBandiScaduti"/>
+   ORDER BY dattermine DESC, oratermine DESC
+  </select>
+  
+  <select id="countElencoBandiScaduti" parameterClass="java.util.HashMap" resultClass="java.lang.Integer">
+  SELECT count(1) 
+    FROM v_ws_bandi
+    <include refid="whereElencoBandiScaduti"/>
+  </select>
+  
+  <select id="getCigBando" parameterClass="java.lang.String" resultClass="java.lang.String">
+  SELECT codcigall FROM v_ws_bandi WHERE codice = #codice#
+  </select>
+
+  <select id="getStazioneAppaltanteBando" parameterClass="java.lang.String" resultMap="resultStazioneAppaltanteBando">
+  SELECT DISTINCT codsa as codstazione, descsa as descstazione, descrup
+    FROM v_ws_dettaglio_bando
+   WHERE codice = #codice#
+  </select>
+
+  <select id="getBando" parameterClass="java.lang.String" resultMap="resultBando">
+  	<include refid="selectDettaglioBando"/>    
+    FROM v_ws_dettaglio_bando
+   WHERE codice = #codice#
+  </select>
+
+  <select id="getDocumentiBandoLotto" parameterClass="java.util.HashMap" resultMap="resultDocumentoBando">
+  SELECT iddoc, urldoc, descdoc, filedoc, datpub 
+    FROM v_ws_gare_documenti
+   WHERE codice = #codiceGara#
+   <isEmpty property="codiceLotto" prepend="AND"> ngara is null</isEmpty>
+   <isNotEmpty property="codiceLotto" prepend="AND"> ngara = #codiceLotto#</isNotEmpty>
+     AND gruppo = 1
+   ORDER BY numord ASC 
+  </select>
+  
+  <select id="getDocumentiInvitoLotto" parameterClass="java.util.HashMap" resultMap="resultDocumentoBando">
+  SELECT iddoc, urldoc, descdoc, filedoc, datpub
+    FROM v_ws_gare_documenti
+   WHERE codice = #codiceGara#
+   <isEmpty property="codiceLotto" prepend="AND"> (ngara is null or ngara=#codiceGara#)</isEmpty>
+   <isNotEmpty property="codiceLotto" prepend="AND"> ngara = #codiceLotto#</isNotEmpty>
+     AND gruppo = 6
+   ORDER BY numord ASC 
+  </select>
+
+  <select id="getDocumentiInvitoAstaLotto" parameterClass="java.util.HashMap" resultMap="resultDocumentoBando">
+  SELECT iddoc, urldoc, descdoc, filedoc, datpub
+    FROM v_ws_gare_documenti
+   WHERE codice = #codiceGara#
+   <isEmpty property="codiceLotto" prepend="AND"> (ngara is null or ngara=#codiceGara#)</isEmpty>
+   <isNotEmpty property="codiceLotto" prepend="AND"> ngara = #codiceLotto#</isNotEmpty>
+     AND gruppo = 12
+   ORDER BY numord ASC 
+  </select>
+
+  <select id="getRequisitiRichiestiBandoLotto" parameterClass="java.util.HashMap" resultMap="resultRequisitoRichiestoBando">
+  SELECT descdoc as nome, obbligatorio, ordine
+    FROM v_ws_gare_documenti
+   WHERE codice = #codiceGara#
+   <isEmpty property="codiceLotto" prepend="AND"> ngara is null</isEmpty>
+   <isNotEmpty property="codiceLotto" prepend="AND"> ngara = #codiceLotto#</isNotEmpty>
+     AND gruppo = 2
+   ORDER BY numord ASC 
+  </select>
+  
+  <select id="getRequisitiRichiestiBando" parameterClass="java.util.HashMap" resultMap="resultRequisitoRichiestoLottoBando">
+  SELECT descdoc as nome, obbligatorio, ordine,
+         ngara
+    FROM v_ws_gare_documenti
+   WHERE codice = #codiceGara#
+     AND gruppo = 2
+   ORDER BY ngara, numord ASC 
+  </select>
+  
+  <select id="getLottiGara" parameterClass="java.lang.String" resultMap="resultLottoGara">
+  SELECT gl.codice, ngara, codiceinterno, gl.oggetto, codciglotto as codcig, codcupprglotto as codcupprg, importo, 
+  		 case when tipologia in (1,4) then gsel.stato else gse.stato end stato,
+         case when tipologia in (1,4) then gsel.esito  else gse.esito end esito, 
+  		 gl.costofisso,
+  		 NULL progofferta
+    FROM v_ws_gare_lotti gl 
+         left outer join v_gare_statoesito gse on (gl.ngara=gse.codice)
+         left outer join v_gare_statoesitolotti gsel on (gl.ngara=gsel.codice)
+   WHERE gl.codice = #codiceGara#
+   ORDER BY tipologia ASC, ngara ASC
+  </select>
+    
+  <select id="getDocumentiGara" parameterClass="java.lang.String" resultMap="resultDocumentiGara">
+  SELECT gl.codice, gl.ngara, codiceinterno, gl.oggetto, 
+	     gl.costofisso,
+	     gd.iddoc, gd.urldoc, gd.descdoc, gd.filedoc, gd.datpub,
+	     gd.gruppo
+    FROM v_ws_gare_lotti gl 
+	     left outer join v_ws_gare_documenti gd on (gl.ngara=gd.ngara)
+   WHERE gl.codice = #codiceGara#
+   ORDER BY ngara ASC, gl.tipologia ASC, numord ASC
+  </select>
+        
+  <select id="getLottiGaraPerDomandePartecipazione" parameterClass="java.lang.String" resultMap="resultLottoGara">
+  SELECT gl.codice, ngara, codiceinterno, gl.oggetto, codciglotto as codcig, codcupprglotto as codcupprg, importo, gse.stato, gse.esito,
+  		 gl.costofisso, 
+  		 NULL progofferta
+    FROM v_ws_lotti_per_partecipazione gl left outer join v_gare_statoesitolotti gse on (gl.ngara=gse.codice)
+   WHERE gl.codice = #codiceGara#
+   ORDER BY tipologia ASC, ngara ASC
+  </select>
+
+  <select id="getLottiGaraPerRichiesteOfferta" parameterClass="java.util.HashMap" resultMap="resultLottoGara">
+  SELECT gl.codice, ngara, codiceinterno, gl.oggetto, codciglotto as codcig, codcupprglotto as codcupprg, importo, gse.stato, gse.esito,
+         gl.costofisso, 
+         progofferta
+    FROM v_ws_lotti_per_offerta gl left outer join v_gare_statoesitolotti gse on (gl.ngara=gse.codice)
+   WHERE gl.codice = #codiceGara# and usernome = #username#
+   ORDER BY tipologia ASC, ngara ASC
+   </select>
+  
+  <select id="getLottiGaraPlicoUnicoPerRichiesteOfferta" parameterClass="java.util.HashMap" resultMap="resultLottoGara">
+  SELECT gl.codice, ngara, codiceinterno, gl.oggetto, codciglotto as codcig, codcupprglotto as codcupprg, importo, gse.stato, gse.esito,
+  	     gl.costofisso, 
+  	     progofferta
+    FROM v_ws_lotti_per_offerte_pl_un gl left outer join v_gare_statoesitolotti gse on (gl.ngara=gse.codice)
+   WHERE gl.codice = #codiceGara# and usernome = #username#
+   ORDER BY tipologia ASC, ngara ASC
+  </select>
+  
+  <select id="getLottiGaraPerRichiesteCheckDocumentazione" parameterClass="java.util.HashMap" resultMap="resultLottoGara">
+  SELECT gl.codice, ngara, codiceinterno, gl.oggetto, codciglotto as codcig, codcupprglotto as codcupprg, importo, gse.stato, gse.esito,
+  		 gl.costofisso, 
+  		 progofferta
+    FROM v_ws_lotti_per_comprovareq gl left outer join v_gare_statoesitolotti gse on (gl.ngara=gse.codice)
+   WHERE gl.codice = #codiceGara# and usernome = #username#
+   ORDER BY tipologia ASC, ngara ASC
+  </select>
+  
+  <select id="getCategorieLotto" parameterClass="java.lang.String" resultMap="resultCategoriaGara">
+  SELECT codice, descrizione, prevalente, descclassifica, perlavori
+    FROM v_ws_gare_categorie
+   WHERE ngara = #codiceLotto#
+   ORDER BY prevalente DESC, numord ASC
+  </select>
+
+  <select id="getElencoBandiIscrizione" resultMap="resultBandoIscrizione">
+     <include refid="selectCampiElenchi"/>
+    FROM v_ws_elenchi 
+   WHERE isvalido = 1 AND genere=#genere#
+     <isNotEmpty property="stazioneAppaltante" prepend="AND"> 
+     (codsa = #stazioneAppaltante# 
+      OR EXISTS (SELECT cenint FROM v_ws_aderente_lotto l WHERE v_ws_elenchi.ngara = l.ngara AND l.cenint = #stazioneAppaltante#) )
+     </isNotEmpty>     
+   ORDER BY datpub desc
+  </select>
+  
+  <select id="searchBandiIscrizione" parameterClass="java.util.HashMap" resultMap="resultBandoIscrizione">
+     <include refid="selectCampiElenchi"/>
+    FROM v_ws_elenchi inner join v_ws_elenchi_ricisc on codice = comkey2
+   WHERE isvalido = 1 AND genere = #genere# AND comkey1 = #username# 
+   <isNotEmpty property="stato" prepend="AND"> stato = #stato#</isNotEmpty>
+   <isNotEmpty property="stazioneAppaltante" prepend="AND"> 
+     (codsa = #stazioneAppaltante# 
+      OR EXISTS (SELECT cenint FROM v_ws_aderente_lotto l WHERE v_ws_elenchi.ngara = l.ngara AND l.cenint = #stazioneAppaltante#) )
+   </isNotEmpty>
+   ORDER BY datpub desc
+  </select>
+  
+  <select id="getStazioneAppaltanteBandoIscrizione" parameterClass="java.lang.String" resultMap="resultStazioneAppaltanteBando">
+  SELECT codsa as codstazione, descsa as descstazione, desrup as descrup 
+    FROM v_ws_elenchi
+   WHERE codice = #codice#
+  </select>
+
+  <select id="getBandoIscrizione" parameterClass="java.lang.String" resultMap="resultBandoIscrizione">
+  SELECT descsa as stazione, codice, oggetto, codtipoelenco as tipo, datpub, datinival, datfinval, datiniisc, orainiisc,  datfinisc, orafinisc, codstato as stato, fase, tipoclass, numprodart, visprezzioe, iscrirt,
+  		dultagg, pubope, coordsic
+    FROM v_ws_elenchi
+   WHERE codice = #codice#
+  </select>
+
+  <select id="getDocumentiBandoIscrizione" parameterClass="java.lang.String" resultMap="resultDocumentoBando">
+  SELECT iddoc, urldoc, descdoc, filedoc, datpub 
+    FROM v_ws_elenchi_documenti
+   WHERE codice = #codice#
+     AND gruppo = 1 
+   ORDER BY numord ASC 
+  </select>
+
+  <select id="getRequisitiRichiestiBandoIscrizione" parameterClass="java.lang.String" resultMap="resultRequisitoRichiestoBando">
+  SELECT descdoc as nome, obbligatorio, ordine
+    FROM v_ws_elenchi_documenti
+   WHERE codice = #codice#
+     AND gruppo = 2
+   ORDER BY numord ASC 
+  </select>
+
+  <select id="getCategorieBandoIscrizione" parameterClass="java.util.HashMap" resultMap="resultCategoriaBandoIscrizione">
+  SELECT codice, descrizione, tipoappalto, titolo, codliv1, codliv2, codliv3, codliv4, livello, foglia
+    FROM v_ws_elenchi_categorie cat
+   WHERE ngara = #codice#
+   <isNotEmpty property="livello1" prepend="AND"> codliv1=#livello1#</isNotEmpty><isEmpty property="livello1" prepend="AND"> codliv1 IS NULL</isEmpty>
+   <isNotEmpty property="livello2" prepend="AND"> codliv2=#livello2#</isNotEmpty><isEmpty property="livello2" prepend="AND"> codliv2 IS NULL</isEmpty>
+   <isNotEmpty property="livello3" prepend="AND"> codliv3=#livello3#</isNotEmpty><isEmpty property="livello3" prepend="AND"> codliv3 IS NULL</isEmpty>
+   <isNotEmpty property="livello4" prepend="AND"> codliv4=#livello4#</isNotEmpty><isEmpty property="livello4" prepend="AND"> codliv4 IS NULL</isEmpty>
+   <isNotEmpty property="filtroCategorie" prepend="AND">
+   ($operatoreUpper$(codice) LIKE #filtroCategorie# OR $operatoreUpper$(descrizione) LIKE #filtroCategorie#  
+   	OR EXISTS (SELECT c1.caisim FROM cais c1 WHERE c1.codliv1=cat.codice AND ($operatoreUpper$(c1.caisim) LIKE #filtroCategorie# OR $operatoreUpper$(c1.descat) LIKE #filtroCategorie#)) 
+   	OR EXISTS (SELECT c2.caisim FROM cais c2 WHERE c2.codliv1=cat.codliv1 AND c2.codliv2=cat.codice AND ($operatoreUpper$(c2.caisim) LIKE #filtroCategorie# OR $operatoreUpper$(c2.descat) LIKE #filtroCategorie#)) 
+   	OR EXISTS (SELECT c3.caisim FROM cais c3 WHERE c3.codliv1=cat.codliv1 AND c3.codliv2=cat.codliv2 AND c3.codliv3=cat.codice AND ($operatoreUpper$(c3.caisim) LIKE #filtroCategorie# OR $operatoreUpper$(c3.descat) LIKE #filtroCategorie#)) 
+   	OR EXISTS (SELECT c4.caisim FROM cais c4 WHERE c4.codliv1=cat.codliv1 AND c4.codliv2=cat.codliv2 AND c4.codliv3=cat.codliv3 AND c4.codliv4=cat.codice AND ($operatoreUpper$(c4.caisim) LIKE #filtroCategorie# OR $operatoreUpper$(c4.descat) LIKE #filtroCategorie#)))
+   </isNotEmpty>
+  ORDER BY numordtipoappalto ASC, tipoappalto ASC, caisord ASC, ordcategorie ASC
+  </select>
+  
+  <select id="getImpresaIscrizione" parameterClass="java.util.HashMap" resultMap="resultImpresaIscrizione">
+  SELECT (case when d.coordsic = '1' then 1 else 0 end) coordsic
+    FROM ditg d INNER JOIN w_puser u ON u.userkey1 = d.dittao
+   WHERE u.usernome = #username#
+     AND d.ngara5 = #codice#
+  </select>
+  
+  <select id="getComunicazioniRicevute" parameterClass="java.util.HashMap" resultMap="resultComunicazione">
+	<include refid="selectComunicazioneRicevuta"/>
+	WHERE 1=1
+	<isEmpty property="username" prepend="AND"> nomeuser is null</isEmpty>
+	<isNotEmpty property="username" prepend="AND"> nomeuser = #username#</isNotEmpty>
+	<isNotEmpty property="codice" prepend="AND"> codice = #codice#</isNotEmpty>
+	<isNotEmpty property="dataInvioDa" prepend="AND"><![CDATA[ datainvio >= #dataInvioDa#]]></isNotEmpty>
+	<isNotEmpty property="dataInvioA" prepend="AND"><![CDATA[ datainvio < #dataInvioA#]]></isNotEmpty>
+	<isNotEmpty property="stazioneAppaltante" prepend="AND"> 
+     (t.cenint = #stazioneAppaltante# 
+      OR EXISTS (SELECT cenint FROM v_ws_aderente_lotto l WHERE l.ngara = g.ngara AND l.cenint = #stazioneAppaltante#) )
+    </isNotEmpty>
+    <isNotEmpty property="modello" prepend="AND"> commodello = #modello#</isNotEmpty>
+    <isEmpty property="modello" prepend="AND"> commodello is null</isEmpty>
+	ORDER BY dataorainvio DESC
+  </select>
+  
+  <select id="getComunicazioniPubblicheRicevute" parameterClass="java.util.HashMap" resultMap="resultComunicazioneLotto">
+	<include refid="selectComunicazioneRicevutaSelect"/>
+  	<include refid="selectComunicazioneRicevutaFrom"/>
+	WHERE (t.codgar = #codice# OR t.codgar = #codice2#)
+	  AND (nomeuser is null)
+	<isNotEmpty property="stazioneAppaltante" prepend="AND"> 
+     (t.cenint = #stazioneAppaltante# 
+      OR EXISTS (SELECT cenint FROM v_ws_aderente_lotto l WHERE l.ngara = g.ngara AND l.cenint = #stazioneAppaltante#) )
+    </isNotEmpty>
+	ORDER BY ngara, dataorainvio DESC
+  </select>
+  
+  <select id="getComunicazioniRicevuteLotti" parameterClass="java.util.HashMap" resultMap="resultComunicazione">
+	<include refid="selectComunicazioneRicevuta"/>
+	WHERE 1=1
+	<isEmpty property="username" prepend="AND"> nomeuser is null</isEmpty>
+	<isNotEmpty property="username" prepend="AND"> nomeuser = #username#</isNotEmpty>
+	<isNotEmpty property="codiciLotto" prepend="AND"> codice IN <iterate property="codiciLotto" open="(" close=")" conjunction=", " >#codiciLotto[]#</iterate></isNotEmpty>
+	<isNotEmpty property="dataInvioDa" prepend="AND"><![CDATA[ datainvio >= #dataInvioDa#]]></isNotEmpty>
+	<isNotEmpty property="dataInvioA" prepend="AND"><![CDATA[ datainvio < #dataInvioA#]]></isNotEmpty>
+	<isNotEmpty property="stazioneAppaltante" prepend="AND"> 
+     (t.cenint = #stazioneAppaltante# 
+      OR EXISTS (SELECT cenint FROM v_ws_aderente_lotto l WHERE l.ngara = g.ngara AND l.cenint = #stazioneAppaltante#) )
+    </isNotEmpty>
+    <isNotEmpty property="modello" prepend="AND"> commodello = #modello#</isNotEmpty>
+    <isEmpty property="modello" prepend="AND"> commodello is null</isEmpty>
+	ORDER BY dataorainvio DESC
+  </select>
+  
+  <select id="getComunicazioniInviate" parameterClass="java.util.HashMap" resultMap="resultComunicazione">
+	<include refid="selectComunicazioneInviata"/>
+    WHERE nomeuser = #username#
+	<isNotEmpty property="codice" prepend="AND"> codice = #codice#</isNotEmpty>
+	<isNotEmpty property="stazioneAppaltante" prepend="AND"> 
+     (t.cenint = #stazioneAppaltante# 
+      OR EXISTS (SELECT cenint FROM v_ws_aderente_lotto l WHERE l.ngara = g.ngara AND l.cenint = #stazioneAppaltante#) )
+    </isNotEmpty> 	 
+	ORDER BY dataorainvio DESC
+  </select>
+  
+  <select id="countComunicazioniRicevute" parameterClass="java.util.HashMap" resultClass="java.lang.Integer">
+  SELECT count(idcom) 
+    FROM v_ws_comunicazioni_da_sa c 
+ 	     INNER JOIN gare g ON (g.ngara = c.codice)
+    	 INNER JOIN torn t ON (t.codgar = g.codgar1)
+   WHERE nomeuser = #username# 
+	<isNotEmpty property="codice" prepend="AND"> codice = #codice#</isNotEmpty>
+	<isNotEmpty property="dataInvioDa" prepend="AND"><![CDATA[ datainvio >= #dataInvioDa#]]></isNotEmpty>
+	<isNotEmpty property="dataInvioA" prepend="AND"><![CDATA[ datainvio < #dataInvioA#]]></isNotEmpty>
+	<isNotEmpty property="soloDaLeggere" prepend="AND"> dataoralettura is null</isNotEmpty>
+	<isNotEmpty property="stazioneAppaltante" prepend="AND"> 
+     (t.cenint = #stazioneAppaltante# 
+      OR EXISTS (SELECT cenint FROM v_ws_aderente_lotto l WHERE l.ngara = g.ngara AND l.cenint = #stazioneAppaltante#) )
+    </isNotEmpty>
+    <isNotEmpty property="modello" prepend="AND"> commodello = #modello#</isNotEmpty>
+    <isEmpty property="modello" prepend="AND"> commodello is null</isEmpty>
+  </select>
+  
+  <select id="countComunicazioniRicevuteLotti" parameterClass="java.util.HashMap" resultClass="java.lang.Integer">
+  SELECT count(idcom) 
+    FROM v_ws_comunicazioni_da_sa c
+     	 INNER JOIN gare g ON (g.ngara = c.codice)
+    	 INNER JOIN torn t ON (t.codgar = g.codgar1) 
+   WHERE nomeuser = #username# 
+	<isNotEmpty property="codiciLotto" prepend="AND"> codice IN <iterate property="codiciLotto" open="(" close=")" conjunction=", " >#codiciLotto[]#</iterate></isNotEmpty>
+	<isNotEmpty property="dataInvioDa" prepend="AND"><![CDATA[ datainvio >= #dataInvioDa#]]></isNotEmpty>
+	<isNotEmpty property="dataInvioA" prepend="AND"><![CDATA[ datainvio < #dataInvioA#]]></isNotEmpty>
+	<isNotEmpty property="soloDaLeggere" prepend="AND"> dataoralettura is null</isNotEmpty>
+	<isNotEmpty property="stazioneAppaltante" prepend="AND"> 
+     (t.cenint = #stazioneAppaltante# 
+      OR EXISTS (SELECT cenint FROM v_ws_aderente_lotto l WHERE l.ngara = g.ngara AND l.cenint = #stazioneAppaltante#) )
+    </isNotEmpty>
+    <isNotEmpty property="modello" prepend="AND"> commodello = #modello#</isNotEmpty>
+    <isEmpty property="modello" prepend="AND"> commodello is null</isEmpty>
+  </select>
+  
+  <select id="countComunicazioniInviate" parameterClass="java.util.HashMap" resultClass="java.lang.Integer">
+  SELECT count(idcom) 
+    FROM v_ws_comunicazioni_per_sa c 
+     	 INNER JOIN gare g ON (g.ngara = c.codice)
+    	 INNER JOIN torn t ON (t.codgar = g.codgar1)
+   WHERE nomeuser = #username# 
+	<isNotEmpty property="codice" prepend="AND"> codice = #codice#</isNotEmpty>
+	<isNotEmpty property="stazioneAppaltante" prepend="AND"> 
+     (t.cenint = #stazioneAppaltante# 
+      OR EXISTS (SELECT cenint FROM v_ws_aderente_lotto l WHERE l.ngara = g.ngara AND l.cenint = #stazioneAppaltante#) )
+    </isNotEmpty>
+  </select>
+  
+  <select id="getDocumentiComunicazione" parameterClass="java.util.HashMap" resultMap="resultDocumentoBando">
+	SELECT iddoc, null urldoc, descdoc, filedoc, datpub
+	  FROM v_ws_comunicazioni_documenti
+	 WHERE idprg = #applicativo# AND idcom = #id# 
+	 ORDER BY iddoc ASC
+  </select>
+  
+  <select id="getDocumentiComunicazioniPubblicheRicevute" parameterClass="java.util.HashMap" resultMap="resultDocumentoLottoBando">
+	SELECT d.idcom, d.iddoc, null urldoc, d.descdoc, d.filedoc, d.datpub,
+		   null gruppo, 
+           g.ngara, null codiceInterno, null oggetto, null costoFisso
+	  FROM v_ws_comunicazioni_da_sa c
+			INNER JOIN gare g ON (g.ngara = c.codice)
+			INNER JOIN torn t ON (t.codgar = g.codgar1)
+			INNER JOIN v_ws_comunicazioni_documenti d ON (d.idcom=c.idcom)
+	 WHERE (t.codgar = #codice# OR t.codgar = #codice2#)
+       AND (nomeuser is null)
+	 ORDER BY d.idcom, d.iddoc ASC	 
+  </select>
+  
+  <select id="getComunicazioneRicevuta" parameterClass="java.util.HashMap" resultMap="resultComunicazione">
+	<include refid="selectComunicazioneRicevuta"/>
+	WHERE nomeuser = #username# AND idcom = #id# AND idComDes = #idDestinatario#
+  </select>
+  
+  <select id="getComunicazioneInviata" parameterClass="java.util.HashMap" resultMap="resultComunicazione">
+	<include refid="selectComunicazioneInviata"/>
+	WHERE nomeuser = #username# AND idcom = #id#
+  </select>
+  
+  <select id="getElencoInvii" parameterClass="java.util.HashMap" resultMap="resultInvio">
+	SELECT idcom, comtipo, comstato, comdatastato 
+	FROM v_ws_invii
+	WHERE comkey1 = #username# AND comkey2 = #codice# AND comtipo IN <iterate property="tipiComunicazione" open="(" close=")" conjunction=", " >#tipiComunicazione[]#</iterate>
+	ORDER BY comdatastato DESC 
+  </select>
+
+  <select id="getStatoIscrizioneABandoIscrizione" parameterClass="java.util.HashMap" resultClass="java.lang.Integer">
+  SELECT stato FROM v_ws_elenchi_ricisc WHERE comkey1 = #username# AND comkey2 = #codice# 
+  </select>
+
+  <select id="getDocumentiRichiestiBandoGara" parameterClass="java.util.HashMap" resultMap="resultDocumentoRichiestoBando">
+  SELECT descdoc as nome, obbligatorio, ordine, iddoc, filedoc, urldoc, codformato, gentel
+    FROM v_ws_gare_documenti
+   WHERE codice = #codiceGara#
+   <isEmpty property="codiceLotto" prepend="AND"> ngara is null</isEmpty>
+   <isNotEmpty property="codiceLotto" prepend="AND"> ngara = #codiceLotto#</isNotEmpty>
+   <isNotEmpty property="tipoImpresa" prepend="AND"> (contestoval is null OR contestoval = #tipoImpresa#)</isNotEmpty>
+   <isNotEmpty property="busta" prepend="AND"> (busta is null OR busta = #busta#)</isNotEmpty>
+     AND gruppo = 3
+   ORDER BY numord ASC 
+  </select>
+  
+  <select id="getDocumentiRichiestiBando" parameterClass="java.util.HashMap" resultMap="resultDocumentoRichiestoLottoBando">
+  SELECT descdoc as nome, obbligatorio, ordine, iddoc, filedoc, urldoc, codformato, 
+  		 ngara, busta 
+    FROM v_ws_gare_documenti
+   WHERE codice = #codiceGara#
+<!--    <isNotEmpty property="busta" prepend="AND"> (busta is null OR busta = #busta#)</isNotEmpty> -->
+     AND gruppo = 3
+   ORDER BY ngara, numord ASC 
+  </select>
+  
+  <select id="getDocumentiRichiestiBandoIscrizione" parameterClass="java.util.HashMap" resultMap="resultDocumentoRichiestoBando">
+  SELECT descdoc as nome, obbligatorio, ordine, iddoc, filedoc, urldoc, codformato, 0 gentel
+    FROM v_ws_elenchi_documenti
+   WHERE codice = #codice#
+   <isNotEmpty property="tipoImpresa" prepend="AND"> (contestoval is null OR contestoval = #tipoImpresa#)</isNotEmpty>
+     AND gruppo = 3
+     AND dociscrizione = 1
+   ORDER BY numord ASC 
+  </select>
+
+  <select id="getDocumentiRichiestiRinnovoIscrizione" parameterClass="java.util.HashMap" resultMap="resultDocumentoRichiestoBando">
+  SELECT descdoc as nome, obbligatorio, ordine, iddoc, filedoc, urldoc, codformato, 0 gentel
+    FROM v_ws_elenchi_documenti
+   WHERE codice = #codice#
+   <isNotEmpty property="tipoImpresa" prepend="AND"> (contestoval is null OR contestoval = #tipoImpresa#)</isNotEmpty>
+     AND gruppo = 3
+     AND docrinnovo = 1
+   ORDER BY numord ASC 
+  </select>
+
+  <select id="getDocumentiRichiestiComunicazione" parameterClass="java.util.HashMap" resultMap="resultDocumentoRichiestoBando">
+  SELECT descrizione nome,
+  		 CASE WHEN obbligatorio = '1' THEN 1 ELSE 0 END obbligatorio, 
+  		 numord ordine, id iddoc, NULL filedoc, NULL urldoc, formato codformato, 0 gentel 
+    FROM G1DOCSOC
+   WHERE idPrg = #idPrg# AND idCom = #idComunicazione#
+   ORDER BY numord ASC 
+  </select>
+
+  <select id="getStatiIscrizioneElencoOperatori" resultMap="DatiCodificati.resultDatoCodificato" >
+  SELECT codstato as codice, descstato as descrizione
+    FROM v_ws_stati_elenchi
+   ORDER BY descstato asc
+  </select>
+
+<!--   
+  <select id="getElencoBandiPerDomandePartecipazione" parameterClass="java.lang.String" resultMap="resultBando">
+       <include refid="selectListaBandi"/>
+    FROM v_ws_bandi_per_partecipazione
+   WHERE usernome = #username#
+  </select>
+-->
+
+  <sql id="whereElencoBandiPerRichiesteOfferta" >
+   WHERE usernome = #username# 
+     AND datletterainv is not null     
+	 and <![CDATA[dataoratermineoff >= #adesso#]]>
+	 and <![CDATA[(dataoraterminepar is null or dataoraterminepar <= #adesso#)]]>
+	 <isNotEmpty property="stazioneAppaltante" prepend="AND"> 
+     (codsa = #stazioneAppaltante# 
+      OR EXISTS (SELECT cenint FROM v_ws_aderente_lotto l WHERE v_ws_bandi_per_offerta.codice = l.codice AND l.cenint = #stazioneAppaltante#) )
+     </isNotEmpty> 
+     <isNotEmpty property="oggetto" prepend="AND"> $operatoreUpper$(oggetto) like #oggetto#</isNotEmpty> 
+     <isNotEmpty property="cig" prepend="AND"> EXISTS (SELECT codgar FROM v_ws_gare_lotti l WHERE v_ws_bandi_per_offerta.codgar = l.codgar AND $operatoreUpper$(l.codciglotto) like #cig#)</isNotEmpty>  
+     <isNotEmpty property="tipoAppalto" prepend="AND"> codtipoapp = #tipoAppalto#</isNotEmpty> 
+     <isNotEmpty property="dataPubblicazioneDa" prepend="AND"><![CDATA[ datpub >= #dataPubblicazioneDa#]]></isNotEmpty> 
+     <isNotEmpty property="dataPubblicazioneA" prepend="AND"><![CDATA[ datpub <= #dataPubblicazioneA#]]></isNotEmpty> 
+     <isNotEmpty property="dataScadenzaDa" prepend="AND"><![CDATA[ dattermine >= #dataScadenzaDa#]]></isNotEmpty> 
+     <isNotEmpty property="dataScadenzaA" prepend="AND"><![CDATA[ dattermine <= #dataScadenzaA#]]></isNotEmpty>
+     <isNotEmpty property="proceduraTelematica" prepend="AND"> gartel = #proceduraTelematica#</isNotEmpty> 
+     <isNotEmpty property="stato" prepend="AND"> codstatogara = #stato#</isNotEmpty>
+     <isNotEmpty property="altriSoggetti" prepend="AND"> altrisog = #altriSoggetti#</isNotEmpty>
+     <isNotEmpty property="sommaUrgenza" prepend="AND"> sommaur = #sommaUrgenza#</isNotEmpty>
+     <isEmpty property="garaPrivatistica" prepend="AND"> garpriv IS NULL</isEmpty>
+     <isNotEmpty property="garaPrivatistica" prepend="AND"> garpriv = #garaPrivatistica#</isNotEmpty>
+  </sql>
+  
+  <select id="getElencoBandiPerRichiesteOfferta" parameterClass="java.util.HashMap" resultMap="resultBando">
+    <include refid="selectListaBandi"/>
+    FROM v_ws_bandi_per_offerta
+    <include refid="whereElencoBandiPerRichiesteOfferta"/>
+   ORDER BY dattermine ASC, oratermine ASC
+  </select>
+  
+  <select id="countElencoBandiPerRichiesteOfferta" parameterClass="java.util.HashMap" resultClass="java.lang.Integer">
+  SELECT count(1)
+    FROM v_ws_bandi_per_offerta
+    <include refid="whereElencoBandiPerRichiesteOfferta"/>
+  </select>
+
+  <sql id="whereElencoBandiPerRichiesteCheckDocumentazione" >
+   WHERE usernome = #username#
+     <isNotEmpty property="stazioneAppaltante" prepend="AND"> 
+     (codsa = #stazioneAppaltante# 
+      OR EXISTS (SELECT cenint FROM v_ws_aderente_lotto l WHERE v_ws_bandi_per_comprovareq.codice = l.codice AND l.cenint = #stazioneAppaltante#) )
+     </isNotEmpty> 
+     <isNotEmpty property="oggetto" prepend="AND"> $operatoreUpper$(oggetto) like #oggetto#</isNotEmpty> 
+     <isNotEmpty property="cig" prepend="AND"> EXISTS (SELECT codgar FROM v_ws_gare_lotti l WHERE v_ws_bandi_per_comprovareq.codgar = l.codgar AND $operatoreUpper$(l.codciglotto) like #cig#)</isNotEmpty>  
+     <isNotEmpty property="tipoAppalto" prepend="AND"> codtipoapp = #tipoAppalto#</isNotEmpty> 
+     <isNotEmpty property="dataPubblicazioneDa" prepend="AND"><![CDATA[ datpub >= #dataPubblicazioneDa#]]></isNotEmpty> 
+     <isNotEmpty property="dataPubblicazioneA" prepend="AND"><![CDATA[ datpub <= #dataPubblicazioneA#]]></isNotEmpty> 
+     <isNotEmpty property="dataScadenzaDa" prepend="AND"><![CDATA[ dattermine >= #dataScadenzaDa#]]></isNotEmpty> 
+     <isNotEmpty property="dataScadenzaA" prepend="AND"><![CDATA[ dattermine <= #dataScadenzaA#]]></isNotEmpty>
+     <isNotEmpty property="proceduraTelematica" prepend="AND"> gartel = #proceduraTelematica#</isNotEmpty> 
+     <isNotEmpty property="stato" prepend="AND"> codstatogara = #stato#</isNotEmpty>
+     <isNotEmpty property="altriSoggetti" prepend="AND"> altrisog = #altriSoggetti#</isNotEmpty>
+     <isNotEmpty property="sommaUrgenza" prepend="AND"> sommaur = #sommaUrgenza#</isNotEmpty>
+     <isEmpty property="garaPrivatistica" prepend="AND"> garpriv IS NULL</isEmpty>
+     <isNotEmpty property="garaPrivatistica" prepend="AND"> garpriv = #garaPrivatistica#</isNotEmpty>
+  </sql>
+  
+  <select id="getElencoBandiPerRichiesteCheckDocumentazione" parameterClass="java.lang.String" resultMap="resultBando">
+    <include refid="selectListaBandi"/>
+    FROM v_ws_bandi_per_comprovareq
+    <include refid="whereElencoBandiPerRichiesteCheckDocumentazione"/>
+   ORDER BY dattermine DESC, oratermine DESC
+  </select>
+
+  <select id="countElencoBandiPerRichiesteCheckDocumentazione" parameterClass="java.util.HashMap" resultClass="java.lang.Integer">
+  SELECT count(1)
+    FROM v_ws_bandi_per_comprovareq
+    <include refid="whereElencoBandiPerRichiesteCheckDocumentazione"/>
+  </select>
+
+  <select id="getElencoBandiPerAsteInCorso" parameterClass="java.util.HashMap" resultMap="resultBando">
+    <include refid="selectListaBandi"/>
+    FROM v_ws_bandi_per_aste
+   WHERE usernome = #username#          
+	 and <![CDATA[dataoraini <= #adesso#]]>
+	 and <![CDATA[(dataorafine is null or #adesso# <= dataorafine)]]>
+	 <isNotEmpty property="stazioneAppaltante" prepend="AND"> 
+     (codsa = #stazioneAppaltante# 
+      OR EXISTS (SELECT cenint FROM v_ws_aderente_lotto l WHERE v_ws_bandi_per_aste.codice = l.codice AND l.cenint = #stazioneAppaltante#) )
+     </isNotEmpty> 
+     <isNotEmpty property="oggetto" prepend="AND"> $operatoreUpper$(oggetto) like #oggetto#</isNotEmpty> 
+     <isNotEmpty property="cig" prepend="AND"> EXISTS (SELECT codgar FROM v_ws_gare_lotti l WHERE v_ws_bandi_per_aste.codgar = l.codgar AND $operatoreUpper$(l.codciglotto) like #cig#)</isNotEmpty>  
+     <isNotEmpty property="tipoAppalto" prepend="AND"> codtipoapp = #tipoAppalto#</isNotEmpty> 
+     <isNotEmpty property="dataPubblicazioneDa" prepend="AND"><![CDATA[ datpub >= #dataPubblicazioneDa#]]></isNotEmpty> 
+     <isNotEmpty property="dataPubblicazioneA" prepend="AND"><![CDATA[ datpub <= #dataPubblicazioneA#]]></isNotEmpty> 
+     <isNotEmpty property="dataScadenzaDa" prepend="AND"><![CDATA[ dattermine >= #dataScadenzaDa#]]></isNotEmpty> 
+     <isNotEmpty property="dataScadenzaA" prepend="AND"><![CDATA[ dattermine <= #dataScadenzaA#]]></isNotEmpty>
+     <isNotEmpty property="proceduraTelematica" prepend="AND"> gartel = #proceduraTelematica#</isNotEmpty> 
+     <isNotEmpty property="stato" prepend="AND"> codstatogara = #stato#</isNotEmpty>
+     <isNotEmpty property="altriSoggetti" prepend="AND"> altrisog = #altriSoggetti#</isNotEmpty>
+     <isNotEmpty property="sommaUrgenza" prepend="AND"> sommaur = #sommaUrgenza#</isNotEmpty>
+     <isEmpty property="garaPrivatistica" prepend="AND"> garpriv IS NULL</isEmpty>
+     <isNotEmpty property="garaPrivatistica" prepend="AND"> garpriv = #garaPrivatistica#</isNotEmpty>
+	 ORDER BY dattermine DESC, oratermine DESC
+  </select>
+  
+  <select id="countBandiPerAsteInCorso" parameterClass="java.util.HashMap" resultClass="java.lang.Integer">
+   SELECT COUNT (aste.ngara) FROM (  
+   	 SELECT DISTINCT ga.ngara 
+  	   FROM v_ws_gare_lotti ga		   
+       		INNER JOIN v_gare_statoesito gse ON ga.codice = gse.codice 
+       		INNER JOIN torn t ON ga.codgar = t.codgar 
+       		INNER JOIN (SELECT MAX(ga1.ngara) ngara, ga1.codice, p.usernome
+				        FROM v_ws_gare_lotti ga1 
+			            INNER JOIN v_ws_ditg i ON ga1.ngara = i.ngara5 
+				        INNER JOIN w_puser p ON i.codman = p.userkey1
+				        GROUP BY ga1.codice, p.usernome) ga2 ON ga.ngara = ga2.ngara       
+<!-- 	   inner join pubbli p on p.CODGAR9 = ga.codice  -->
+	   		INNER JOIN aefasi f ON f.ngara = ga.ngara
+      WHERE usernome = #username#          
+	    AND <![CDATA[dataoraini <= #adesso#]]>
+	 	AND <![CDATA[(dataorafine is null or #adesso# <= dataorafine)]]>
+	    <isNotEmpty property="stazioneAppaltante" prepend="AND"> 
+        (codsa = #stazioneAppaltante# 
+         OR EXISTS (SELECT cenint FROM v_ws_aderente_lotto l WHERE ga.codice = l.codice AND l.cenint = #stazioneAppaltante#) )
+        </isNotEmpty> 
+        <isNotEmpty property="oggetto" prepend="AND"> $operatoreUpper$(oggetto) like #oggetto#</isNotEmpty> 
+     	<isNotEmpty property="cig" prepend="AND"> EXISTS (SELECT codgar FROM v_ws_gare_lotti l WHERE ga.codgar = l.codgar AND $operatoreUpper$(l.codciglotto) like #cig#)</isNotEmpty>  
+     	<isNotEmpty property="tipoAppalto" prepend="AND"> codtipoapp = #tipoAppalto#</isNotEmpty> 
+<!--      	<isNotEmpty property="dataPubblicazioneDa" prepend="AND"><![CDATA[ datpub >= #dataPubblicazioneDa#]]></isNotEmpty>  -->
+<!--      	<isNotEmpty property="dataPubblicazioneA" prepend="AND"><![CDATA[ datpub <= #dataPubblicazioneA#]]></isNotEmpty>  -->
+     	<isNotEmpty property="dataScadenzaDa" prepend="AND"><![CDATA[ dattermine >= #dataScadenzaDa#]]></isNotEmpty> 
+     	<isNotEmpty property="dataScadenzaA" prepend="AND"><![CDATA[ dattermine <= #dataScadenzaA#]]></isNotEmpty>
+     	<isNotEmpty property="proceduraTelematica" prepend="AND"> gartel = #proceduraTelematica#</isNotEmpty> 
+     	<isNotEmpty property="stato" prepend="AND"> codstatogara = #stato#</isNotEmpty>
+<!--   	<isNotEmpty property="sommaUrgenza" prepend="AND"> sommaur = #sommaUrgenza#</isNotEmpty> -->
+		<isEmpty property="garaPrivatistica" prepend="AND"> t.garpriv IS NULL</isEmpty>
+     	<isNotEmpty property="garaPrivatistica" prepend="AND"> t.garpriv = #garaPrivatistica#</isNotEmpty>
+   ) aste
+  </select>
+  
+  <sql id="whereBandiPerProcInAggiudicazione" >
+   WHERE usernome = #username#
+     <isNotEmpty property="stazioneAppaltante" prepend="AND"> 
+     (codsa = #stazioneAppaltante# 
+      OR EXISTS (SELECT cenint FROM v_ws_aderente_lotto l WHERE v_ws_bandi_per_procaggiud.codice = l.codice AND l.cenint = #stazioneAppaltante#) )
+     </isNotEmpty> 
+     <isNotEmpty property="oggetto" prepend="AND"> $operatoreUpper$(oggetto) like #oggetto#</isNotEmpty> 
+     <isNotEmpty property="cig" prepend="AND"> EXISTS (SELECT codgar FROM v_ws_gare_lotti l WHERE v_ws_bandi_per_procaggiud.codgar = l.codgar AND $operatoreUpper$(l.codciglotto) like #cig#)</isNotEmpty>  
+     <isNotEmpty property="tipoAppalto" prepend="AND"> codtipoapp = #tipoAppalto#</isNotEmpty> 
+     <isNotEmpty property="dataPubblicazioneDa" prepend="AND"><![CDATA[ datpub >= #dataPubblicazioneDa#]]></isNotEmpty> 
+     <isNotEmpty property="dataPubblicazioneA" prepend="AND"><![CDATA[ datpub <= #dataPubblicazioneA#]]></isNotEmpty> 
+     <isNotEmpty property="dataScadenzaDa" prepend="AND"><![CDATA[ dattermine >= #dataScadenzaDa#]]></isNotEmpty> 
+     <isNotEmpty property="dataScadenzaA" prepend="AND"><![CDATA[ dattermine <= #dataScadenzaA#]]></isNotEmpty>
+     <isNotEmpty property="proceduraTelematica" prepend="AND"> gartel = #proceduraTelematica#</isNotEmpty> 
+     <isNotEmpty property="stato" prepend="AND"> codstatogara = #stato#</isNotEmpty>        
+     <isNotEmpty property="esito" prepend="AND"> descstatoesito = #esito#</isNotEmpty>   
+     <isNotEmpty property="altriSoggetti" prepend="AND"> altrisog = #altriSoggetti#</isNotEmpty>
+     <isNotEmpty property="sommaUrgenza" prepend="AND"> sommaur = #sommaUrgenza#</isNotEmpty>
+     <isEmpty property="garaPrivatistica" prepend="AND"> garpriv IS NULL</isEmpty>
+     <isNotEmpty property="garaPrivatistica" prepend="AND"> garpriv = #garaPrivatistica#</isNotEmpty>
+  </sql>
+  
+  <select id="searchBandiPerProcInAggiudicazione" parameterClass="java.util.HashMap" resultMap="resultBando">
+    <include refid="selectListaBandi"/>
+    FROM v_ws_bandi_per_procaggiud
+    <include refid="whereBandiPerProcInAggiudicazione"/>
+   ORDER BY dattermine DESC, oratermine DESC
+  </select>
+  
+  <select id="countBandiPerProcInAggiudicazione" parameterClass="java.util.HashMap" resultClass="java.lang.Integer">
+  SELECT count(1)
+    FROM v_ws_bandi_per_procaggiud
+    <include refid="whereBandiPerProcInAggiudicazione"/>
+  </select>
+
+  <sql id="whereBandiConEsito" >
+   WHERE <![CDATA[#annoMinimoPubblicazione# <= annoinizioperscadenza]]>      
+     AND NOT(coditergara in (3,5,6) AND codstatogara=1)
+     <isNotEmpty property="stazioneAppaltante" prepend="AND"> 
+     (codsa = #stazioneAppaltante# 
+      OR EXISTS (SELECT cenint FROM v_ws_aderente_lotto l WHERE v_ws_bandi.codice = l.codice AND l.cenint = #stazioneAppaltante#) )
+     </isNotEmpty> 
+     <isNotEmpty property="oggetto" prepend="AND"> $operatoreUpper$(oggetto) like #oggetto#</isNotEmpty>
+     <isNotEmpty property="cig" prepend="AND"> $operatoreUpper$(codcigall) like #cig#</isNotEmpty> 
+     <isNotEmpty property="tipoAppalto" prepend="AND"> codtipoapp = #tipoAppalto#</isNotEmpty> 
+     <isNotEmpty property="dataPubblicazioneDa" prepend="AND"><![CDATA[ datpub >= #dataPubblicazioneDa#]]></isNotEmpty> 
+     <isNotEmpty property="dataPubblicazioneA" prepend="AND"><![CDATA[ datpub <= #dataPubblicazioneA#]]></isNotEmpty> 
+     <isNotEmpty property="dataScadenzaDa" prepend="AND"><![CDATA[ dattermine >= #dataScadenzaDa#]]></isNotEmpty> 
+     <isNotEmpty property="dataScadenzaA" prepend="AND"><![CDATA[ dattermine <= #dataScadenzaA#]]></isNotEmpty>
+     <isNotEmpty property="proceduraTelematica" prepend="AND"> gartel = #proceduraTelematica#</isNotEmpty> 
+     <isNotEmpty property="stato" prepend="AND"> codstatogara = #stato#</isNotEmpty>
+     <isNotEmpty property="esito" prepend="AND"> descstatoesito = #esito#</isNotEmpty>
+     <isNotEmpty property="altriSoggetti" prepend="AND"> altrisog = #altriSoggetti#</isNotEmpty>
+     <isNotEmpty property="sommaUrgenza" prepend="AND"> sommaur = #sommaUrgenza#</isNotEmpty>
+  </sql>
+
+  <select id="searchBandiConEsito" parameterClass="java.util.HashMap" resultMap="resultBando">
+    <include refid="selectListaBandi"/>
+    FROM v_ws_bandi
+	<include refid="whereBandiConEsito"/>
+   ORDER BY dattermine DESC, oratermine DESC
+  </select>  
+
+  <select id="countBandiConEsito" parameterClass="java.util.HashMap" resultClass="java.lang.Integer">
+  SELECT count(1)
+    FROM v_ws_bandi
+	<include refid="whereBandiConEsito"/>
+  </select>
+
+  <select id="getAbilitazionePartecipazioneGara" parameterClass="java.util.HashMap" resultClass="java.lang.Integer">
+  SELECT count(1) FROM v_ws_bandi_per_partecipazione WHERE usernome = #username# AND codice = #codice#
+  </select>
+  
+  <select id="getAbilitazionePresentazioneOfferta" parameterClass="java.util.HashMap" resultClass="java.lang.Integer">
+  SELECT count(1) FROM v_ws_bandi_per_offerta WHERE usernome = #username# AND codice = #codice#     
+  </select>
+  
+  <select id="getAbilitazioneCheckDocumentazione" parameterClass="java.util.HashMap" resultClass="java.lang.Integer">
+  SELECT count(1) FROM v_ws_bandi_per_comprovareq WHERE usernome = #username# AND codice = #codice#
+  </select>
+  
+  <select id="getTipoPartecipazioneImpresa" parameterClass="java.util.HashMap" resultMap="resultTipoPartecipazione">
+  SELECT distinct nomeati as denrti FROM v_ws_fornitori_ati WHERE usernome = #username# AND codice = #codice#
+  <isNotEmpty property="progressivoOfferta" prepend="AND"> progofferta = #progressivoOfferta# </isNotEmpty>  
+  </select>
+  
+  <select id="getElencoStazioniAppaltantiPerIscrizione" parameterClass="java.lang.String" resultMap="DatiCodificati.resultDatoCodificato" >
+  SELECT codsa as codice, dessa as descrizione
+    FROM v_ws_elenchi_sa
+   WHERE codice = #codice#
+   ORDER BY dessa asc
+  </select>
+
+  <select id="getCategorieImpresaPerIscrizione" parameterClass="java.util.HashMap" resultMap="resultCategoriaImpresa">
+  SELECT categoria, clasmin, clasmax, nota
+    FROM v_ws_fornitori_catiscrizione
+   WHERE codice = #codice# AND usernome = #username#
+  </select>
+  
+  <select id="getElencoClassificazioniLavoriPerIscrizione" resultMap="DatiCodificati.resultDatoCodificato" >
+  SELECT tab1tip as codice, tab1desc as descrizione
+    FROM v_ws_classif_lavori_elenchi
+   WHERE (tab1arc is null or tab1arc = '2') 
+   ORDER BY tab1nord, tab1tip
+  </select>
+  
+  <select id="isGaraConOffertaTecnica" parameterClass="java.lang.String" resultClass="java.lang.Integer">
+  select count(1)
+    from v_ws_gare_lotti 
+   where ngara = #codiceGara# and (codmodagg=6 or valtec=1)
+  </select>
+
+  <select id="isImpresaAbilitataRinnovo" parameterClass="java.util.HashMap" resultClass="java.lang.Integer">
+  select count(1)
+    from v_ws_oe_abilitati_rinnovo 
+   where usernome = #username# and codice = #codiceBandoIscrizione#
+  </select>
+  
+  <select id="getVociDettaglioOfferta" parameterClass="java.lang.String" resultMap="resultVociDettaglioOfferta">
+  select progressivo, codvoc, voce, desest, descclasi1, solsic, sogrib, unimis, quanti, prezun, peso
+    from v_ws_voci_dettaglio_offerta 
+   where codice = #codice# and (solsic = 0 and sogrib = 0)
+   order by numordine
+  </select>
+  
+  <select id="getVociDettaglioOffertaNoRibasso" parameterClass="java.lang.String" resultMap="resultVociDettaglioOfferta">
+  select progressivo, codvoc, voce, desest, descclasi1, solsic, sogrib, unimis, quanti, prezun, peso
+    from v_ws_voci_dettaglio_offerta 
+   where codice = #codice# and (solsic = 1 or sogrib = 1)
+   order by numordine
+  </select>
+  
+  <select id="getAttributiAggiuntiviOfferta" parameterClass="java.lang.String" resultMap="resultAttributiAggiuntiviOfferta">
+  select nome, descrizione, tipo, formato, tabellato, obbligatorio
+    from v_ws_attrib_agg_offerta 
+   where codice = #codice#
+   order by numord
+  </select>
+  
+  <select id="getDettaglioStazioneAppaltante" parameterClass="java.lang.String" resultMap="resultDettaglioStazioneAppaltante">
+<!-- 
+  select codice, denominazione, codfiscale, indirizzo, numcivico, cap, comune, provincia, telefono, fax, email, pec
+    from v_ws_stazioni_app
+   where codice = #codice#
+-->  
+  select codein codice, nomein denominazione, cfein codfiscale, viaein indirizzo, nciein numcivico, capein cap, citein comune, 
+  	     proein provincia, telein telefono, faxein fax, emaiin email, emai2in pec
+    from uffint    
+   where codein = #codice#
+  </select>
+  
+  <select id="getStazioniAppaltanti" resultMap="resultDettaglioStazioneAppaltante">
+  select codice, denominazione, codfiscale, indirizzo, numcivico, cap, comune, provincia, telefono, fax, email, pec
+    from v_ws_stazioni_app
+  </select>
+  
+  <select id="getPuntiOrdinanti" parameterClass="java.lang.String" resultClass="java.lang.String">
+  select sysute from v_ws_gare_ordinanti where codice=#codice# order by propri desc, numper asc
+  </select>
+
+  <select id="getPuntiIstruttori" parameterClass="java.lang.String" resultClass="java.lang.String">
+  select sysute from v_ws_gare_istruttori where codice=#codice# order by propri desc, numper asc
+  </select>
+
+  <select id="getMandantiRTI" parameterClass="java.util.HashMap" resultMap="resultMandantiRTI">
+  select nomimp, tipimp, nazione, cfimp, pivimp, quodic
+    from v_ws_mandanti_ati
+   where codice = #codiceProcedura# and usernome = #username# 
+   <isNotEmpty property="progressivoOfferta" prepend="AND"> progofferta = #progressivoOfferta# </isNotEmpty>  
+  </select>
+  
+  <select id="getFascicoloProtocollo" parameterClass="java.lang.String" resultMap="resultFascicoloProtocollo">
+  select codicefascicolo, annofascicolo, numerofascicolo, classificafascicolo, codaoofascicolo, codufffascicolo, strutturafascicolo, 
+  		 CASE WHEN riservafascicolo = '1' THEN 1 ELSE 0 END AS riservatezzafascicolo
+    from v_ws_gare_fascicoli
+   where codice = #codice#
+  </select>
+  
+  <select id="getGenere" parameterClass="java.lang.String" resultClass="java.lang.Long">
+  select genere from v_gare_genere where codice = #codice#
+  </select>
+  
+  <select id="getCodiceGaraFromCodiceLotto" parameterClass="java.lang.String" resultClass="java.lang.String">
+  select codice from v_ws_gare_lotti where ngara = #codiceLotto#
+  </select>
+  
+  <select id="getChiavePubblica" parameterClass="java.util.HashMap" resultClass="java.lang.String">
+  select chiavepubb from chiavibuste where ngara = #codice# and busta = #tipo#
+  </select>
+
+  <select id="isConsorziateEsecutriciPresenti" parameterClass="java.util.HashMap" resultClass="java.lang.Integer">
+  select count(1)
+    from w_puser u inner join impr i on u.userkey1 = i.codimp and u.userent = #tabella#
+         inner join ragdet c on i.codimp = c.codimp    
+   where usernome = #username# and ngara = #codiceGara#
+  </select>
+  
+  <select id="getAttiDocumentiBandoGara" parameterClass="java.lang.String" resultMap="resultDocumentoBando">
+  SELECT iddoc, urldoc, descdoc, filedoc, datpub 
+    FROM v_ws_gare_documenti
+   WHERE codice = #codiceGara#
+     AND (gruppo = 10 OR gruppo = 15)
+   ORDER BY numord ASC 
+  </select>
+
+  <select id="isAstaElettronica" parameterClass="java.util.HashMap" resultClass="java.lang.Integer">
+  SELECT CASE WHEN ricastae = '1' THEN 1 ELSE 0 END AS ricastae  
+    FROM torn t 
+   WHERE (t.codgar = #codiceGara# OR t.codgar = #codiceGara2#)
+<!--      AND EXISTS (SELECT f.ngara FROM gare g INNER JOIN aefasi f ON f.ngara = g.ngara WHERE g.codgar1 = t.codgar) -->
+  </select>
+   
+  <select id="isAstaAttiva" parameterClass="java.util.HashMap" resultClass="java.lang.Integer">
+  SELECT COUNT(1)
+  	FROM gare g 
+         INNER JOIN aefasi f ON f.ngara = g.ngara         
+   WHERE (g.codgar1 = #codiceGara# OR g.codgar1 = #codiceGara2#) 
+   	 <isNotEmpty property="dataCorrente" prepend="AND"> 
+   	     (<![CDATA[f.dataoraini <= #dataCorrente#]]> AND f.dataoraini IS NOT NULL) 
+     AND (<![CDATA[f.dataorafine >= #dataCorrente#]]> OR f.dataorafine IS NULL)
+     </isNotEmpty>  
+  </select>
+  
+ <select id="getDataInizioAsta" parameterClass="java.util.HashMap" resultClass="java.util.Date">
+  SELECT MIN(dataoraini) 
+    FROM aefasi 
+   WHERE ngara IN (SELECT ngara FROM gare WHERE codgar1 = #codiceGara# OR codgar1 = #codiceGara2#)
+ </select>
+  
+ <select id="getDataInvitoAsta" parameterClass="java.util.HashMap" resultClass="java.util.Date">
+  SELECT MIN(aedinvit) 
+    FROM gare1 
+   WHERE codgar1 = #codiceGara# OR codgar1 = #codiceGara2# 
+ </select>
+   
+ <select id="isInvitataAsta" parameterClass="java.util.HashMap" resultClass="java.lang.Integer">
+  SELECT
+  	SUM( CASE WHEN (d.ammgar='1' OR d.ammgar IS NULL) AND (g1.aedinvit IS NOT NULL) 
+  		 THEN 1 
+  		 ELSE 0 END ) invitata 
+<!-- ,g1.codgar1 AS codgar, d.ngara5 as ngara, d.dittao, g1.aedinvit, d.ammgar, d.dittao, u.usernome, r.coddic --> 
+    FROM gare1 g1 
+         INNER JOIN ditg d ON d.ngara5=g1.ngara
+		 LEFT JOIN ragimp r ON (r.codime9=d.dittao AND r.impman='1')
+         LEFT JOIN w_puser u ON u.userkey1=d.dittao		 
+   WHERE (g1.ngara=#codiceGara# 
+          OR g1.codgar1 = #codiceGara# OR g1.codgar1 = #codiceGara2#)
+     AND <![CDATA[g1.aedinvit <= #dataCorrente#]]>     
+   <isNotEmpty property="username" prepend="AND"> 
+         (u.usernome = #username# OR r.coddic = (SELECT userkey1 FROM w_puser 
+         								         WHERE usernome = #username#))
+   </isNotEmpty> 
+ </select>
+
+  <select id="checkAggiornamentoIscrizionePosticipata" parameterClass="java.util.HashMap" resultClass="java.lang.Long">
+  SELECT idcom 
+    FROM v_ws_aggiscr_posticipate
+   WHERE usernome = #usernome# AND codice = #codice#
+  </select>
+
+
+  <select id="getEspletamentoGaraSoccorsiElencoOperatori" parameterClass="java.util.HashMap" resultMap="resultEspletGaraOperEcoDocAmm">
+    SELECT NULL numplico, 
+		 NULL cfopeconomico, 
+  		 df.dittao codopeconomico, 
+  		 NULL denopeconomico, 
+		 NULL statobusta,
+		 ammissione, 
+  		 NULL descammissione, 
+  		 0 rti
+    FROM v_gare_dittefasi df 
+         INNER JOIN gare g ON g.codgar1 = df.codgar AND g.ngara = df.ngara
+         LEFT JOIN w_puser u ON u.userkey1 = df.dittao
+   WHERE df.ammissione = 10
+     AND df.num_fase = #fase#
+     <isNotEmpty property="codiceLotto" prepend="AND">
+     	(df.ngara = #codice# OR df.ngara = #codiceLotto#)
+    </isNotEmpty>
+    <isEmpty property="codiceLotto" prepend="AND">
+       	 df.codgar = #codice#
+    </isEmpty>
+    <isNotEmpty property="username" prepend="AND">
+       	 u.usernome = #username#
+    </isNotEmpty>
+ORDER BY df.dittao, df.codgar, df.ngara 
+  </select>
+
+  
+  <select id="getEspletamentoGaraDocAmmElencoOperatori" parameterClass="java.util.HashMap" resultMap="resultEspletGaraOperEcoDocAmm">
+  SELECT numplico, cfopeconomico, codopeconomico, denopeconomico, statobusta, ammissione, descammissione, rti
+    FROM v_ws_apertura_doc_amm
+   WHERE codice = #codice# 
+     AND lotto IS NULL
+    <isNotEmpty property="username" prepend="AND">
+       	 codopeconomico = #username#
+    </isNotEmpty>    
+ORDER BY numplico    
+  </select>
+  
+  <select id="getEspletamentoGaraValTecElencoOperatori" parameterClass="java.util.HashMap" resultMap="resultEspletGaraOperEcoValTec">
+  SELECT numplico, cfopeconomico, codopeconomico, denopeconomico, statobusta, ammissione, descammissione, rti,
+  		 codmodagg, puntec, puntecrip, g.riptec
+    FROM v_ws_apertura_val_tecnica t
+    	 LEFT OUTER JOIN gare1 g ON t.codice = g.ngara
+   WHERE codice = #codice#
+    <isNotEmpty property="username" prepend="AND">
+       	 codopeconomico = #username#
+    </isNotEmpty>    
+ORDER BY numplico    
+  </select>
+
+  <select id="getEspletamentoGaraValTecElencoOperatoriLotto" parameterClass="java.util.HashMap" resultMap="resultEspletGaraOperEcoValTecLotto">
+  SELECT NULL numplico, NULL cfopeconomico, d.dittao codopeconomico, NULL denopeconomico, NULL statobusta, NULL ammissione, NULL descammissione, 0 rti,
+  		NULL codmodagg, NULL puntec, NULL puntecrip, NULL riptec,
+  		d.ngara5 codice, d.codgar5, g.fasgar  
+    FROM ditg d 
+         INNER JOIN gare g ON g.codgar1 = d.codgar5 AND g.ngara = d.ngara5
+         LEFT JOIN w_puser u ON u.userkey1 = d.dittao 
+   WHERE d.codgar5 like #codice# 
+     AND (d.ammgar IS NULL OR d.ammgar = 1)
+     AND (g.fasgar IS NULL OR g.fasgar >= 5) 
+    <isNotEmpty property="username" prepend="AND">
+       	 u.usernome = #username#
+    </isNotEmpty>
+ORDER BY d.dittao, d.codgar5, d.ngara5
+  </select>
+  
+  <select id="getEspletamentoGaraOffEcoElencoOperatori" parameterClass="java.util.HashMap" resultMap="resultEspletGaraOperEcoOffEco">
+  SELECT numplico, cfopeconomico, codopeconomico, denopeconomico, statobusta, ammissione, descammissione, rti,
+  		 codmodagg,	ribcal, impoff, ribauo, puneco, punecorip, g.ripeco
+    FROM v_ws_apertura_off_economica e
+    	 LEFT OUTER JOIN gare1 g ON e.codice = g.ngara
+   WHERE codice = #codice#
+    <isNotEmpty property="username" prepend="AND">
+       	 codopeconomico = #username#
+    </isNotEmpty>    
+ORDER BY numplico    
+  </select>
+
+  <select id="getEspletamentoGaraOffEcoElencoOperatoriLotto" parameterClass="java.util.HashMap" resultMap="resultEspletGaraOperEcoOffEcoLotto">		 
+  SELECT NULL numplico, NULL cfopeconomico, d.dittao codopeconomico, NULL denopeconomico, NULL statobusta, NULL ammissione, null descammissione, 0 rti,
+  		 NULL codmodagg, NULL ribcal, NULL impoff, NULL ribauo, NULL puneco, NULL punecorip, NULL ripeco,
+  		 d.ngara5 codice, d.codgar5, g.fasgar
+    FROM ditg d 
+         INNER JOIN gare g ON g.codgar1 = d.codgar5 AND g.ngara = d.ngara5
+         LEFT JOIN w_puser u ON u.userkey1 = d.dittao 
+   WHERE d.codgar5 like #codice# 
+     AND (d.ammgar IS NULL OR d.ammgar = 1)
+     AND (g.fasgar IS NULL OR g.fasgar >= 6) 
+    <isNotEmpty property="username" prepend="AND">
+       	 u.usernome = #username#
+    </isNotEmpty>
+ORDER BY d.dittao, d.codgar5, d.ngara5
+  </select>
+  
+  <select id="getEspletamentoGaraGraduatoriaElencoOperatori" parameterClass="java.util.HashMap" resultMap="resultEspletGaraOperEcoGraduatoria">
+  SELECT numplico, cfopeconomico, codopeconomico, denopeconomico, rti, 
+  		 codmodagg,	ribcal, impoff, ribauo,
+  		 CASE WHEN (codmodagg = 6) THEN ribauo ELSE NULL END AS puntot,   
+  		 descgraduatoria,
+  		 inversa, amminversa, NULL ammissione, NULL descammissione
+    FROM v_ws_gara_graduatoria
+   WHERE codice = #codice#       
+    <isNotEmpty property="orderby" >
+       	<isEqual prepend="ORDER BY" property="orderby" compareValue="1"> ribauo DESC </isEqual>
+       	<isEqual prepend="ORDER BY" property="orderby" compareValue="2"> impoff </isEqual>
+       	<isEqual prepend="ORDER BY" property="orderby" compareValue="3"> ribauo </isEqual>
+       	<isEqual prepend="ORDER BY" property="orderby" compareValue="4"> ribauo DESC </isEqual>
+    </isNotEmpty>
+  </select>
+
+  <select id="getEspletamentoGaraLotti" parameterClass="java.util.HashMap" resultMap="resultEspletGaraLotti">
+  SELECT numplico, cfopeconomico, codopeconomico, denopeconomico, statobusta, ammissione, descammissione, rti, 
+    	 partecipalotto, lotto, codinternolotto, oggettolotto
+    FROM v_ws_apertura_doc_amm
+   WHERE ngara = #codice#
+     AND codopeconomico = #username#
+     AND lotto IS NOT NULL
+     AND partecipalotto = 1
+ORDER BY codopeconomico, codinternolotto    
+  </select>
+  
+  <select id="getEspletamentoGaraDocumenti" parameterClass="java.util.HashMap" resultMap="resultEspletGaraDocumenti">
+  SELECT codice, codopeconomico, busta, bustaord, descrizione, nomefile, datalettura
+    FROM v_ws_apertura_buste_allegati    
+   WHERE (codice = #codice# OR codice = #codiceLotto#)
+   	 AND codopeconomico = #username#
+   	<isNotEmpty property="busta" prepend="AND">
+     	 busta = #busta#
+    </isNotEmpty> 
+  	<isNotEmpty property="partecipaLotto" prepend="AND">
+     	 partecipalotto = #partecipaLotto#
+    </isNotEmpty>        
+ORDER BY codopeconomico, bustaord    
+  </select>
+
+  <select id="getEspletamentoGaraComponentiRti" parameterClass="java.util.HashMap" resultMap="resultEspletGaraComponentiRti">
+  SELECT codimprti, ragsoc, codfisc, partiva, mandataria 
+    FROM v_ws_trasp_contratti_dett_rti
+   WHERE codimprti = #username#  
+ORDER BY ragsoc    
+  </select>
+
+  <select id="getFaseGara" parameterClass="java.lang.String" resultClass="java.lang.Long">
+  SELECT DISTINCT fasgar FROM v_ws_dettaglio_bando WHERE codice = #codice#  
+  </select>
+  
+  <select id="getNews" parameterClass="java.util.HashMap" resultMap="resultComunicazione">
+  SELECT idcom, idcomdes, c.codice, commsgogg oggetto, commsgtes testo, dataorainvio, dataoralettura, dataoraprotocollo, numprotocollo, bloccarispondi, comdatins,
+         t.cenint codsa, null ngara, gg.genere,         
+         CASE WHEN gg.genere=10 THEN ga.oggetto
+      		  WHEN gg.genere=20 THEN ga.oggetto
+              ELSE gg.oggetto END AS titolo,
+         CASE WHEN gg.genere=10 THEN 'Elenco operatori'
+              WHEN gg.genere=20 THEN 'Catalogo'
+              WHEN (gg.genere=100 OR gg.genere=300) THEN 'Lotto di gara'
+              ELSE 'Gara' END AS tipologia, idcfg,
+         null idcomris, null desintest, null committ
+	<include refid="fromWhereNews"/>
+ORDER BY comdatins DESC
+  </select>
+
+  <select id="countNews" parameterClass="java.util.HashMap" resultClass="java.lang.Integer">
+  SELECT count(idcom)
+  	<include refid="fromWhereNews"/>
+  </select>
+
+  <select id="getSoggettiAderenti" parameterClass="java.util.HashMap" resultMap="resultSoggettoAderente">
+  SELECT cfein, nomein
+  	FROM V_WS_ADERENTE_LOTTO  	
+   WHERE <![CDATA[
+         (codice = #codice# AND codice = ngara)   
+      OR (ngara = #codice# AND codice <> ngara)]]> 
+  </select>
+
+  <select id="getSoggettiAderentiLotti" parameterClass="java.util.HashMap" resultMap="resultSoggettoAderenteLotto">
+  SELECT cfein, nomein,
+  		 ngara, codice
+  	FROM V_WS_ADERENTE_LOTTO  	
+   WHERE codice = #codice# 
+ORDER BY ngara
+  </select>
+
+  <select id="getOperatoriIscritti" parameterClass="java.util.HashMap" resultMap="resultOperatoriIscritti">
+  SELECT dittao codimp, UPPER(nomimp) nomimp, cfimp, pivimp, locimp, proimp
+    FROM ditg d 
+         INNER JOIN impr i ON (d.dittao = i.codimp)
+         INNER JOIN v_ws_elenchi e ON (d.ngara5 = e.ngara)
+   WHERE abilitaz = 1 
+     AND (dabilitaz IS NOT NULL) 
+     AND (numordpl IS NOT NULL)
+     AND (e.pubope = 1)
+     AND ngara5 = #codice#
+ORDER BY UPPER(nomimp) 
+  </select>
+
+  <select id="getElencoCategorieOperatoriIscritti" parameterClass="java.util.HashMap" resultMap="resultCategorieOperatoriIscritti">
+SELECT c.codimp, c.codcat categoria, c.tipcat tipocategoria, c.infnumclass clasmin, c.supnumclass clasmax, cat.descat descrizione,
+  		CASE WHEN cat.codliv4 is not null THEN 5 
+  		     WHEN cat.codliv3 is not null THEN 4 
+  		     WHEN cat.codliv2 is not null THEN 3 
+  		     WHEN cat.codliv1 is not null THEN 2 
+  		     ELSE 1 END livello,
+		CASE WHEN (select count(*) from cais 
+		           where cais.codliv1=cat.caisim or 
+		                 cais.codliv2=cat.caisim or 
+		                 cais.codliv3=cat.caisim or 
+		                 cais.codliv4=cat.caisim)=0 THEN 1 
+			 ELSE 0 END foglia
+    FROM iscrizcat c inner join impr i on (i.codimp = c.codimp)
+         inner join ditg d on (d.ngara5 = c.ngara AND d.dittao = c.codimp)
+		 inner join cais cat on (cat.caisim = c.codcat)
+   WHERE NOT EXISTS (SELECT caisim FROM cais 
+                      WHERE codliv1 = c.codcat 
+                         OR codliv2 = c.codcat 
+                         OR codliv3 = c.codcat 
+                         OR codliv4 = c.codcat)
+     AND c.ngara = #codice#
+ORDER BY i.nomimp, c.codimp, tipcat, codcat 
+  </select>
+  
+  
+    <select id="getRettifichePresentazioneDomandaOfferta" parameterClass="java.util.HashMap" resultMap="resultRettifichePresentazione">
+    SELECT id ,codice ,tipter ,datter ,orater ,drettif  
+    FROM v_ws_gare_rettifiche
+    WHERE codice = #codice# AND tipter = #tipter#
+ ORDER BY id DESC
+  </select>
+      
+
+  <select id="getCriteriValutazione" parameterClass="java.util.HashMap" resultMap="resultCriteriValutazione">
+  SELECT g.ngara, g.tippar, g.despar, gd.id codice,
+       	 gd.necvan, gd.formato, gd.numdeci,
+       	 gr.puntuale, gr.valmin, gr.valmax 
+	FROM goev g 
+	     INNER JOIN g1cridef gd ON g.ngara = gd.ngara AND g.necvan = gd.necvan
+ 	     LEFT OUTER JOIN g1crireg gr ON gd.id = gr.idcridef
+   WHERE <![CDATA[gd.formato <> 100]]> 
+	 AND g.ngara = #codice# 
+  <isNotEmpty property="tippar" prepend="AND">
+	     g.tippar = #tippar#
+  </isNotEmpty> 	  
+  <isEmpty property="tippar" prepend="AND">
+	     (g.tippar = 1 OR g.tippar = 2) 
+  </isEmpty>
+ORDER BY g.tippar, g.norpar, g.norpar1, gr.id
+  </select>
+  
+  
+  <select id="getCriteriValutazioneLotti" parameterClass="java.util.HashMap" resultMap="resultCriteriValutazioneLotto">
+   SELECT g.ngara, g.tippar, g.despar, gd.id codice, 
+          gd.necvan, gd.formato, gd.numdeci,
+       	  gr.puntuale, gr.valmin, gr.valmax	  
+     FROM goev g 
+	 	  INNER JOIN g1cridef gd ON g.ngara = gd.ngara AND g.necvan = gd.necvan
+ 	 	  LEFT OUTER JOIN g1crireg gr ON gd.id = gr.idcridef
+	WHERE <![CDATA[gd.formato <> 100]]>
+	  AND g.ngara = #codice# 
+  <isNotEmpty property="tippar" prepend="AND">
+	      g.tippar = #tippar#
+  </isNotEmpty> 	  
+  <isEmpty property="tippar" prepend="AND">
+	      (g.tippar = 1 OR g.tippar = 2) 
+  </isEmpty>
+ ORDER BY g.ngara, g.tippar, g.norpar, g.norpar1, gr.id 
+  </select>  
+      
+      
+  <select id="checkDocumentiNulli" parameterClass="java.util.HashMap" resultMap="resultDocumentoBandoInfo">
+   SELECT i.idcom, d.iddocdig iddoc, NULL urldoc, d.digdesdoc descdoc, d.dignomdoc filedoc, i.comdatins datpub,
+		  NULL gruppo, 
+          i.comkey2 ngara, g.codiga codiceInterno, NULL oggetto, NULL costoFisso,
+          NULL docsize,
+          d.digkey3 uuid
+     FROM w_docdig d
+          INNER JOIN w_invcom i ON d.idprg = i.idprg AND d.DIGKEY1 = $operatoreWinvcomIdCom$
+          INNER JOIN gare g ON g.ngara = i.comkey2
+    WHERE d.idprg = 'PA'        
+	  AND d.digogg IS NULL
+	  AND ($operatoreUpper$(g.codgar1) = #codiceGara# OR $operatoreUpper$(g.codgar1) = #codiceGara2#)
+	  AND comkey1 = #username#
+      AND comtipo = #tipoBusta#
+	  AND i.comstato IN ('1','5')
+  </select>  
+     
+     
+  <select id="checkDimensioneDocumenti" parameterClass="java.util.HashMap" resultMap="resultDocumentoBandoInfo">
+   SELECT i.idcom, d.iddocdig iddoc, NULL urldoc, d.digdesdoc descdoc, d.dignomdoc filedoc, i.comdatins datpub,
+		  NULL gruppo, 
+          i.comkey2 ngara, g.codiga codiceInterno, NULL oggetto, NULL costoFisso,
+          $operatoreDatasize$(d.digogg) docsize,
+          d.digkey3 uuid
+     FROM w_docdig d
+          INNER JOIN w_invcom i ON d.idprg = i.idprg AND d.DIGKEY1 = $operatoreWinvcomIdCom$
+          INNER JOIN gare g ON g.ngara = i.comkey2
+    WHERE d.idprg = 'PA'
+	  AND ($operatoreUpper$(g.codgar1) = #codiceGara# OR $operatoreUpper$(g.codgar1) = #codiceGara2#)
+	  AND comkey1 = #username#
+      AND comtipo = #tipoBusta#
+      AND i.comstato IN ('1','5')
+  </select>
+
+
+  <select id="getDelibere" parameterClass="java.util.HashMap" resultMap="resultDelibera">
+   SELECT g.codice, sa.nomein, g.oggetto, g.codcig, d.datpub, d.dataprov dataatto, d.numprov numatto, d.iddoc, d.descdoc, d.urldoc, d.filedoc 
+	<include refid="fromWhereDelibere"/>
+ ORDER BY d.datpub desc
+  </select>
+  
+  <select id="countDelibere" parameterClass="java.util.HashMap" resultClass="java.lang.Integer">
+   SELECT COUNT(g.codice)
+    <include refid="fromWhereDelibere"/>
+  </select>
+
+  <select id="getElencoSommaUrgenza" parameterClass="java.util.HashMap" resultMap="resultSommaUrgenza">
+   SELECT codgara, not_gar, dt_primo_esito, dt_prima_pubb, data, codcig, stato, tipo_procedura,
+   		imp_base_gara
+	 <include refid="fromWhereElencoSommaUrgenza"/>
+  ORDER BY codgar, ngara
+  </select>
+  
+  <select id="countElencoSommaUrgenza" parameterClass="java.util.HashMap" resultClass="java.lang.Integer">
+   SELECT COUNT(codgar)
+     <include refid="fromWhereElencoSommaUrgenza"/>
+  </select>
+  
+  <select id="getWSDMConfig" parameterClass="java.util.HashMap" resultMap="resultWSDMConfig">
+   SELECT c.codapp, cp.idconfi, cp.chiave, cp.valore, cp.descri, cu.codein
+  	 FROM wsdmconfi c 
+  	   	  INNER JOIN wsdmconfipro cp ON c.id = cp.idconfi 
+		  LEFT OUTER JOIN wsdmconfiuff cu ON cp.idconfi = cu.idconfi
+    WHERE c.codapp = 'PG'
+<!--  
+      AND c.id IN (SELECT idconfi FROM wsdmconfipro 
+                   WHERE chiave = 'protocollazione.wsdm.url' 
+                     AND valore IS NOT NULL AND <![CDATA[valore <> '']]>)
+-->      
+      <isNotEmpty property="stazioneAppaltante" prepend="AND">
+	      cu.codein = #stazioneAppaltante#
+  	  </isNotEmpty>
+  	  <isEmpty property="stazioneAppaltante" prepend="AND">
+  	      cu.codein IS NULL
+	  </isEmpty>
+	ORDER BY c.id
+  </select>
+  
+  <select id="getElencoInvitiGara" parameterClass="java.util.HashMap" resultMap="resultElencoInviti">
+   SELECT d.ncomope, d.codgar5, d.ngara5, u.usernome 
+ 	 FROM v_ws_ditg d JOIN w_puser u ON (d.dittao = u.userkey1 OR d.codman = u.userkey1)
+    WHERE d.codgar5 = #codiceGara#
+	  AND u.usernome = #username# 
+  </select>
+ 
+  <select id="getNumeroOrdineInvito" parameterClass="java.util.HashMap" resultClass="java.lang.Long">
+  SELECT numordinv 
+    FROM ditg d JOIN w_puser u ON d.dittao = u.userkey1
+	WHERE d.ngara5 = #codice#
+	  AND u.usernome = #username# 
+   </select>
+   
+</sqlMap>

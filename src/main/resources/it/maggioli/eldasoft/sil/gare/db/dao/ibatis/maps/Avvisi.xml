@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="Avvisi">
+
+	<resultMap id="resultAvviso" class="it.maggioli.eldasoft.sil.gare.ws.AvvisoType">
+		<result property="stazioneAppaltante" column="sa" />
+		<result property="codice" column="codice" />
+		<result property="oggetto" column="oggetto" />
+		<result property="tipoAvviso" column="tipoavv" />
+		<result property="tipoAppalto" column="tipoapp" />
+		<result property="dataPubblicazione" column="datpub" />
+		<result property="dataScadenza" column="datascadenza" />
+		<result property="oraScadenza" column="orascadenza" />
+		<result property="dataUltimoAggiornamento" column="dultagg" />
+	</resultMap>
+
+  <sql id="selectListaAvvisi">
+  SELECT descsa as sa, codice, oggetto, desctipoapp as tipoapp, desctipoavv as tipoavv, datpub, datascadenza, orascadenza, 
+  		dultagg 
+    FROM v_ws_avvisi
+  </sql>
+
+  <sql id="whereAvvisi" >
+   WHERE <![CDATA[#annoMinimoPubblicazione# <= annoinizioperscadenza]]>
+     <isNotEmpty property="stazioneAppaltante" prepend="AND"> codsa = #stazioneAppaltante#</isNotEmpty> 
+     <isNotEmpty property="oggetto" prepend="AND"> $operatoreUpper$(oggetto) like #oggetto#</isNotEmpty> 
+     <isNotEmpty property="tipoAvviso" prepend="AND"> codtipoavv = #tipoAvviso#</isNotEmpty> 
+     <isNotEmpty property="dataPubblicazioneDa" prepend="AND"><![CDATA[ datpub >= #dataPubblicazioneDa#]]></isNotEmpty> 
+     <isNotEmpty property="dataPubblicazioneA" prepend="AND"><![CDATA[ datpub <= #dataPubblicazioneA#]]></isNotEmpty> 
+     <isNotEmpty property="dataScadenzaDa" prepend="AND"><![CDATA[ datascadenza >= #dataScadenzaDa#]]></isNotEmpty> 
+     <isNotEmpty property="dataScadenzaA" prepend="AND"><![CDATA[ datascadenza <= #dataScadenzaA#]]></isNotEmpty> 
+     <isNotEmpty property="altriSoggetti" prepend="AND"> altrisog = #altriSoggetti#</isNotEmpty>  
+  </sql>
+    
+  <select id="searchAvvisi" parameterClass="java.util.HashMap" resultMap="resultAvviso">
+   <include refid="selectListaAvvisi"/>
+   <include refid="whereAvvisi"/>
+   ORDER BY dataorascadenza DESC, datpub DESC
+  </select>
+
+  <select id="countAvvisi" parameterClass="java.util.HashMap" resultClass="java.lang.Integer">
+ SELECT count(1)
+   FROM v_ws_avvisi
+   <include refid="whereAvvisi"/>
+  </select>
+
+  <sql id="whereElencoAvvisi" >
+  WHERE <![CDATA[#dataOdierna# <= dataorascadenza]]>
+     <isNotEmpty property="stazioneAppaltante" prepend="AND"> codsa = #stazioneAppaltante#</isNotEmpty> 
+     <isNotEmpty property="oggetto" prepend="AND"> $operatoreUpper$(oggetto) like #oggetto#</isNotEmpty> 
+     <isNotEmpty property="tipoAvviso" prepend="AND"> codtipoavv = #tipoAvviso#</isNotEmpty> 
+     <isNotEmpty property="dataPubblicazioneDa" prepend="AND"><![CDATA[ datpub >= #dataPubblicazioneDa#]]></isNotEmpty> 
+     <isNotEmpty property="dataPubblicazioneA" prepend="AND"><![CDATA[ datpub <= #dataPubblicazioneA#]]></isNotEmpty> 
+     <isNotEmpty property="dataScadenzaDa" prepend="AND"><![CDATA[ datascadenza >= #dataScadenzaDa#]]></isNotEmpty> 
+     <isNotEmpty property="dataScadenzaA" prepend="AND"><![CDATA[ datascadenza <= #dataScadenzaA#]]></isNotEmpty> 
+     <isNotEmpty property="altriSoggetti" prepend="AND"> altrisog = #altriSoggetti#</isNotEmpty> 
+  </sql>
+  
+  <select id="getElencoAvvisi" resultMap="resultAvviso">
+   <include refid="selectListaAvvisi"/>
+   <include refid="whereElencoAvvisi"/>
+   ORDER BY dataorascadenza ASC, datpub ASC
+  </select>
+
+  <select id="countElencoAvvisi" parameterClass="java.util.HashMap" resultClass="java.lang.Integer">
+ SELECT count(1)
+   FROM v_ws_avvisi
+   <include refid="whereElencoAvvisi"/>
+  </select>
+  
+  <sql id="whereElencoAvvisiScaduti" >
+   WHERE <![CDATA[#dataOdierna# > dataorascadenza]]> 
+     AND <![CDATA[#annoMinimoPubblicazione# <= annoinizioperscadenza]]>
+     <isNotEmpty property="stazioneAppaltante" prepend="AND"> codsa = #stazioneAppaltante#</isNotEmpty> 
+     <isNotEmpty property="oggetto" prepend="AND"> $operatoreUpper$(oggetto) like #oggetto#</isNotEmpty> 
+     <isNotEmpty property="tipoAvviso" prepend="AND"> codtipoavv = #tipoAvviso#</isNotEmpty> 
+     <isNotEmpty property="dataPubblicazioneDa" prepend="AND"><![CDATA[ datpub >= #dataPubblicazioneDa#]]></isNotEmpty> 
+     <isNotEmpty property="dataPubblicazioneA" prepend="AND"><![CDATA[ datpub <= #dataPubblicazioneA#]]></isNotEmpty> 
+     <isNotEmpty property="dataScadenzaDa" prepend="AND"><![CDATA[ datascadenza >= #dataScadenzaDa#]]></isNotEmpty> 
+     <isNotEmpty property="dataScadenzaA" prepend="AND"><![CDATA[ datascadenza <= #dataScadenzaA#]]></isNotEmpty>  
+     <isNotEmpty property="altriSoggetti" prepend="AND"> altrisog = #altriSoggetti#</isNotEmpty> 
+  </sql>
+  
+  <select id="getElencoAvvisiScaduti" resultMap="resultAvviso">
+   <include refid="selectListaAvvisi"/>
+   <include refid="whereElencoAvvisiScaduti"/>
+   ORDER BY dataorascadenza DESC
+  </select>
+  
+  <select id="countElencoAvvisiScaduti" parameterClass="java.util.HashMap" resultClass="java.lang.Integer">
+ SELECT count(1)
+   FROM v_ws_avvisi
+   <include refid="whereElencoAvvisiScaduti"/>
+  </select>
+
+  <select id="getStazioneAppaltanteAvviso" parameterClass="java.lang.String" resultMap="Bandi.resultStazioneAppaltanteBando">
+  SELECT codsa as codstazione, descsa as descstazione, descrup
+    FROM v_ws_avvisi
+   WHERE codice = #codice#
+  </select>
+
+  <select id="getAvviso" parameterClass="java.lang.String" resultMap="resultAvviso">
+  SELECT codsa as sa, codice, oggetto, codtipoapp as tipoapp, codtipoavv as tipoavv, datpub, datascadenza, orascadenza,
+  		 dultagg
+    FROM v_ws_avvisi
+   WHERE codice = #codice#
+  </select>
+  
+<!--   <select id="getDocumentiAvvisoLotto" parameterClass="java.util.HashMap" resultMap="Bandi.resultDocumentoBando"> -->
+<!--   SELECT iddoc, urldoc, descdoc, filedoc, datpub -->
+<!--     FROM v_ws_gare_documenti -->
+<!--    WHERE codice = #codiceGara# -->
+<!--    <isEmpty property="codiceLotto" prepend="AND"> ngara is null</isEmpty> -->
+<!--    <isNotEmpty property="codiceLotto" prepend="AND"> ngara = #codiceLotto#</isNotEmpty> -->
+<!--      AND gruppo = 4 -->
+<!--    ORDER BY numord ASC  -->
+<!--   </select> -->
+  
+</sqlMap>

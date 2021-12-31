@@ -1,0 +1,575 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions name="WSAsteSoap" targetNamespace="http://www.eldasoft.it/sil/WSAste/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://www.eldasoft.it/sil/WSAste/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
+  <wsdl:types>
+    <xs:schema targetNamespace="http://www.eldasoft.it/sil/WSGareAppalto/" version="1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:complexType name="VoceDettaglioOffertaType">
+    <xs:sequence>
+      <xs:element name="id" type="xs:int"/>
+      <xs:element minOccurs="0" name="codice" type="xs:string"/>
+      <xs:element minOccurs="0" name="voce" type="xs:string"/>
+      <xs:element minOccurs="0" name="descrizione" type="xs:string"/>
+      <xs:element minOccurs="0" name="tipoClassificazione" type="xs:string"/>
+      <xs:element name="soloSicurezza" type="xs:boolean"/>
+      <xs:element name="nonSoggettoRibasso" type="xs:boolean"/>
+      <xs:element minOccurs="0" name="unitaMisura" type="xs:string"/>
+      <xs:element minOccurs="0" name="quantita" type="xs:double"/>
+      <xs:element minOccurs="0" name="prezzoUnitario" type="xs:double"/>
+      <xs:element minOccurs="0" name="importoUnitario" type="xs:double"/>
+    </xs:sequence>
+  </xs:complexType>
+
+</xs:schema>
+    <xs:schema elementFormDefault="unqualified" targetNamespace="http://www.eldasoft.it/sil/WSAste/" version="1.0" xmlns:ns1="http://www.eldasoft.it/sil/WSGareAppalto/" xmlns:tns="http://www.eldasoft.it/sil/WSAste/" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:import namespace="http://www.eldasoft.it/sil/WSGareAppalto/"/>
+
+  <xs:element name="getClassifica" type="tns:getClassifica"/>
+
+  <xs:element name="getClassificaResponse" type="tns:getClassificaResponse"/>
+
+  <xs:element name="getDettaglioAsta" type="tns:getDettaglioAsta"/>
+
+  <xs:element name="getDettaglioAstaResponse" type="tns:getDettaglioAstaResponse"/>
+
+  <xs:element name="getElencoRilanci" type="tns:getElencoRilanci"/>
+
+  <xs:element name="getElencoRilanciResponse" type="tns:getElencoRilanciResponse"/>
+
+  <xs:element name="getElencoTerminiAsta" type="tns:getElencoTerminiAsta"/>
+
+  <xs:element name="getElencoTerminiAstaResponse" type="tns:getElencoTerminiAstaResponse"/>
+
+  <xs:element name="getElencoTipiClassifica" type="tns:getElencoTipiClassifica"/>
+
+  <xs:element name="getElencoTipiClassificaResponse" type="tns:getElencoTipiClassificaResponse"/>
+
+  <xs:element name="getFasiAsta" type="tns:getFasiAsta"/>
+
+  <xs:element name="getFasiAstaResponse" type="tns:getFasiAstaResponse"/>
+
+  <xs:element name="getPrezziUnitariPrimoRilancio" type="tns:getPrezziUnitariPrimoRilancio"/>
+
+  <xs:element name="getPrezziUnitariPrimoRilancioResponse" type="tns:getPrezziUnitariPrimoRilancioResponse"/>
+
+  <xs:element name="getPrezziUnitariRilancio" type="tns:getPrezziUnitariRilancio"/>
+
+  <xs:element name="getPrezziUnitariRilancioResponse" type="tns:getPrezziUnitariRilancioResponse"/>
+
+  <xs:element name="insertRilancioAsta" type="tns:insertRilancioAsta"/>
+
+  <xs:element name="insertRilancioAstaResponse" type="tns:insertRilancioAstaResponse"/>
+
+  <xs:complexType name="getPrezziUnitariPrimoRilancio">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="codice" type="xs:string"/>
+      <xs:element minOccurs="0" name="codiceLotto" type="xs:string"/>
+      <xs:element minOccurs="0" name="username" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getPrezziUnitariPrimoRilancioResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="tns:GetPrezziUnitariOutType"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="GetPrezziUnitariOutType">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="dettaglio" nillable="true" type="tns:VoceDettaglioAstaType"/>
+      <xs:element minOccurs="0" name="errore" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="VoceDettaglioAstaType">
+    <xs:complexContent>
+      <xs:extension base="ns1:VoceDettaglioOffertaType">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="asteId" type="xs:long"/>
+          <xs:element minOccurs="0" name="asteIdRilancio" type="xs:long"/>
+          <xs:element minOccurs="0" name="asteCodice" type="xs:string"/>
+          <xs:element minOccurs="0" name="asteIdLavorazione" type="xs:long"/>
+          <xs:element minOccurs="0" name="asteUsername" type="xs:string"/>
+          <xs:element minOccurs="0" name="asteDitta" type="xs:string"/>
+          <xs:element minOccurs="0" name="astePrezzoUnitario" type="xs:double"/>
+          <xs:element minOccurs="0" name="asteImportoUnitario" type="xs:double"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="getElencoTipiClassifica">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="getElencoTipiClassificaResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="tns:GetElencoTipiClassificaOutType"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="GetElencoTipiClassificaOutType">
+    <xs:sequence>
+      <xs:element name="elenco">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element maxOccurs="unbounded" minOccurs="0" name="entry">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element minOccurs="0" name="key" type="xs:string"/>
+                  <xs:element minOccurs="0" name="value" type="xs:string"/>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element minOccurs="0" name="errore" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getPrezziUnitariRilancio">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="codice" type="xs:string"/>
+      <xs:element minOccurs="0" name="codiceLotto" type="xs:string"/>
+      <xs:element minOccurs="0" name="username" type="xs:string"/>
+      <xs:element minOccurs="0" name="idRilancio" type="xs:long"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getPrezziUnitariRilancioResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="tns:GetPrezziUnitariOutType"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="insertRilancioAsta">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="codice" type="xs:string"/>
+      <xs:element minOccurs="0" name="codiceLotto" type="xs:string"/>
+      <xs:element minOccurs="0" name="username" type="xs:string"/>
+      <xs:element minOccurs="0" name="offerta" type="xs:double"/>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="prezziUnitari" type="tns:VoceDettaglioAstaType"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="insertRilancioAstaResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="tns:InsertRilancioAstaOutType"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="InsertRilancioAstaOutType">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="idRilancio" type="xs:long"/>
+      <xs:element minOccurs="0" name="errore" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getElencoRilanci">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="codice" type="xs:string"/>
+      <xs:element minOccurs="0" name="codiceLotto" type="xs:string"/>
+      <xs:element minOccurs="0" name="username" type="xs:string"/>
+      <xs:element minOccurs="0" name="numeroFase" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getElencoRilanciResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="tns:GetElencoRilanciOutType"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="GetElencoRilanciOutType">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="dettaglio" nillable="true" type="tns:DettaglioRilancioType"/>
+      <xs:element minOccurs="0" name="errore" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="DettaglioRilancioType">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="id" type="xs:long"/>
+      <xs:element minOccurs="0" name="codiceGara" type="xs:string"/>
+      <xs:element minOccurs="0" name="username" type="xs:string"/>
+      <xs:element minOccurs="0" name="ditta" type="xs:string"/>
+      <xs:element minOccurs="0" name="numeroRilancio" type="xs:int"/>
+      <xs:element minOccurs="0" name="numeroFase" type="xs:int"/>
+      <xs:element minOccurs="0" name="ribasso" type="xs:double"/>
+      <xs:element minOccurs="0" name="importo" type="xs:double"/>
+      <xs:element minOccurs="0" name="dataRilancio" type="xs:dateTime"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getDettaglioAsta">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="codice" type="xs:string"/>
+      <xs:element minOccurs="0" name="username" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getDettaglioAstaResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="tns:GetDettaglioAstaOutType"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="GetDettaglioAstaOutType">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="dettaglio" type="tns:DettaglioAstaType"/>
+      <xs:element minOccurs="0" name="errore" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="DettaglioAstaType">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="codice" type="xs:string"/>
+      <xs:element minOccurs="0" name="codiceLotto" type="xs:string"/>
+      <xs:element minOccurs="0" name="dataOraApertura" type="xs:dateTime"/>
+      <xs:element minOccurs="0" name="dataOraChiusura" type="xs:dateTime"/>
+      <xs:element minOccurs="0" name="fase" type="xs:int"/>
+      <xs:element minOccurs="0" name="durataMinima" type="xs:long"/>
+      <xs:element minOccurs="0" name="durataMassima" type="xs:long"/>
+      <xs:element minOccurs="0" name="tempoBase" type="xs:long"/>
+      <xs:element minOccurs="0" name="tipoClassifica" type="xs:int"/>
+      <xs:element name="elettronica" type="xs:boolean"/>
+      <xs:element name="attiva" type="xs:boolean"/>
+      <xs:element minOccurs="0" name="termineAsta" type="xs:int"/>
+      <xs:element minOccurs="0" name="tipoOfferta" type="xs:int"/>
+      <xs:element minOccurs="0" name="scartoRilancioMinimo" type="xs:double"/>
+      <xs:element minOccurs="0" name="scartoRilancioMassimo" type="xs:double"/>
+      <xs:element minOccurs="0" name="dataUltimoRilancio" type="xs:dateTime"/>
+      <xs:element minOccurs="0" name="importoUltimoRilancio" type="xs:double"/>
+      <xs:element minOccurs="0" name="ribassoUltimoRilancio" type="xs:double"/>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="fasi" nillable="true" type="tns:DettaglioFaseAstaType"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="DettaglioFaseAstaType">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="id" type="xs:long"/>
+      <xs:element minOccurs="0" name="codice" type="xs:string"/>
+      <xs:element minOccurs="0" name="dataInizio" type="xs:date"/>
+      <xs:element minOccurs="0" name="oraInizio" type="xs:string"/>
+      <xs:element minOccurs="0" name="durataMinima" type="xs:long"/>
+      <xs:element minOccurs="0" name="durataMassima" type="xs:long"/>
+      <xs:element minOccurs="0" name="tempoBase" type="xs:long"/>
+      <xs:element minOccurs="0" name="dataOraApertura" type="xs:dateTime"/>
+      <xs:element minOccurs="0" name="dataOraChiusura" type="xs:dateTime"/>
+      <xs:element minOccurs="0" name="numeroFase" type="xs:int"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getElencoTerminiAsta">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="getElencoTerminiAstaResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="tns:GetElencoTerminiAstaOutType"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="GetElencoTerminiAstaOutType">
+    <xs:sequence>
+      <xs:element name="elenco">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element maxOccurs="unbounded" minOccurs="0" name="entry">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element minOccurs="0" name="key" type="xs:string"/>
+                  <xs:element minOccurs="0" name="value" type="xs:string"/>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element minOccurs="0" name="errore" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getClassifica">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="tipoClassifica" type="xs:int"/>
+      <xs:element minOccurs="0" name="codice" type="xs:string"/>
+      <xs:element minOccurs="0" name="codiceLotto" type="xs:string"/>
+      <xs:element minOccurs="0" name="username" type="xs:string"/>
+      <xs:element minOccurs="0" name="numeroFase" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getClassificaResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="tns:GetClassificaOutType"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="GetClassificaOutType">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="dettaglio" nillable="true" type="tns:DettaglioClassificaType"/>
+      <xs:element minOccurs="0" name="errore" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="DettaglioClassificaType">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="id" type="xs:long"/>
+      <xs:element minOccurs="0" name="username" type="xs:string"/>
+      <xs:element minOccurs="0" name="mandataria" type="xs:string"/>
+      <xs:element minOccurs="0" name="ragioneSociale" type="xs:string"/>
+      <xs:element minOccurs="0" name="importo" type="xs:double"/>
+      <xs:element minOccurs="0" name="posizione" type="xs:int"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getFasiAsta">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="codice" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getFasiAstaResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="tns:GetFasiAstaOutType"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="GetFasiAstaOutType">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="dettaglio" nillable="true" type="tns:DettaglioFaseAstaType"/>
+      <xs:element minOccurs="0" name="errore" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+</xs:schema>
+  </wsdl:types>
+  <wsdl:message name="getElencoRilanciResponse">
+    <wsdl:part name="parameters" element="tns:getElencoRilanciResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getPrezziUnitariPrimoRilancioResponse">
+    <wsdl:part name="parameters" element="tns:getPrezziUnitariPrimoRilancioResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="insertRilancioAsta">
+    <wsdl:part name="parameters" element="tns:insertRilancioAsta">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getElencoTerminiAstaResponse">
+    <wsdl:part name="parameters" element="tns:getElencoTerminiAstaResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="insertRilancioAstaResponse">
+    <wsdl:part name="parameters" element="tns:insertRilancioAstaResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getClassifica">
+    <wsdl:part name="parameters" element="tns:getClassifica">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getFasiAstaResponse">
+    <wsdl:part name="parameters" element="tns:getFasiAstaResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getFasiAsta">
+    <wsdl:part name="parameters" element="tns:getFasiAsta">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getElencoTipiClassificaResponse">
+    <wsdl:part name="parameters" element="tns:getElencoTipiClassificaResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getDettaglioAsta">
+    <wsdl:part name="parameters" element="tns:getDettaglioAsta">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getElencoTerminiAsta">
+    <wsdl:part name="parameters" element="tns:getElencoTerminiAsta">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getPrezziUnitariRilancioResponse">
+    <wsdl:part name="parameters" element="tns:getPrezziUnitariRilancioResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getDettaglioAstaResponse">
+    <wsdl:part name="parameters" element="tns:getDettaglioAstaResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getPrezziUnitariPrimoRilancio">
+    <wsdl:part name="parameters" element="tns:getPrezziUnitariPrimoRilancio">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getElencoTipiClassifica">
+    <wsdl:part name="parameters" element="tns:getElencoTipiClassifica">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getClassificaResponse">
+    <wsdl:part name="parameters" element="tns:getClassificaResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getElencoRilanci">
+    <wsdl:part name="parameters" element="tns:getElencoRilanci">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getPrezziUnitariRilancio">
+    <wsdl:part name="parameters" element="tns:getPrezziUnitariRilancio">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="WSAsteSoap">
+    <wsdl:operation name="getPrezziUnitariPrimoRilancio">
+<wsdl:documentation>Richiesta dell'elenco dei prezzi unitari del I rilancio di un'offerta d'asta</wsdl:documentation>
+      <wsdl:input name="getPrezziUnitariPrimoRilancio" message="tns:getPrezziUnitariPrimoRilancio">
+    </wsdl:input>
+      <wsdl:output name="getPrezziUnitariPrimoRilancioResponse" message="tns:getPrezziUnitariPrimoRilancioResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getElencoTipiClassifica">
+<wsdl:documentation>Richiesta dell'elenco dei tipi di classifica d'asta</wsdl:documentation>
+      <wsdl:input name="getElencoTipiClassifica" message="tns:getElencoTipiClassifica">
+    </wsdl:input>
+      <wsdl:output name="getElencoTipiClassificaResponse" message="tns:getElencoTipiClassificaResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getPrezziUnitariRilancio">
+<wsdl:documentation>Richiesta dell'elenco dei prezzi unitari di un'offerta d'asta</wsdl:documentation>
+      <wsdl:input name="getPrezziUnitariRilancio" message="tns:getPrezziUnitariRilancio">
+    </wsdl:input>
+      <wsdl:output name="getPrezziUnitariRilancioResponse" message="tns:getPrezziUnitariRilancioResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="insertRilancioAsta">
+<wsdl:documentation>Richiesta di inserimento di un rilancio per un'asta</wsdl:documentation>
+      <wsdl:input name="insertRilancioAsta" message="tns:insertRilancioAsta">
+    </wsdl:input>
+      <wsdl:output name="insertRilancioAstaResponse" message="tns:insertRilancioAstaResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getElencoRilanci">
+<wsdl:documentation>Richiesta d'elenco dei rilanci relativi ad un'asta</wsdl:documentation>
+      <wsdl:input name="getElencoRilanci" message="tns:getElencoRilanci">
+    </wsdl:input>
+      <wsdl:output name="getElencoRilanciResponse" message="tns:getElencoRilanciResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getDettaglioAsta">
+<wsdl:documentation>Richiesta del dettaglio dei dati dell'asta</wsdl:documentation>
+      <wsdl:input name="getDettaglioAsta" message="tns:getDettaglioAsta">
+    </wsdl:input>
+      <wsdl:output name="getDettaglioAstaResponse" message="tns:getDettaglioAstaResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getElencoTerminiAsta">
+<wsdl:documentation>Richiesta dell'elenco dei tipi di termine asta</wsdl:documentation>
+      <wsdl:input name="getElencoTerminiAsta" message="tns:getElencoTerminiAsta">
+    </wsdl:input>
+      <wsdl:output name="getElencoTerminiAstaResponse" message="tns:getElencoTerminiAstaResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getClassifica">
+<wsdl:documentation>Richiesta della classifica utenti dell'asta</wsdl:documentation>
+      <wsdl:input name="getClassifica" message="tns:getClassifica">
+    </wsdl:input>
+      <wsdl:output name="getClassificaResponse" message="tns:getClassificaResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getFasiAsta">
+<wsdl:documentation>Richiesta delle fasi dell'asta</wsdl:documentation>
+      <wsdl:input name="getFasiAsta" message="tns:getFasiAsta">
+    </wsdl:input>
+      <wsdl:output name="getFasiAstaResponse" message="tns:getFasiAstaResponse">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="WSAsteSoapSoapBinding" type="tns:WSAsteSoap">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="getPrezziUnitariPrimoRilancio">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="getPrezziUnitariPrimoRilancio">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getPrezziUnitariPrimoRilancioResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getElencoTipiClassifica">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="getElencoTipiClassifica">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getElencoTipiClassificaResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getPrezziUnitariRilancio">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="getPrezziUnitariRilancio">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getPrezziUnitariRilancioResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="insertRilancioAsta">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="insertRilancioAsta">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="insertRilancioAstaResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getElencoRilanci">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="getElencoRilanci">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getElencoRilanciResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getDettaglioAsta">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="getDettaglioAsta">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getDettaglioAstaResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getClassifica">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="getClassifica">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getClassificaResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getElencoTerminiAsta">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="getElencoTerminiAsta">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getElencoTerminiAstaResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getFasiAsta">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="getFasiAsta">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getFasiAstaResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="WSAsteSoap">
+    <wsdl:port name="WSAsteSOAP" binding="tns:WSAsteSoapSoapBinding">
+      <soap:address location="http://localhost:8100/WSAppalti/services/WSAsteSOAP"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>
