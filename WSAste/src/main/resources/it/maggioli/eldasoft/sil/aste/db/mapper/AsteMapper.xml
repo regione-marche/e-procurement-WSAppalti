@@ -1,0 +1,319 @@
+<?xml version="1.0" encoding="UTF-8"?><!--Converted at: Tue Jun 07 15:49:55 CEST 2022-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="it.maggioli.eldasoft.sil.aste.db.mapper.AsteMapper">
+
+  <resultMap id="resultClassifica" type="it.maggioli.eldasoft.sil.aste.ws.DettaglioClassificaType">
+    <result property="id" column="id"/>
+	<result property="username" column="usernome"/>
+	<result property="mandataria" column="codati"/>
+	<result property="ragioneSociale" column="descditta"/>
+	<result property="importo" column="offerta"/>
+<!-- 	<result property="posizione"  /> -->
+  </resultMap>
+
+  <resultMap id="resultDettaglioAsta" type="it.maggioli.eldasoft.sil.aste.ws.DettaglioAstaType">
+  <result property="codice" column="codice"/>
+    <result property="codiceLotto" column="codiceLotto"/>
+	<result property="dataOraApertura" column="dataoraini"/>
+	<result property="dataOraChiusura" column="dataorafine"/>
+	<result property="fase" column="numfase"/>	
+	<result property="durataMinima" column="durmin"/>
+	<result property="durataMassima" column="durmax"/>
+	<result property="tempoBase" column="tbase"/>
+	<result property="tipoClassifica" column="aemodvis"/>
+	<result property="elettronica" column="ricastae"/>
+<!-- 	<result property="attiva" column="..." /> -->
+	<result property="tipoOfferta" column="ribcal"/>
+	<result property="scartoRilancioMinimo" column="rilmin"/>
+	<result property="scartoRilancioMassimo" column="rilmax"/>
+<!-- 	<result property="dataUltimoRilancio" column="..." /> -->
+<!-- 	<result property="importoUltimoRilancio" column="..." /> -->
+	<result property="numDecimaliRibasso" column="prerib"/>
+  </resultMap>
+  
+  <resultMap id="resultDettaglioFase" type="it.maggioli.eldasoft.sil.aste.ws.DettaglioFaseAstaType">
+  	<result property="id" column="id"/>
+	<result property="codice" column="ngara"/>
+	<result property="dataInizio" column="datini"/>
+	<result property="oraInizio" column="oraini"/>
+	<result property="durataMinima" column="durmin"/>
+	<result property="durataMassima" column="durmax"/>
+	<result property="tempoBase" column="tbase"/>
+	<result property="dataOraApertura" column="dataoraini"/>
+	<result property="dataOraChiusura" column="dataorafine"/>
+	<result property="numeroFase" column="numfase"/>
+  </resultMap>
+
+  <resultMap id="resultRilancio" type="it.maggioli.eldasoft.sil.aste.ws.DettaglioRilancioType">
+    <result property="id" column="id"/>
+    <result property="codiceGara" column="ngara"/>
+    <result property="username" column="usernome"/> 
+    <result property="ditta" column="dittao"/>
+    <result property="numeroRilancio" column="numril"/>
+    <result property="numeroFase" column="numfase"/>
+    <result property="ribasso" column="ribauo"/>
+	<result property="importo" column="impoff"/>
+ 	<result property="dataRilancio" column="dataoraril"/>
+  </resultMap>
+
+  <resultMap id="resultPrezziUnitari" type="it.maggioli.eldasoft.sil.aste.ws.VoceDettaglioAstaType">
+  	<result property="asteId" column="aeid"/>
+	<result property="asteIdRilancio" column="aeidril"/>
+	<result property="asteCodice" column="aengara"/>
+	<result property="asteIdLavorazione" column="aecontaf"/>
+	<result property="asteUsername" column="usernome"/>
+	<result property="asteDitta" column="aedittao"/>
+	<result property="astePrezzoUnitario" column="aepreoff"/>
+	<result property="asteImportoUnitario" column="aeimpoff"/>
+<!-- 	<result property="id" column="" /> -->
+	<result property="codice" column="codvoc"/>
+	<result property="voce" column="voce"/>
+	<result property="descrizione" column="desest"/>
+	<result property="tipoClassificazione" column="codclasi1"/>
+	<result property="soloSicurezza" column="solsic"/>
+	<result property="nonSoggettoRibasso" column="sogrib"/>
+	<result property="quantita" column="quanti"/>
+	<result property="unitaMisura" column="unimis"/>
+	<result property="prezzoUnitario" column="prezun"/>
+	<result property="importoUnitario" column="impoff"/>
+  </resultMap>
+
+  <select id="getClassifica" parameterType="java.util.HashMap" resultMap="resultClassifica">
+ SELECT r.id, p.usernome, d.codati, 
+        CASE WHEN i.nomest IS NOT NULL 
+        	 THEN i.nomest
+             ELSE d.nomeati
+             END AS descditta,
+        CASE WHEN g.ribcal=1 THEN ABS(r.ribauo)
+             WHEN g.ribcal=2 THEN r.impoff 
+             END AS offerta  
+   FROM torn t 
+        INNER JOIN gare g ON g.codgar1 = t.codgar
+        INNER JOIN aefasi f ON f.ngara = g.ngara 
+   	    INNER JOIN aerilanci r ON r.ngara = f.ngara
+   	    LEFT JOIN w_puser p ON p.userkey1 = r.dittao
+		LEFT JOIN v_ws_ditg d ON d.codati = r.dittao AND d.ngara5 = r.ngara
+		LEFT JOIN impr i ON i.codimp = r.dittao
+  WHERE r.ngara = #{ngara} 
+       <if test="tipoClassifica != null and tipoClassifica != ''">AND t.aemodvis = #{tipoClassifica} </if>
+  	   <if test="username != null and username != ''">AND p.usernome = #{username} </if>
+	   <if test="numeroFase != null and numeroFase != ''">AND f.numfase = #{numeroFase} </if>
+	AND r.id = (SELECT MAX(r2.id) FROM aerilanci r2 
+	             WHERE r2.ngara = r.ngara 
+	               AND ((p.usernome IS NOT NULL AND r2.dittao = r.dittao) OR
+			            (p.usernome IS NULL AND r2.dittao = d.codati)))
+  ORDER BY CASE WHEN g.ribcal=1 THEN r.ribauo 
+                WHEN g.ribcal=2 THEN r.impoff 
+			    ELSE r.id END 
+			    <!--  <if test="alRialzo != null and alRialzo"> DESC </if> -->
+  </select>
+
+  <select id="getFasiAsta" parameterType="java.util.HashMap" resultMap="resultDettaglioFase">    
+  SELECT f.id, f.ngara, f.datini, f.oraini, f.durmin, f.durmax, f.tbase, f.dataoraini, f.dataorafine, f.numfase  
+   FROM torn t 
+        INNER JOIN gare g ON g.codgar1 = t.codgar
+        INNER JOIN aefasi f ON f.ngara = g.ngara
+  WHERE g.ngara = #{ngara}
+  ORDER BY f.numfase   
+  </select>
+
+  <select id="getDettaglioAsta" parameterType="java.util.HashMap" resultMap="resultDettaglioAsta">
+  SELECT t.codgar, gl.codice, f.ngara, f.dataoraini, f.dataorafine, f.numfase, f.durmin, f.durmax, f.tbase, t.aemodvis, g.ribcal,
+  		 t.prerib,
+  		 CASE WHEN gl.codice!=f.ngara THEN f.ngara ELSE null END AS codiceLotto,
+  		 CASE WHEN t.ricastae=1 THEN 1 ELSE 0 END AS ricastae,
+  		 CASE WHEN g.ribcal=1 THEN t.aeribmin
+     		  WHEN g.ribcal=2 THEN t.aeimpmin
+     		  ELSE 0
+  		 END AS rilmin, 
+  		 CASE WHEN g.ribcal=1 THEN t.aeribmax
+     		  WHEN g.ribcal=2 THEN t.aeimpmax
+     		  ELSE 0
+  		 END AS rilmax
+   FROM torn t 
+        INNER JOIN gare g ON g.codgar1 = t.codgar
+        INNER JOIN aefasi f ON f.ngara = g.ngara
+        INNER JOIN v_ws_gare_lotti_pub_ris gl ON (gl.codgar = t.codgar AND gl.ngara = g.ngara)
+   WHERE g.ngara = #{ngara} 
+  	 AND (f.numfase = (SELECT f2.numfase FROM aefasi f2 
+   	                    WHERE f2.ngara = g.ngara 
+   			              AND  f2.dataoraini &lt;= #{dataCorrente}  
+				          AND ( f2.dataorafine &gt;= #{dataCorrente}  OR f2.dataorafine IS NULL))
+		  OR (NOT EXISTS (SELECT f2.numfase 
+			                FROM aefasi f2 
+				           WHERE f2.ngara = g.ngara 
+				             AND  f2.dataoraini &lt;= #{dataCorrente}  
+				             AND ( f2.dataorafine &gt;= #{dataCorrente}  OR f2.dataorafine IS NULL))
+			  AND f.numfase = (SELECT MAX(f2.numfase) FROM aefasi f2 WHERE f2.ngara = g.ngara))
+		 )   		
+  </select>
+                
+  <update id="updateAsta" parameterType="java.util.HashMap">
+  UPDATE aefasi 
+     SET ngara = ngara
+        <if test="dataApertura != null">, dataoraini = #{dataApertura,jdbcType=TIMESTAMP} </if>
+     	<if test="dataChiusura != null">, dataorafine = #{dataChiusura,jdbcType=TIMESTAMP} </if>
+     	<if test="durataMin != null and durataMin != ''">, durmin = #{durataMin,jdbcType=NUMERIC} </if>
+     	<if test="durataMax != null and durataMax != ''">, durmax = #{durataMax,jdbcType=NUMERIC} </if>
+     	<if test="tempoBase != null and tempoBase != ''">, tbase = #{tempoBase,jdbcType=NUMERIC} </if>
+   WHERE ngara = #{ngara}
+   	 AND numfase = #{fase}  
+  </update>  
+             
+  <select id="getElencoRilanci" parameterType="java.util.HashMap" resultMap="resultRilancio">
+  SELECT r.id, r.ngara, r.numril, r.numfase, r.dataoraril, ABS(r.ribauo) AS ribauo, r.impoff, 
+  		 r.dittao, u.usernome
+    FROM aerilanci r
+		 LEFT JOIN gare g ON g.ngara = r.ngara
+		 LEFT JOIN v_ws_ditg d ON d.ngara5 = r.ngara AND r.dittao = d.dittao
+		 LEFT JOIN w_puser u ON (u.userent = 'IMPR' AND ((d.codati is null AND d.dittao = u.userkey1) OR d.codman = u.userkey1))
+   WHERE r.ngara = #{ngara}
+   	 AND d.ammgar = 1
+   		<if test="numeroFase != null and numeroFase != ''">AND 
+        (r.numfase = #{numeroFase} OR r.numril = -1) 
+        </if>
+        <if test="username != null and username != ''">AND 
+     	(u.usernome = #{username}
+	     OR d.codman = (SELECT userkey1 FROM w_puser WHERE usernome = #{username}))
+		</if>         
+ORDER BY
+		<if test="username != null and username != ''">
+		id     	
+		</if>
+		<if test="username == null">
+		CASE WHEN g.ribcal=1 THEN r.ribauo 
+             WHEN g.ribcal=2 THEN r.impoff 
+			 ELSE r.id END 
+		</if>
+  </select>
+  
+  <insert id="insertRilancioAsta" parameterType="java.util.HashMap">
+  INSERT INTO aerilanci (
+  		id, ngara, dittao, numril, numfase, ribauo, impoff, dataoraril
+  ) VALUES (
+  		#{id}, 
+  		#{ngara,jdbcType=VARCHAR}, 
+  		<if test="ditta != null and ditta != ''"> #{ditta,jdbcType=VARCHAR}, </if>
+  		<if test="ditta == null or ditta == ''">
+  			<if test="username != null and username != ''"> (SELECT userkey1 FROM w_puser WHERE usernome = #{username}), </if> 
+  		</if>
+  		#{numeroRilancio,jdbcType=NUMERIC}, 
+  		#{numeroFase,jdbcType=NUMERIC}, 
+  		#{ribasso,jdbcType=NUMERIC}, 
+  		#{importo,jdbcType=NUMERIC}, 
+  		#{dataRilancio,jdbcType=TIMESTAMP}
+  )
+  </insert>
+  
+  <update id="updateRilancioAsta" parameterType="java.util.HashMap">
+  UPDATE aerilanci 
+     SET id = id
+		<if test="ngara != null and ngara != ''">, ngara = #{ngara,jdbcType=VARCHAR} </if>
+		<if test="ditta != null and ditta != ''">, dittao = #{ditta,jdbcType=VARCHAR} </if>
+  		<if test="ditta == null or ditta == ''">
+  			<if test="username != null and username != ''">, dittao = (SELECT userkey1 FROM w_puser WHERE usernome = #{username}) </if> 
+  		</if>
+		<if test="numeroRilancio != null and numeroRilancio != ''">, numril = #{numeroRilancio,jdbcType=NUMERIC} </if>
+		<if test="numeroFase != null and numeroFase != ''">, numfase = #{numeroFase,jdbcType=NUMERIC} </if>
+		<if test="ribasso != null and ribasso != ''">, ribauo = #{ribasso,jdbcType=NUMERIC} </if>
+		<if test="importo != null and importo != ''">, impoff = #{importo,jdbcType=NUMERIC} </if>
+		<if test="dataRilancio != null">, dataoraril = #{dataRilancio,jdbcType=TIMESTAMP} </if>
+   WHERE id = #{id} 
+  </update>  
+
+  <sql id="selectPrezziUnitari">  
+  SELECT g.codice, g.progressivo, g.numordine, g.codvoc, g.voce, g.desest, g.unimis, g.quanti, g.prezun, g.codclasi1, g.descclasi1, g.solsic, g.sogrib, 
+	     d.preoff, d.impoff, d.dittao, p.usernome,
+	     rp.id AS aeid, 
+		 rp.idril AS aeidril, 
+		 CASE WHEN d.dittao is null THEN g.codice ELSE rp.ngara END AS aengara, 
+		 CASE WHEN d.dittao is null THEN g.progressivo ELSE rp.contaf END AS aecontaf, 
+		 CASE WHEN d.dittao is null THEN p.userkey1 ELSE rp.dittao END AS aedittao, 
+		 CASE WHEN d.dittao is null THEN g.prezun ELSE rp.preoff END AS aepreoff, 
+		 CASE WHEN d.dittao is null THEN g.prezun*g.quanti ELSE rp.impoff END AS aeimpoff
+	FROM v_ws_voci_dettaglio_offerta g 
+         LEFT JOIN dpre d ON (d.contaf = g.progressivo AND d.ngara = g.codice) 
+		 LEFT JOIN aerilpre rp ON (rp.contaf = d.contaf AND rp.ngara = d.ngara AND (rp.dittao = d.dittao OR d.dittao IS NULL))
+	 	 LEFT JOIN w_puser p on (p.userkey1 = d.dittao or d.dittao is null)
+		 LEFT JOIN v_ws_ditg dt ON dt.codati = rp.dittao AND dt.ngara5 = rp.ngara
+  </sql>
+
+  <select id="getPrezziUnitariPrimoRilancio" parameterType="java.util.HashMap" resultMap="resultPrezziUnitari">
+  	<include refid="selectPrezziUnitari"/>
+	   WHERE g.codice = #{ngara}
+		 AND ((p.usernome IS NOT NULL AND p.usernome = #{username})
+			   OR (p.usernome IS NULL AND dt.codman = (SELECT userkey1 FROM w_puser WHERE usernome = #{username})))			   		 
+	 	 AND (rp.idril IS NULL  
+	 		  OR rp.idril = (SELECT MIN(rp2.idril) 
+						       FROM aerilpre rp2 
+					          WHERE rp2.ngara = rp.ngara
+							    AND (rp2.dittao = (SELECT userkey1 FROM w_puser WHERE usernome = #{username})
+							 		 OR rp2.dittao = (SELECT codati 
+							 		                    FROM v_ws_ditg 
+							 		                   WHERE ngara5 = rp2.ngara
+							 		                     AND codati IS NOT NULL 
+							 		                     AND codman = (SELECT userkey1 FROM w_puser WHERE usernome = #{username})))))
+	ORDER BY g.progressivo  
+  </select>
+  
+  <select id="getPrezziUnitari" parameterType="java.util.HashMap" resultMap="resultPrezziUnitari">
+  	<include refid="selectPrezziUnitari"/>
+	   WHERE g.codice = #{ngara}
+		 AND ((p.usernome IS NOT NULL AND p.usernome = #{username})
+			   OR (p.usernome IS NULL AND dt.codman = (SELECT userkey1 FROM w_puser WHERE usernome = #{username})))		 
+	   	 AND (rp.idril IS NULL 
+	   	      OR rp.idril = #{idRilancio})
+	ORDER BY rp.id
+  </select>
+  
+  <insert id="insertPrezziUnitari" parameterType="it.maggioli.eldasoft.sil.aste.ws.VoceDettaglioAstaType">
+  INSERT INTO aerilpre (
+  		id, idril, ngara, contaf, dittao, preoff, impoff
+  ) VALUES (
+  	    #{asteId,jdbcType=NUMERIC},
+  		#{asteIdRilancio,jdbcType=NUMERIC},
+  		#{asteCodice,jdbcType=VARCHAR},
+  		#{asteIdLavorazione,jdbcType=NUMERIC},
+  		#{asteDitta,jdbcType=VARCHAR},
+  		#{astePrezzoUnitario,jdbcType=NUMERIC},
+  		#{quantita,jdbcType=NUMERIC} * #{astePrezzoUnitario,jdbcType=NUMERIC}
+  )
+  </insert>
+       
+  <update id="updatePrezziUnitari" parameterType="java.util.HashMap">
+  UPDATE aerilpre 
+     SET ngara = #{ngara,jdbcType=VARCHAR}, 
+         dittao = #{ditta,jdbcType=VARCHAR}, 
+         preoff = #{prezzoUnitario,jdbcType=NUMERIC}, 
+         impoff = #{importo,jdbcType=NUMERIC}
+   WHERE idril = #{idRilancio,jdbcType=NUMERIC} 
+     AND id = #{id,jdbcType=NUMERIC}
+<!--      AND idril = #{idRilancio,jdbcType=NUMERIC} -->
+  </update>
+
+  <select id="getMandatariaRti" parameterType="java.util.HashMap" resultType="java.lang.String">
+  SELECT codati
+	FROM v_ws_ditg 	 
+   WHERE ngara5 = #{ngara} 
+     AND codman = (SELECT userkey1 FROM w_puser WHERE usernome = #{username})
+     AND ammgar = 1
+  </select>
+  
+  <select id="getTipoRilancioAsta" parameterType="java.util.HashMap" resultType="java.lang.Integer">
+  SELECT CASE WHEN ribcal IS NULL THEN 0 ELSE ribcal END   
+    FROM gare 
+   WHERE ngara = #{ngara} 
+  </select>
+
+  <select id="getTotaleNonSoggettoPrezziUnitari" parameterType="java.lang.String" resultType="java.lang.Double">
+  SELECT ( 
+  	CASE WHEN impnoribasso IS NOT NULL THEN impnoribasso ELSE 0 END + 
+  	CASE WHEN impsicurezza IS NOT NULL THEN impsicurezza ELSE 0 END +
+  	CASE WHEN imponeriprogett IS NOT NULL THEN imponeriprogett ELSE 0 END
+  	) AS totaleNonSoggetto 
+    FROM v_ws_bandi
+   WHERE codice = #{ngara} 
+  </select>
+
+</mapper>

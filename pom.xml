@@ -1,270 +1,280 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-  
+
+	<modules>
+		<module>WSOperazioniGenerali</module>
+		<module>WSGare</module>
+		<module>WSAste</module>
+		<module>WSLFS</module>
+		<module>WSPagoPA</module>
+		<module>WSStipule</module>
+		<module>Webapp</module>
+	</modules>
+
 	<parent>
 		<groupId>it.maggioli.eldasoft</groupId>
 		<artifactId>eldasoft-base</artifactId>
-		<version>1.1.0</version>
+		<version>8.0</version>
+		<relativePath />
 	</parent>
+	<modelVersion>4.0.0</modelVersion>
 	<groupId>it.maggioli.eldasoft.sil</groupId>
-	<artifactId>wsappalti</artifactId>
-	<version>3.13.0</version>
-  	<packaging>war</packaging>
+	<artifactId>wsappalti-pom</artifactId>
+	<version>${revision}</version>
+  	<packaging>pom</packaging>
 	
-	<name>Webapp Servizi Appalti</name>
-  	
+	<name>WS Appalti POM</name>
+
 	<organization>
 		<name>Maggioli S.p.A.</name>
 	</organization>
 
+	<properties>
+		<project.build.sourceEncoding>Cp1252</project.build.sourceEncoding>
+		<java.version>1.8</java.version>
+		<revision>3.24.0</revision>
+		<spring.version>5.3.20</spring.version>
+		<cxf.version>3.5.2</cxf.version>
+		<log4j2.version>2.17.2</log4j2.version>
+		<skipTests>true</skipTests>
+	</properties>
+
 	<dependencies>
+
+		<!-- dipendenze esplicite per eliminare problemi rimozione JAX-RS dalla JDK 11 -->
+		<!--
 		<dependency>
-			<groupId>it.maggioli.eldasoft.commons</groupId>
-			<artifactId>wsgene-webapp</artifactId>
-			<version>${wsgene.version}</version>
-			<type>war</type>
+			<groupId>com.sun.xml.ws</groupId>
+			<artifactId>jaxws-rt</artifactId>
+			<version>2.3.0</version>
+			<type>pom</type>
+		</dependency>-->
+		<dependency>
+			<groupId>javax.activation</groupId>
+			<artifactId>activation</artifactId>
+			<version>1.1</version>
 		</dependency>
 		<dependency>
+			<groupId>javax.jws</groupId>
+			<artifactId>javax.jws-api</artifactId>
+			<version>1.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.xmlbeans</groupId>
+			<artifactId>xmlbeans</artifactId>
+			<version>5.0.3</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.apache.logging.log4j</groupId>
+					<artifactId>log4j-api</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<dependency>
+			<groupId>com.sun.activation</groupId>
+			<artifactId>javax.activation</artifactId>
+			<version>1.2.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>jakarta.transaction</groupId>
+			<artifactId>jakarta.transaction-api</artifactId>
+			<version>2.0.1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>javax.servlet-api</artifactId>
+			<version>4.0.1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>cglib</groupId>
+			<artifactId>cglib-nodep</artifactId>
+			<version>3.3.0</version>
+		</dependency>
+		<dependency>
+			<groupId>xml-apis</groupId>
+			<artifactId>xml-apis</artifactId>
+			<version>2.0.2</version>
+		</dependency>
+		<dependency>
+			<groupId>javax.xml.ws</groupId>
+			<artifactId>jaxws-api</artifactId>
+			<version>2.3.1</version>
+		</dependency>
+		<dependency>
+			<groupId>com.sun.xml.ws</groupId>
+			<artifactId>jaxws-rt</artifactId>
+			<version>3.0.2</version>
+			<type>pom</type>
+			<exclusions>
+				<exclusion>
+					<groupId>com.fasterxml.woodstox</groupId>
+					<artifactId>woodstox-core</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.codehaus.woodstox</groupId>
+			<artifactId>stax2-api</artifactId>
+			<version>4.2.1</version>
+		</dependency>
+
+		<!-- CXF -->
+
+		<dependency>
+			<groupId>org.apache.cxf</groupId>
+			<artifactId>cxf-rt-frontend-jaxws</artifactId>
+			<version>${cxf.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>com.sun.xml.messaging.saaj</groupId>
+					<artifactId>saaj-impl</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.sun.activation</groupId>
+					<artifactId>jakarta.activation</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>jakarta.annotation</groupId>
+					<artifactId>jakarta.annotation-api</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>jakarta.jws</groupId>
+					<artifactId>jakarta.jws-api</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>jakarta.xml.bind</groupId>
+					<artifactId>jakarta.xml.bind-api</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>jakarta.xml.soap</groupId>
+					<artifactId>jakarta.xml.soap-api</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>jakarta.xml.ws</groupId>
+					<artifactId>jakarta.xml.ws-api</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.cxf</groupId>
+			<artifactId>cxf-rt-transports-http</artifactId>
+			<version>${cxf.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>com.sun.xml.messaging.saaj</groupId>
+					<artifactId>saaj-impl</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.sun.activation</groupId>
+					<artifactId>jakarta.activation</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>jakarta.annotation</groupId>
+					<artifactId>jakarta.annotation-api</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>jakarta.jws</groupId>
+					<artifactId>jakarta.jws-api</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>jakarta.xml.soap</groupId>
+					<artifactId>jakarta.xml.soap-api</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>jakarta.xml.ws</groupId>
+					<artifactId>jakarta.xml.ws-api</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<!-- Mybatis -->
+
+		<dependency>
+			<groupId>org.mybatis</groupId>
+			<artifactId>mybatis</artifactId>
+			<version>3.5.9</version>
+		</dependency>
+		<dependency>
+			<groupId>org.mybatis</groupId>
+			<artifactId>mybatis-spring</artifactId>
+			<version>2.0.7</version>
+		</dependency>
+
+		<!-- Spring -->
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-web</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context-support</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-jdbc</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+
+		<!-- Librerie di log -->
+
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-slf4j-impl</artifactId>
+			<version>${log4j2.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-1.2-api</artifactId>
+			<version>${log4j2.version}</version>
+		</dependency>
+
+
+		<!-- Dipendenze interne -->
+		<dependency>
 			<groupId>it.maggioli.eldasoft.commons</groupId>
-			<artifactId>wsgene-engine</artifactId>
-			<version>${wsgene.version}</version>
-			<scope>provided</scope>
+			<artifactId>eldasoft-utils</artifactId>
+			<version>2.0.15</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.springframework</groupId>
+					<artifactId>spring</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>xml-apis</groupId>
+					<artifactId>xml-apis</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.apache.xmlbeans</groupId>
+					<artifactId>xmlbeans</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>it.maggioli.eldasoft.portal</groupId>
-			<artifactId>eldasoft-portgare-datatypes</artifactId>
-			<version>3.13.0</version>
+			<artifactId>eldasoft-wscommonsdata</artifactId>
+			<version>1.0.0</version>
 		</dependency>
-  	</dependencies>
-	
-	<properties>
-		<project.build.sourceEncoding>Cp1252</project.build.sourceEncoding>
-		<java.version>1.6</java.version>
-		<wsgene.version>1.9.0</wsgene.version>
-	</properties>
 
-	<profiles>
-         <profile>
-            <id>env-dev</id>
-            <activation>
-				<activeByDefault>true</activeByDefault>
-                <property>
-					<!-- Activate: mvn -Denv=dev <phase> -->
-                    <name>env</name>
-                    <value>dev</value>
-                </property>
-            </activation>
-			<build>
-				<filters>
-					<filter>src/main/filters/sviluppo.properties</filter>
-				</filters>
-			</build>
-         </profile>
-         <profile>
-            <id>env-prod</id>
-            <activation>
-                <property>
-					<!-- Activate: mvn -Denv=prod <phase> -->
-                    <name>env</name>
-                    <value>prod</value>
-                </property>
-            </activation>
-			<build>
-				<filters>
-					<filter>src/main/filters/rilascio.properties</filter>
-				</filters>
-			</build>
-         </profile>
-	</profiles>
+		<dependency>
+			<groupId>it.maggioli.eldasoft.portal</groupId>
+			<artifactId>eldasoft-portgare-datatypes</artifactId>
+			<version>3.24.0</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.apache.xmlbeans</groupId>
+					<artifactId>xmlbeans</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
 
-	<build>
-  		<finalName>WSAppalti</finalName>
-		
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<configuration>
-					<source>${java.version}</source>
-					<target>${java.version}</target>
-				</configuration>
-			</plugin>
+	</dependencies>
 
-			<plugin>
-				<!-- espande in una cartella di appoggio alcuni file presenti in wsgene per le successive elaborazioni -->
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-dependency-plugin</artifactId>
-				<version>2.3</version>
-				<executions>
-					<execution>
-						<id>unpack-wsgene-dependencies</id>
-						<phase>generate-sources</phase>
-						<goals>
-							<goal>unpack-dependencies</goal>
-						</goals>
-						<configuration>
-							<outputDirectory>${project.build.directory}/dependencies-unpacked/wsgene-webapp</outputDirectory>
-							<verbose>true</verbose>
-							<overWriteReleases>true</overWriteReleases>
-							<overWriteSnapshots>true</overWriteSnapshots>
-							<appendOutput>true</appendOutput>
-							<includeGroupIds>it.maggioli.eldasoft.commons</includeGroupIds>
-							<includeArtifactIds>wsgene-webapp</includeArtifactIds>
-							<includes>configuration/*,WEB-INF/classes/*.properties,WEB-INF/xml/ibatis/*.xml,META-INF/context*.xml,wsdl/*.wsdl</includes>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
 
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-antrun-plugin</artifactId>
-				<version>1.7</version>
-				<executions>                   	   
-					<execution>
-						<id>context-antrun</id>
-						<phase>prepare-package</phase>
-						<goals>
-							<goal>run</goal>
-						</goals>                        
-						<!-- task di generazione file di context -->
-						<configuration>
-							<target>
-								<echo>Generazione ${build.finalName}.xml in corso...</echo>
-								<copy file="${project.build.directory}/war/work/resources/context.xml" tofile="${project.build.directory}/${build.finalName}.xml" />
-								<copy file="${project.build.directory}/war/work/resources/context-tomcat8.xml" tofile="${project.build.directory}/${build.finalName}-tomcat8.xml" />
-								<echo>Generazione ${build.finalName}.xml effettuato...</echo>
-							</target>
-						</configuration>
-					</execution>    
-				</executions>
-			</plugin>
-
-			<plugin>
-				<!-- effettua l'iniezione dei global forward nei file di struts -->
-				<groupId>com.google.code.maven-config-processor-plugin</groupId>
-				<artifactId>maven-config-processor-plugin</artifactId>
-				<version>2.0</version>			
-				<executions>
-					<execution>
-						<id>xml-ibatis</id>
-						<phase>generate-sources</phase>
-						<goals>
-							<goal>process</goal>
-						</goals>
-						<configuration>
-							<encoding>UTF-8</encoding>
-							<outputDirectory>${project.build.directory}/war/work/xml-ibatis</outputDirectory>
-							<transformations>
-								<transformation>
-									<input>${project.build.directory}/dependencies-unpacked/wsgene-webapp/WEB-INF/xml/ibatis/sql-map-config.xml</input>
-									<output>sql-map-config.xml</output>
-									<config>${project.build.directory}/dependencies-unpacked/wsgene-webapp/configuration/ibatis-transformation.xml</config>
-								</transformation>
-							</transformations>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-
-			<plugin>
-				<artifactId>maven-resources-plugin</artifactId>
-				<version>2.5</version>
-				<executions>
-					<!-- copia i file di geneweb per i quali si richiede il filtraggio con le sostituzioni -->
-					<execution>
-						<id>filter-resources</id>
-						<phase>process-sources</phase>
-						<goals>
-							<goal>copy-resources</goal>
-						</goals>
-						<configuration>
-							<outputDirectory>${project.build.directory}/war/work/resources</outputDirectory>
-							<resources>          
-								<resource>
-									<directory>${project.build.directory}/dependencies-unpacked/wsgene-webapp/WEB-INF</directory>
-									<includes>
-										<include>**/*.properties</include>
-									</includes>
-									<filtering>true</filtering> <!-- si mantiene per webconsole -->
-								</resource>
-								<resource>
-									<directory>${project.build.directory}/dependencies-unpacked/wsgene-webapp/META-INF</directory>
-									<filtering>true</filtering>
-								</resource>
-							</resources>              
-						</configuration>            
-					</execution>
-				</executions>
-			</plugin>
-			
-			<plugin>
-				<!-- build con i file di struts e ibatis corretti, un unico file di resources, e properties filtrate o eliminate -->
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-war-plugin</artifactId>
-				<version>2.1.1</version>
-				<configuration>
-					<overlays>
-						<overlay>
-							<groupId>it.maggioli.eldasoft.commons</groupId>
-							<artifactId>wsgene-webapp</artifactId>
-							<excludes>
-								<exclude>META-INF/context*.xml</exclude>
-								<exclude>WEB-INF/classes/*.properties</exclude>
-								<exclude>configuration/**</exclude>
-							</excludes>
-						</overlay>
-					</overlays>
-					<warSourceExcludes>WEB-INF/xml/ibatis/add.xml</warSourceExcludes>
-					<webResources>
-						<resource>
-							<!-- "touch" del web.xml inserito nell'artefatto -->
-							<directory>src/main/webapp/WEB-INF</directory>
-							<targetPath>WEB-INF</targetPath>
-							<includes>
-								<include>web.xml</include>
-							</includes>
-							<filtering>true</filtering>
-						</resource>												
-						<resource>
-							<!-- gareAppalto.xml, aste.xml 	-->		
-							<directory>src/main/webapp/WEB-INF/xml/spring</directory>
-							<targetPath>WEB-INF/xml/spring</targetPath>
-							<includes>
-								<include>*.xml</include>
-							</includes>
-						</resource>											
-						<resource>
-						    <!-- WSGareAppaltoSOAP.wsdl, WSAsteSOAP.wsdl -->		
-							<directory>src/main/webapp/wsdl</directory>
-							<targetPath>wsdl</targetPath>
-							<includes>
-								<include>*.wsdl</include>
-							</includes>
-						</resource>
-						<resource>
-							<!-- risorse filtrate derivate dalla webapp geneweb-webapp -->
-							<!-- NOTA BENE: MAI METTERE QUESTA RISORSA PER ULTIMA NELLA SEZIONE, ALTRIMENTI PER UN BACO DI MAVEN NON SI COPIANO I FILE! -->
-							<directory>${project.build.directory}/war/work/resources</directory>
-							<targetPath>WEB-INF</targetPath>
-							<excludes>
-								<exclude>**/context*.xml</exclude>
-							</excludes>
-						</resource>
-						<resource>
-							<directory>${project.build.directory}/war/work/xml-ibatis</directory>
-							<targetPath>WEB-INF/xml/ibatis</targetPath>
-							<includes>
-								<include>*</include>
-							</includes>
-						</resource>
-					</webResources>
-				</configuration>
-			</plugin>
-
-		</plugins>
-
-	</build>
-  
 </project>

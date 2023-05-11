@@ -1,0 +1,448 @@
+<?xml version="1.0" encoding="UTF-8"?><!--Converted at: Wed May 25 17:56:09 CEST 2022-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="it.maggioli.eldasoft.sil.gare.db.mapper.ImpreseMapper">
+
+	<resultMap id="resultImpresa" type="it.eldasoft.sil.portgare.datatypes.ImpresaAggiornabileType">
+		<result property="ragioneSociale" column="nomest"/>
+		<result property="naturaGiuridica" column="natgiui"/>
+		<result property="tipoImpresa" column="tipimp"/>
+		<result property="codiceFiscale" column="cfimp"/>
+		<result property="partitaIVA" column="pivimp"/>
+		<result property="oggettoSociale" column="oggsoc"/>
+		<result property="microPiccolaMediaImpresa" column="flag_ismpmi"/>
+		<result property="sitoWeb" column="indweb"/>
+		<result property="soggettoDURC" column="flag_soggdurc"/>
+		<result property="settoreProduttivo" column="settprod"/>
+		<result property="altreCertificazioniAttestazioni" column="acertatt"/>
+		<result property="altriIstitutiPrevidenziali" column="aistprev"/>
+		<result property="assunzioniObbligate" column="flag_assobbl"/>
+		<result property="zoneAttivita" column="zoneat"/>
+		<result property="classeDimensione" column="cladim"/>
+		<result property="settoreAttivitaEconomica" column="codatt"/>
+		<result property="ulterioriDichiarazioni" column="ultdic"/>
+		<result property="socioUnico" column="sociounico"/>
+		<result property="regimeFiscale" column="regfisc"/>
+		<result property="gruppoIva" column="isgruppoiva"/>
+		<result property="tipoSocietaCooperativa" column="TIPOCOOP"/>
+	</resultMap>
+
+	<resultMap id="resultIndirizzo" type="it.eldasoft.sil.portgare.datatypes.IndirizzoAggiornabileType">
+		<result property="indirizzo" column="indirizzo"/>
+		<result property="numCivico" column="civico"/>
+		<result property="cap" column="cap"/>
+		<result property="comune" column="comune"/>
+		<result property="provincia" column="provincia"/>
+		<result property="nazione" column="nazione"/>
+	</resultMap>
+
+	<resultMap id="resultRecapiti" type="it.eldasoft.sil.portgare.datatypes.RecapitiAggiornabileType">
+		<result property="telefono" column="telimp"/>
+		<result property="fax" column="faximp"/>
+		<result property="cellulare" column="telcel"/>
+		<result property="email" column="emaiip"/>
+		<result property="pec" column="emai2ip"/>
+	</resultMap>
+
+	<resultMap id="resultIndirizzoEsteso" type="it.eldasoft.sil.portgare.datatypes.IndirizzoEstesoAggiornabileType">
+		<result property="indirizzo" column="indirizzo"/>
+		<result property="numCivico" column="civico"/>
+		<result property="cap" column="cap"/>
+		<result property="comune" column="comune"/>
+		<result property="provincia" column="provincia"/>
+		<result property="nazione" column="nazione"/>
+		<result property="telefono" column="telimp"/>
+		<result property="fax" column="faximp"/>
+		<result property="tipoIndirizzo" column="indtip"/>
+	</resultMap>
+	
+	<resultMap id="resultCCIAA" type="it.eldasoft.sil.portgare.datatypes.CameraCommercioAggiornabileType">
+		<result property="iscritto" column="flag_iscrcciaa"/>
+		<result property="numRegistroDitte" column="regdit"/>
+		<result property="dataDomandaIscrizione" column="discif" typeHandler="CalendarTypeHandler"/>
+		<result property="numIscrizione" column="ncciaa"/>
+		<result property="dataIscrizione" column="dcciaa" typeHandler="CalendarTypeHandler"/>
+		<result property="provinciaIscrizione" column="pcciaa"/>
+		<result property="dataNullaOstaAntimafia" column="dantim" typeHandler="CalendarTypeHandler"/>
+	</resultMap>
+
+	<resultMap id="resultINPS" type="it.eldasoft.sil.portgare.datatypes.INPSAggiornabileType">
+		<result property="numIscrizione" column="ninps"/>
+		<result property="dataIscrizione" column="dinps" typeHandler="CalendarTypeHandler"/>
+		<result property="localitaIscrizione" column="linps"/>
+		<result property="posizContributivaIndividuale" column="posinps"/>
+	</resultMap>
+
+	<resultMap id="resultINAIL" type="it.eldasoft.sil.portgare.datatypes.INAILAggiornabileType">
+		<result property="numIscrizione" column="ninail"/>
+		<result property="dataIscrizione" column="dinail" typeHandler="CalendarTypeHandler"/>
+		<result property="localitaIscrizione" column="linail"/>
+		<result property="posizAssicurativa" column="posinail"/>
+	</resultMap>
+
+	<resultMap id="resultCassaEdile" type="it.eldasoft.sil.portgare.datatypes.CassaEdileAggiornabileType">
+		<result property="numIscrizione" column="ncedil"/>
+		<result property="dataIscrizione" column="dcedil" typeHandler="CalendarTypeHandler"/>
+		<result property="localitaIscrizione" column="lcedil"/>
+		<result property="codice" column="codcedil"/>
+	</resultMap>
+
+	<resultMap id="resultSOA" type="it.eldasoft.sil.portgare.datatypes.SOAAggiornabileType">
+		<result property="numIscrizione" column="nisanc"/>
+		<result property="dataIscrizione" column="disanc" typeHandler="CalendarTypeHandler"/>
+		<result property="dataScadenza" column="dscanc" typeHandler="CalendarTypeHandler"/>
+		<result property="dataUltimaRichiestaIscrizione" column="duranc" typeHandler="CalendarTypeHandler"/>
+		<result property="dataScadenzaTriennale" column="dtrisoa" typeHandler="CalendarTypeHandler"/>
+		<result property="dataVerificaTriennale" column="dversoa" typeHandler="CalendarTypeHandler"/>
+		<result property="dataScadenzaIntermedia" column="dintsoa" typeHandler="CalendarTypeHandler"/>
+		<result property="organismoCertificatore" column="octsoa"/>
+	</resultMap>
+
+	<resultMap id="resultISO9001" type="it.eldasoft.sil.portgare.datatypes.ISO9001AggiornabileType">
+		<result property="numIscrizione" column="numiso"/>
+		<result property="dataScadenza" column="datiso" typeHandler="CalendarTypeHandler"/>
+		<result property="organismoCertificatore" column="octiso"/>
+	</resultMap>
+
+	<resultMap id="resultIscrizioneWhitelistAntimafia" type="it.eldasoft.sil.portgare.datatypes.IscrizioneWhitelistAntimafiaAggiornabileType">
+		<result property="iscritto" column="iscriwl"/>
+		<result property="sedePrefetturaCompetente" column="wlprefe"/>
+		<result property="sezioniIscrizione" column="wlsezio"/>
+		<result property="dataIscrizione" column="wldiscri" typeHandler="CalendarTypeHandler"/>
+		<result property="dataScadenzaIscrizione" column="wldscad" typeHandler="CalendarTypeHandler"/>
+		<result property="aggiornamento" column="wlincorso"/>
+	</resultMap>
+	
+	<resultMap id="resultIscrizioneElenchiRicostruzione" type="it.eldasoft.sil.portgare.datatypes.IscrizioneElenchiRicostruzioneAggiornabileType">
+		<result property="iscrittoAnagrafeAntimafiaEsecutori" column="iscriae"/>
+		<result property="dataScadenza" column="aedscad" typeHandler="CalendarTypeHandler"/>
+		<result property="rinnovoIscrizioneInCorso" column="aeincorso"/>
+		<result property="iscrittoElencoSpecialeProfessionisti" column="iscriesp"/>
+	</resultMap>
+	
+	<resultMap id="resultRatingLegalita" type="it.eldasoft.sil.portgare.datatypes.RatingLegalitaAggiornabileType">
+		<result property="possiedeRating" column="iscrirat"/>
+		<result property="rating" column="rating"/>
+		<result property="dataScadenza" column="ratdscad" typeHandler="CalendarTypeHandler"/>
+		<result property="aggiornamentoRatingInCorso" column="ratincorso"/>
+	</resultMap>
+	
+	<resultMap id="resultContoCorrenteDedicato" type="it.eldasoft.sil.portgare.datatypes.ContoCorrenteDedicatoAggiornabileType">
+		<result property="estremi" column="coorba"/>
+		<result property="soggettiAbilitati" column="sogmov"/>
+		<result property="bic" column="codbic"/>
+	</resultMap>
+
+	<resultMap id="resultAbilitazionePreventiva" type="it.eldasoft.sil.portgare.datatypes.AbilitazionePreventivaAggiornabileType">
+		<result property="dataScadenzaRinnovo" column="dscnos" typeHandler="CalendarTypeHandler"/>
+		<result property="faseRinnovo" column="flag_rinnos"/>
+		<result property="dataRichiestaRinnovo" column="drinos" typeHandler="CalendarTypeHandler"/>
+	</resultMap>
+	
+	<resultMap id="resultAltriDatiLiberoProfessionista" type="it.eldasoft.sil.portgare.datatypes.AltriDatiAnagraficiAggiornabileType">
+		<result property="nome" column="nometec"/>
+		<result property="cognome" column="cognometec"/>
+		<result property="titolo" column="inctec"/>
+		<result property="dataNascita" column="dnatec" typeHandler="CalendarTypeHandler"/>
+		<result property="comuneNascita" column="cnatec"/>
+		<result property="provinciaNascita" column="pronas"/>
+		<result property="sesso" column="sextec"/>
+		<collection property="alboProfessionale" resultMap="resultAlboProfessionale"/>
+		<collection property="cassaPrevidenza" resultMap="resultCassaPrevidenza"/>
+	</resultMap>
+	
+	<resultMap id="resultAlboProfessionale" type="it.eldasoft.sil.portgare.datatypes.AlboProfessionaleAggiornabileType">
+		<result property="tipologia" column="tipalb"/>
+		<result property="numIscrizione" column="albtec"/>
+		<result property="dataIscrizione" column="datalb" typeHandler="CalendarTypeHandler"/>
+		<result property="provinciaIscrizione" column="proalb"/>
+	</resultMap>
+	
+	<resultMap id="resultCassaPrevidenza" type="it.eldasoft.sil.portgare.datatypes.CassaPrevidenzaAggiornabileType">
+		<result property="tipologia" column="tcapre"/>
+		<result property="numMatricola" column="ncapre"/>
+	</resultMap>
+	
+	<resultMap id="resultPKReferente" type="it.maggioli.eldasoft.sil.gare.db.vo.PKReferenteImpresa">
+		<result property="codice" column="codtim"/>
+		<result property="incarico" column="inctim"/>
+		<result property="qualifica" column="incqual"/>
+		<result property="id" column="id"/>
+	</resultMap>
+	
+	<resultMap id="resultReferente" type="it.eldasoft.sil.portgare.datatypes.ReferenteImpresaAggiornabileType">
+		<result property="cognome" column="cogtim"/>
+		<result property="nome" column="nometim"/>
+		<result property="titolo" column="inctim"/>
+		<result property="codiceFiscale" column="cftim"/>
+		<result property="sesso" column="sextim"/>
+		<result property="dataNascita" column="dnatim" typeHandler="CalendarTypeHandler"/>
+		<result property="comuneNascita" column="cnatim"/>
+		<result property="provinciaNascita" column="pronas"/>
+	</resultMap>
+	
+	<resultMap id="resultIncarico" type="it.eldasoft.sil.portgare.datatypes.ReferenteImpresaAggiornabileType">
+		<result property="dataInizioIncarico" column="incini" typeHandler="CalendarTypeHandler"/>
+		<result property="dataFineIncarico" column="incfin" typeHandler="CalendarTypeHandler"/>
+		<result property="qualifica" column="incqual"/>
+		<result property="note" column="incnote"/>
+		<result property="responsabileDichiarazioni" column="flag_respdich"/>
+	</resultMap>
+	
+	<resultMap id="resultDatiAnnui" type="it.eldasoft.sil.portgare.datatypes.DatoAnnuoImpresaAggiornabileType">
+		<result property="anno" column="anno"/>
+		<result property="dipendenti" column="numdip"/>
+	</resultMap>
+
+	<select id="getPKImpresaByUsername" parameterType="java.lang.String" resultType="java.lang.String">
+	select codimp
+	  from v_ws_fornitori
+	 where usernome = #{username}
+	</select>
+
+	<select id="getImpresa" parameterType="java.lang.String" resultMap="resultImpresa">
+	select nomest, natgiui, tipimp, cfimp, pivimp, oggsoc, indweb, flag_soggdurc, settprod, acertatt, aistprev, flag_assobbl, zoneat, flag_ismpmi,
+	       cladim, codatt, ultdic, regfisc, sociounico, isgruppoiva, TIPOCOOP
+	  from v_ws_fornitori
+	 where codimp = #{codiceImpresa}
+	</select>
+
+	<select id="getSedeLegaleImpresa" parameterType="java.lang.String" resultMap="resultIndirizzo">
+	select indirizzo, civico, cap, comune, provincia, nazione
+	  from v_ws_fornitori
+	 where codimp = #{codiceImpresa}
+	</select>
+
+	<select id="getRecapitiImpresa" parameterType="java.lang.String" resultMap="resultRecapiti">
+	select mgsflg, telimp, faximp, telcel, emaiip, emai2ip
+	  from v_ws_fornitori
+	 where codimp = #{codiceImpresa}
+	</select>
+
+	<select id="getIndirizziImpresa" parameterType="java.lang.String" resultMap="resultIndirizzoEsteso">
+	select indirizzo, civico, cap, comune, provincia, nazione, telimp, faximp, indtip
+	  from v_ws_fornitori_indirizzi
+	 where codimp = #{codiceImpresa}
+	</select>
+
+	<select id="getDatiCCIAAImpresa" parameterType="java.lang.String" resultMap="resultCCIAA">
+	select regdit, discif, ncciaa, dcciaa, pcciaa, dantim, flag_iscrcciaa 
+	  from v_ws_fornitori_cciaa
+	 where codimp = #{codiceImpresa}
+	</select>
+
+	<select id="getDatiINPSImpresa" parameterType="java.lang.String" resultMap="resultINPS">
+	select ninps, dinps, linps, posinps
+	  from v_ws_fornitori
+	 where codimp = #{codiceImpresa}
+	</select>
+	
+	<select id="getDatiINAILImpresa" parameterType="java.lang.String" resultMap="resultINAIL">
+	select ninail, dinail, linail, posinail
+	  from v_ws_fornitori
+	 where codimp = #{codiceImpresa}
+	</select>
+	
+	<select id="getDatiCassaEdileImpresa" parameterType="java.lang.String" resultMap="resultCassaEdile">
+	select ncedil, dcedil, lcedil, codcedil
+	  from v_ws_fornitori
+	 where codimp = #{codiceImpresa}
+	</select>
+	
+	<select id="getDatiSOAImpresa" parameterType="java.lang.String" resultMap="resultSOA">
+	select nisanc, disanc, dscanc, duranc, dtrisoa, dversoa, octsoa, dintsoa
+	  from v_ws_fornitori
+	 where codimp = #{codiceImpresa}
+	</select>
+	
+	<select id="getDatiISO9001Impresa" parameterType="java.lang.String" resultMap="resultISO9001">
+	select numiso, datiso, octiso
+	  from v_ws_fornitori
+	 where codimp = #{codiceImpresa}
+	</select>
+	
+	<select id="getDatiIscrizioneWhitelistImpresa" parameterType="java.lang.String" resultMap="resultIscrizioneWhitelistAntimafia">
+    select iscriwl, wlprefe, wlsezio, wldiscri, wldscad, wlincorso
+  	  from v_ws_fornitori
+     where codimp = #{codiceImpresa}
+	</select>
+
+	<select id="getDatiIscrizioneElenchiRicostruzioneImpresa" parameterType="java.lang.String" resultMap="resultIscrizioneElenchiRicostruzione">
+	select iscriae, aedscad, aeincorso, iscriesp 
+	  from v_ws_fornitori
+     where codimp = #{codiceImpresa}
+	</select>
+	
+	<select id="getDatiRatingLegalitaImpresa" parameterType="java.lang.String" resultMap="resultRatingLegalita">
+    select iscrirat, rating, ratdscad, ratincorso 
+      from v_ws_fornitori
+     where codimp = #{codiceImpresa}
+	</select>
+  
+	<select id="getDatiContoCorrenteDedicatoImpresa" parameterType="java.lang.String" resultMap="resultContoCorrenteDedicato">
+	select coorba, sogmov, codbic
+	  from v_ws_fornitori
+	 where codimp = #{codiceImpresa}
+	</select>
+	
+	<select id="getDatiAbilitazionePreventivaImpresa" parameterType="java.lang.String" resultMap="resultAbilitazionePreventiva">
+	select dscnos, flag_rinnos, drinos
+	  from v_ws_fornitori
+	 where codimp = #{codiceImpresa}
+	</select>
+
+	<select id="getAlboProfessionaleReferenteImpresa" parameterType="java.lang.String" resultMap="resultAlboProfessionale">
+	select tipalb, albtec, datalb, proalb	   
+	  from v_ws_tecnici
+	 where codtim = #{codiceReferente}
+	</select>
+
+	<select id="getCassaPrevidenzaReferenteImpresa" parameterType="java.lang.String" resultMap="resultCassaPrevidenza">
+	select tcapre, ncapre	   
+	  from v_ws_tecnici
+	 where codtim = #{codiceReferente}
+	</select>
+
+	<select id="getAltriDatiLiberoProfessionista" parameterType="java.lang.String" resultMap="resultAltriDatiLiberoProfessionista">
+	select cognometec, nometec, inctec, dnatec, cnatec, pronas, sextec, tipalb, albtec, datalb, proalb, tcapre, ncapre	   
+	  from v_ws_fornitori
+	 where codimp = #{codiceImpresa}
+	</select>
+
+	<select id="getAlboProfessionaleLiberoProfessionista" parameterType="java.lang.String" resultMap="resultAlboProfessionale">
+	select tipalb, albtec, datalb, proalb	   
+	  from v_ws_fornitori
+	 where codimp = #{codiceImpresa}
+	</select>
+
+	<select id="getCassaPrevidenzaLiberoProfessionista" parameterType="java.lang.String" resultMap="resultCassaPrevidenza">
+	select tcapre, ncapre	   
+	  from v_ws_fornitori
+	 where codimp = #{codiceImpresa}
+	</select>
+
+	<select id="getPKAttualiReferentiImpresa" parameterType="java.util.HashMap" resultMap="resultPKReferente">
+	select codtim, inctim, incqual, id
+	  from v_ws_fornitori_tec
+	 where codimp = #{codiceImpresa} and inctim = #{incarico}
+	 <if test="dataPartenzaCessati == null">and incfin is null </if>
+	 <if test="dataPartenzaCessati != null">and (incfin is null or incfin &gt; #{dataPartenzaCessati}) </if>
+	 order by incprog
+	</select>
+
+	<select id="getDatiReferenteImpresa" parameterType="java.lang.String" resultMap="resultReferente">
+	select cogtim, nometim, inctim, cftim, pivatei, sextim, dnatim, cnatim, pronas
+	  from v_ws_tecnici
+	 where codtim = #{codiceReferente}
+	</select>
+
+	<select id="getIndirizzoReferenteImpresa" parameterType="java.lang.String" resultMap="resultIndirizzo">
+	select indirizzo, civico, cap, comune, provincia, nazione
+	  from v_ws_tecnici
+	 where codtim = #{codiceReferente}
+	</select>
+	
+	<select id="getIncaricoReferenteImpresa" parameterType="java.util.HashMap" resultMap="resultIncarico">
+	select incini, incfin, incqual, incnote, flag_respdich
+	  from v_ws_fornitori_tec
+	 where codimp = #{codiceImpresa} and codtim = #{codiceReferente} and inctim = #{incarico}
+	 <if test="qualifica != null and qualifica != ''">and incqual = #{qualifica}</if>
+	 <if test="id != null and id != ''">and id = #{id}</if>
+	</select>
+	
+	<select id="getElencoTipiImpresaPerIscrizione" resultMap="it.maggioli.eldasoft.gene.db.mapper.DatiCodificatiMapper.resultDatoCodificato">
+	select codice, descrizione
+	  from v_ws_tipi_impresa
+	 order by ordine, codice
+	</select>
+	
+	<select id="getElencoTipiImpresaDittaIndividuale" resultMap="it.maggioli.eldasoft.gene.db.mapper.DatiCodificatiMapper.resultDatoCodificato">
+	select codice, descrizione
+	  from v_ws_tipi_impresa
+	 where ditta_individuale = 1
+	 order by ordine, codice
+	</select>
+	
+	<select id="getElencoTipiImpresaLiberoProfessionista" resultMap="it.maggioli.eldasoft.gene.db.mapper.DatiCodificatiMapper.resultDatoCodificato">
+	select codice, descrizione
+	  from v_ws_tipi_impresa
+	 where libero_professionista = 1
+	 order by ordine, codice
+	</select>
+	
+	<select id="getElencoTipiImpresaSociale" resultMap="it.maggioli.eldasoft.gene.db.mapper.DatiCodificatiMapper.resultDatoCodificato">
+	select codice, descrizione
+	  from v_ws_tipi_impresa
+	 where impresa_sociale = 1
+	 order by ordine, codice
+	</select>
+	
+	<select id="getElencoTipiImpresaConsorzio" resultMap="it.maggioli.eldasoft.gene.db.mapper.DatiCodificatiMapper.resultDatoCodificato">
+	select codice, descrizione
+	  from v_ws_tipi_impresa
+	 where consorzio = 1
+	 order by ordine, codice
+	</select>
+	
+  <select id="isImpresaRegistrata" parameterType="java.util.HashMap" resultType="java.lang.Integer">
+  select count(1)
+    from impr inner join w_puser on userkey1 = codimp    
+   where userent = #{tabella}
+   and 
+   <if test="codiceFiscale != null and codiceFiscale != ''">
+   		(cfimp = #{codiceFiscale} <if test="partitaIva != null and partitaIva != ''"> <if test="isGruppoIva">and pivimp = #{partitaIva}</if><if test="!isGruppoIva">or cfimp = #{partitaIva} or pivimp = #{partitaIva}</if></if>)
+   </if>
+   <if test="codiceFiscale == null or codiceFiscale == '' and (partitaIva != null and partitaIva != '')">
+   		(pivimp = #{partitaIva})
+   </if>
+  </select>
+  
+  <select id="getImpresaRegistrata" parameterType="java.util.HashMap" resultType="java.lang.String">
+  select u.usernome
+    from impr i, w_puser u 
+   where userkey1 = codimp 
+     and userent = #{tabella} 
+     and (cfimp = #{codiceFiscale} <if test="partitaIva != null and partitaIva != ''">or cfimp = #{partitaIva} or pivimp = #{partitaIva}</if>)
+     <if test="email != null and email != ''">AND emaiip = #{email} </if>
+     <if test="pec != null and pec != ''">AND emai2ip = #{pec} </if>
+  </select>
+  
+  <select id="getDatiAnnui" parameterType="java.util.HashMap" resultMap="resultDatiAnnui">
+  select anno, numdip
+    from v_ws_fornitori_datiannui
+   where codimp = #{codiceImpresa} and anno = #{anno} and numdip is not null
+  </select>
+
+	<select id="getIdImpresa" parameterType="java.util.HashMap" resultType="java.lang.String">
+  select userkey1 codimp 
+    from w_puser
+   where userent = 'IMPR' and usernome = #{username}
+    </select>
+
+
+	<resultMap id="resultVendorRating" type="it.maggioli.eldasoft.sil.gare.ws.VendorRatingType">
+		<result property="dataInizioValidita" column="ivr_data_inizio"/>
+		<result property="dataFineValidita" column="ivr_data_fine"/>
+		<result property="dataInizioSospensione" column="sospensione_data_inizio"/>
+		<result property="dataFineSospensione" column="sospensione_data_fine"/>
+		<result property="indiceVR" column="ivr"/>
+	</resultMap>
+
+	<select id="getVendorRatingValidita" parameterType="java.util.HashMap" resultMap="resultVendorRating">
+		SELECT i.ivr, i.ivr_data_inizio , i.ivr_data_fine
+		FROM imprvr i
+		JOIN w_puser wp ON i.codimp = wp.userkey1
+		WHERE usernome = #{tokenRichiedente}
+		AND #{data} BETWEEN ivr_data_inizio AND ivr_data_fine
+	</select>
+
+	<select id="getVendorRatingSospensione" parameterType="java.util.HashMap" resultMap="resultVendorRating">
+		SELECT  i.sospensione_data_inizio, i.sospensione_data_fine
+		FROM imprvr i
+		JOIN w_puser wp on i.codimp = wp.userkey1
+		WHERE  usernome = #{tokenRichiedente}
+		AND #{data} BETWEEN sospensione_data_inizio  AND sospensione_data_fine
+		AND (sospensione_revocata IS NULL OR sospensione_revocata != 1)
+	</select>
+
+</mapper>

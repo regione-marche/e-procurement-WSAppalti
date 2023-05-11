@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?><!--Converted at: Tue Jun 07 11:02:29 CEST 2022-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="it.maggioli.eldasoft.sil.stipule.db.mapper.StipuleContrattiMapper">
+
+	<resultMap id="resultStipulaContratto" type="it.maggioli.eldasoft.sil.stipule.ws.StipulaContrattoType">
+		<result property="id" column="id"/>
+		<result property="codiceGara" column="ngara"/>
+		<result property="contatore" column="numcont"/>
+		<result property="codiceStipula" column="codstipula"/>
+		<result property="oggetto" column="oggetto"/>
+		<result property="importo" column="impstipula"/>
+		<result property="stato" column="stato"/>
+		<result property="syscon" column="syscon"/>
+		<result property="assegnatario" column="assegnatario"/>
+		<result property="codicedec" column="coddec"/>
+		<result property="dataPubblicazione" column="dataatto"/>
+		<result property="codiceSa" column="cenint"/>
+		<result property="descStato" column="descstato"/>
+		<result property="descSa" column="descsa"/> 
+		<result property="descRup" column="descrup"/>
+	</resultMap>
+
+	<resultMap id="resultDocumentoRichiestoStipula" type="it.maggioli.eldasoft.sil.stipule.ws.DocumentazioneStipulaContrattiType">	
+		<result property="id" column="id"/>
+		<!-- <result property="idStipula" column="idstipula"/> -->
+		<!-- <result property="ordine" column="numord"/> -->
+		<result property="fase" column="fase"/>
+		<result property="titolo" column="titolo"/>
+		<result property="descrizione" column="descrizione"/>
+		<result property="note" column="note"/>
+		<result property="visibilita" column="visibilita"/>
+		<result property="stato" column="statodoc"/>
+		<result property="obbligatorio" column="obbligatorio"/>
+		<result property="iddocdig" column="iddocdig"/>
+		<result property="nomeFile" column="dignomdoc"/>
+		<result property="formato" column="formato"/>
+		<result property="firmacheck" column="firmacheck"/>
+		<result property="firmacheckts" column="firmacheckts"/>
+	</resultMap>
+
+	<select id="countStipuleContratti" parameterType="java.util.HashMap" resultType="java.lang.Integer">
+  SELECT count(1)
+	FROM v_ws_gare_stipula s
+   WHERE s.usernome = #{usernome}  and datpub is not null 
+		<if test="codiceStipula != null and codiceStipula != ''">AND codstipula = #{codiceStipula}</if> 
+		<if test="oggetto != null and oggetto != ''">AND ${operatoreUpper}(oggetto) like #{oggetto}</if> 
+		<if test="stato != null and stato != ''">AND stato_portale = #{stato}</if>
+		<if test="stazioneAppaltante != null and stazioneAppaltante != ''">AND cenint = #{stazioneAppaltante}</if>
+	</select>
+
+	<select id="searchStipuleContratti" parameterType="java.util.HashMap" resultMap="resultStipulaContratto">
+  SELECT id, s.ngara, s.numcont, s.codstipula, s.oggetto, s.impstipula, s.stato, s.descstato, null syscon, null assegnatario, NREPAT coddec, s.daatto dataatto, s.isarchi, s.cenint, descsa, descrup
+	FROM v_ws_gare_stipula s 
+   WHERE s.usernome = #{usernome} and datpub is not null 
+		<if test="codiceStipula != null and codiceStipula != ''">AND codstipula = #{codiceStipula}</if> 
+		<if test="oggetto != null and oggetto != ''">AND ${operatoreUpper}(oggetto) like #{oggetto}</if> 
+		<if test="stato != null and stato != ''">AND stato_portale = #{stato}</if>
+		<if test="stazioneAppaltante != null and stazioneAppaltante != ''">AND cenint = #{stazioneAppaltante}</if>
+	ORDER BY datpub DESC,codstipula desc
+	</select>
+
+	<select id="getDettaglioStipulaContratto" parameterType="java.util.HashMap" resultMap="resultStipulaContratto">
+  SELECT id, s.ngara, s.numcont, s.codstipula, s.oggetto, s.impstipula, s.stato, s.descstato, null syscon, nome_contract assegnatario, NREPAT coddec, s.daatto dataatto, s.isarchi, s.cenint, descsa, descrup
+	FROM v_ws_gare_stipula s 
+   WHERE s.usernome = #{usernome}
+       <if test="codiceStipula != null and codiceStipula != ''">AND s.codstipula = #{codiceStipula}</if>
+       <if test="idstipula != null and idstipula != ''">AND s.id = #{idstipula}</if>
+   
+   <if test="pubblicata != null and pubblicata">AND datpub is not null</if>
+   </select>
+	
+    <select id="getDocumentiRichiestiStipulaContratto" parameterType="java.util.HashMap" resultMap="resultDocumentoRichiestoStipula">
+  SELECT id, idstipula, numord, fase, titolo, descrizione, note, 
+  		 visibilita,
+  		 statodoc, 
+  		 obbligatorio,
+  		 d.iddocdig,
+  		 d.dignomdoc,
+  		 g.formato,
+  		 d.firmacheck,
+  		 d.firmacheckts
+    FROM g1docstipula g
+    	 LEFT OUTER JOIN w_docdig d ON g.id = d.digkey1 and d.digent = 'G1DOCSTIPULA' and idprg = 'PG'
+   WHERE g.idStipula = #{idStipula} 
+     AND g.visibilita != 1
+   	 AND g.statodoc != 1
+	 <!-- AND ((g.statodoc = 3) OR (g.statodoc != 3 AND d.digogg IS NOT NULL)) --> 	 
+ORDER BY g.fase, g.numord
+  </select>
+  
+    <update id="updateStipula" parameterType="java.util.HashMap">
+	  UPDATE g1stipula
+     SET stato = #{stato}
+   WHERE id = #{codiceStipula}
+  </update>  
+  
+  <update id="updateDocStipula" parameterType="java.util.HashMap">
+  UPDATE g1docstipula 
+     SET statodoc = #{stato}
+   WHERE idstipula = #{codiceStipula}
+   and statodoc = 3 and visibilita = 3
+  </update>  
+  
+    <update id="updateNoteDoc" parameterType="java.util.HashMap">
+  UPDATE g1docstipula 
+     SET note = #{note}
+   WHERE id = #{id}
+  </update>  
+  
+</mapper>

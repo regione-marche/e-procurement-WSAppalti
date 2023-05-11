@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?><!--Converted at: Mon May 23 09:58:06 CEST 2022-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="it.maggioli.eldasoft.gene.db.mapper.DocumentiMapper">
+
+	<resultMap id="resultGetDocumentoDigitale" type="it.maggioli.eldasoft.gene.ws.FileType">
+		<result property="file" column="contfile" jdbcType="BINARY"/>
+		<result property="nome" column="nome"/>
+	</resultMap>
+	
+	<select id="getDocumentoDigitale" parameterType="java.util.HashMap" resultMap="resultGetDocumentoDigitale">
+	SELECT digogg as contfile, dignomdoc as nome 
+	FROM v_ws_documenti_digitali
+	WHERE iddocdig = #{id}
+	AND idprg = #{prg}
+	<if test="username == null or username == ''">and usernome IS NULL</if>
+	<if test="username != null and username != ''">and usernome = #{username}</if>
+	</select>
+
+	<select id="getUsernameDocumentoRiservato" parameterType="java.util.HashMap" resultType="java.lang.String">
+	SELECT dd.usernome, dd.idprg, dd.iddocdig id, dignomdoc
+	FROM v_ws_documenti_digitali dd 
+	     INNER JOIN documgara dg ON (dd.digkey1=dg.codgar and dd.iddocdig=dg.iddocdg)
+	WHERE dg.gruppo = 6
+ 	AND dd.iddocdig = #{id}
+	ANd dd.idprg = #{prg}
+	</select>
+
+</mapper>

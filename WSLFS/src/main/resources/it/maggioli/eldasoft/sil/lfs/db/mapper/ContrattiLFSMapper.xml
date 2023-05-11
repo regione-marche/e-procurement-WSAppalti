@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?><!--Converted at: Wed May 25 17:33:39 CEST 2022-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="it.maggioli.eldasoft.sil.lfs.db.mapper.ContrattiLFSMapper">
+
+	<resultMap id="resultContrattoLFS" type="it.maggioli.eldasoft.sil.lfs.ws.ContrattoLFSType">
+		<result property="codice" column="codice"/>
+		<result property="nappal" column="nappal"/>
+		<result property="oggetto" column="oggetto"/>
+		<result property="importo" column="importo"/>
+		<result property="codiceSA" column="codiceSA"/>
+		<result property="stazioneAppaltante" column="descSA"/>
+		<result property="dataContratto" column="dataContratto"/>
+		<result property="nominativoDirettoreTecni" column="nominativoDirettoreTecni"/>
+		<result property="nominativoDirettoreImpr" column="nominativoDirettoreImpr"/>
+		<result property="nominativoRespSicTecni" column="nominativoRespSicTecni"/>
+		<result property="nominativoRespSicImpr" column="nominativoRespSicImpr"/>
+		<result property="cig" column="cig"/>
+		<result property="ngara" column="ngara"/>
+		<result property="dataContratto" column="dataContratto"/>
+		<result property="numeroRepertorio" column="numeroRepertorio"/>
+		<result property="fase" column="fase"/>
+	</resultMap>
+
+	<!-- riutilizza la classe del package "contratti" per i documenti allegati -->
+	<resultMap id="resultAllegatiLFS" type="it.maggioli.eldasoft.sil.gare.ws.DocumentoAllegatoType">
+		<result property="descrizione" column="descdoc"/>
+		<result property="nomefile" column="filedoc"/>
+		<result property="id" column="iddoc"/>
+	</resultMap>
+	
+	<select id="searchContrattiLFS" parameterType="java.util.HashMap" resultMap="resultContrattoLFS">
+	SELECT
+			codice,
+			nappal,  
+			oggetto,	
+			cig,	
+			importo,
+			codiceSA,
+			descSA,
+			g.ngara,		
+			nominativoDirettoreTecni,	
+			nominativoDirettoreImpr,
+			nominativoRespSicTecni,	
+			nominativoRespSicImpr,	
+			dataContratto,
+			numeroRepertorio,
+			fase
+	FROM v_ws_lfs_contratti c
+		left outer join gare g on g.codcig = c.cig
+	WHERE usernome = #{username}
+		<if test="stazioneAppaltante != null and stazioneAppaltante != ''">AND codiceSA = #{stazioneAppaltante}</if> 
+		<if test="oggetto != null and oggetto != ''">AND ${operatoreUpper}(oggetto) like #{oggetto}</if> 
+		<if test="cig != null and cig != ''">AND cig like #{cig}</if>  
+		<if test="gara != null and gara != ''">AND g.ngara like #{gara}</if>
+		<if test="codice != null and codice != ''">AND ${operatoreUpper}(codice)like #{codice}</if>
+	ORDER BY dataContratto DESC
+	</select>
+	
+	
+	<select id="countContrattiLFS" parameterType="java.util.HashMap" resultType="java.lang.Integer">
+	SELECT	count(1)
+	FROM v_ws_lfs_contratti c
+		left outer join gare g on g.codcig = c.cig
+	WHERE usernome = #{username}
+		<if test="stazioneAppaltante != null and stazioneAppaltante != ''">AND codiceSA = #{stazioneAppaltante}</if> 
+		<if test="oggetto != null and oggetto != ''">AND ${operatoreUpper}(oggetto) like #{oggetto}</if> 
+		<if test="cig != null and cig != ''">AND cig like #{cig}</if>  
+		<if test="gara != null and gara != ''">AND g.ngara like #{gara}</if>
+		<if test="codice != null and codice != ''">AND ${operatoreUpper}(codice)like #{codice}</if>
+	</select>
+	
+	
+
+	<select id="getDettaglioContrattoLFS" parameterType="java.util.HashMap" resultMap="resultContrattoLFS">
+	SELECT codice,
+			nappal,
+			oggetto,
+			cig,
+			importo,
+			codiceSA,
+			descSA,	
+			g.ngara,
+			nominativoDirettoreTecni,
+			nominativoDirettoreImpr,
+			nominativoRespSicTecni,
+			nominativoRespSicImpr,
+			dataContratto,
+			numeroRepertorio,
+			fase 
+	FROM v_ws_lfs_contratti v
+	LEFT OUTER JOIN gare g ON g.codcig = v.cig
+	WHERE usernome = #{username} AND v.codice = #{codice} AND v.nappal = #{nappal}
+	</select>
+	
+	
+	<select id="getListaNgaraLFS" parameterType="java.util.HashMap" resultType="java.lang.String">
+	SELECT ngara
+	  FROM gare
+	 WHERE CLAVOR = #{clavor} AND numera = #{numera}
+	</select>
+	
+	<select id="getListaCigLFS" parameterType="java.util.HashMap" resultType="java.lang.String">
+	SELECT cig 
+	  FROM appacig
+	 WHERE codlav = #{clavor} AND nappal = #{numera} AND cig IS NOT NULL
+	</select>
+</mapper>

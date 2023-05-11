@@ -1,0 +1,288 @@
+<?xml version="1.0" encoding="UTF-8"?><!--Converted at: Wed May 25 17:56:09 CEST 2022-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="it.maggioli.eldasoft.sil.gare.db.mapper.CataloghiMapper">
+
+	<resultMap id="resultArticolo" type="it.maggioli.eldasoft.sil.gare.ws.ArticoloType">
+		<result property="id" column="id"/>
+		<result property="codiceCategoria" column="codcategoria"/>
+		<result property="descrizioneCategoria" column="desccategoria"/>
+		<result property="tipo" column="tipoarticolo"/>
+		<result property="codice" column="cod"/>
+		<result property="descrizione" column="descr"/>
+		<result property="descrizioneTecnica" column="descrtecn"/>
+		<result property="colore" column="colore"/>
+		<result property="obbligoImmagine" column="obblimg"/>
+		<result property="obbligoDescrizioneAggiuntiva" column="obbldescagg"/>
+		<result property="obbligoDimensioni" column="obbldim"/>
+		<result property="obbligoCertificazioni" column="obblcertif"/>
+		<result property="certificazioniRichieste" column="certifrich"/>
+		<result property="obbligoSchedaTecnica" column="obblschtecn"/>
+		<result property="obbligoGaranzia" column="obblgar"/>
+		<result property="unitaMisuraDetermPrezzo" column="unimisprz"/>
+		<result property="numDecimaliDetermPrezzo" column="decunimisprz"/>
+		<result property="unitaMisuraAcquisto" column="unimisacq"/>
+		<result property="numDecimaliAcquisto" column="decunimisacq"/>
+		<result property="prezzoUnitarioPer" column="przunitper"/>
+		<result property="quantitaUnitaAcquisto" column="qunimisacq"/>
+		<result property="quantitaMinimaUnitaAcquisto" column="qminunimis"/>
+		<result property="quantitaMassimaUnitaAcquisto" column="qmaxunimis"/>
+		<result property="tempoMaxConsegna" column="tempomaxcons"/>
+		<result property="unitaMisuraTempoConsegna" column="unimistempocons"/>
+		<result property="note" column="note"/>
+		<result property="prodottoDaVerificare" column="chkprod"/>
+	</resultMap>
+
+	<resultMap id="resultProdotto" type="it.maggioli.eldasoft.sil.gare.ws.ProdottoType">
+		<result property="id" column="id"/>
+		<result property="codiceCatalogo" column="ngara"/>
+		<result property="idArticolo" column="idartcat"/>
+		<result property="marcaProdottoProduttore" column="marcaprodut"/>
+		<result property="codiceProdottoProduttore" column="codprodut"/>
+		<result property="nomeCommerciale" column="nome"/>
+		<result property="codiceProdottoFornitore" column="codoe"/>
+		<result property="descrizioneAggiuntiva" column="descagg"/>
+		<result property="dimensioni" column="dimensioni"/>
+		<result property="quantitaUMPrezzo" column="qunimisprz"/>
+		<result property="aliquotaIVA" column="perciva"/>
+		<result property="prezzoUnitario" column="przunit"/>
+		<result property="quantitaUMAcquisto" column="qunimisacq"/>
+		<result property="prezzoUnitarioPerAcquisto" column="przunitprod"/>
+		<result property="garanzia" column="garanzia"/>
+		<result property="tempoConsegna" column="tempocons"/>
+		<result property="dataScadenzaOfferta" column="datscadoff"/>
+		<result property="stato" column="stato"/>
+		<result property="garanzia" column="garanzia"/>
+	</resultMap>
+
+	<resultMap id="resultCategoriaCatalogo" type="it.maggioli.eldasoft.sil.gare.ws.CategoriaCatalogoType" extends="it.maggioli.eldasoft.sil.gare.db.mapper.BandiMapper.resultCategoriaBandoIscrizione">
+	</resultMap>
+
+	<sql id="selectListaArticoli">
+  SELECT desctipoarticolo tipoarticolo,
+		 descunimisprz unimisprz, 
+		 descunimisacq unimisacq, 
+		 descprzunitper przunitper, 
+		 descunimistempocons unimistempocons,
+	</sql>
+	
+	<sql id="selectDettaglioArticolo">
+  SELECT codtipoarticolo tipoarticolo,
+		 codunimisprz unimisprz, 
+		 codunimisacq unimisacq, 
+		 codprzunitper przunitper, 
+		 codunimistempocons unimistempocons, 
+	</sql>
+	
+	<sql id="selectArticolo">
+		 id,
+		 codcategoria,
+		 desccategoria, 
+         cod, 
+		 descr, 
+		 descrtecn, 
+		 colore, 
+		 obblimg,
+		 obbldescagg,
+		 obbldim,
+		 obblcertif,
+		 certifrich, 
+		 obblschtecn,
+		 obblgar,
+		 decunimisprz, 
+		 decunimisacq,
+		 qunimisacq,
+		 qminunimis,
+		 qmaxunimis,
+		 tempomaxcons, 
+		 note,
+		 chkprod
+    FROM v_ws_articoli_catalogo 
+	</sql>
+
+	<sql id="filtriRicercaArticoli">
+   WHERE v_ws_articoli_catalogo.ngara = #{codiceCatalogo}
+		<if test="codiceCategoria != null and codiceCategoria != ''">AND codcategoria = #{codiceCategoria}</if>
+		<if test="codice != null and codice != ''">AND cod = #{codice}</if>
+		<if test="tipo != null and tipo != ''">AND codtipoarticolo = #{tipo}</if>
+		<if test="descrizione != null and descrizione != ''">AND ${operatoreUpper}(descr) like #{descrizione}</if>
+		<if test="colore != null and colore != ''">AND ${operatoreUpper}(colore) like #{colore}</if>
+	</sql>
+
+  	<select id="searchArticoli" parameterType="java.util.HashMap" resultMap="resultArticolo">
+		<include refid="selectListaArticoli"/>
+	  	<include refid="selectArticolo"/>
+	   	<if test="username != null and username != ''">, v_ws_elenchi_cat_iscritte cat</if>
+   		<include refid="filtriRicercaArticoli"/>
+	   	<if test="username != null and username != ''"> AND v_ws_articoli_catalogo.ngara = cat.ngara AND cat.usernome = #{username} AND v_ws_articoli_catalogo.codcategoria = cat.codice</if>
+   ORDER BY descr ASC
+	</select>
+
+  	<select id="countSearchArticoli" parameterType="java.util.HashMap" resultType="java.lang.Integer">
+   SELECT count(1)
+   FROM v_ws_articoli_catalogo
+	   	<if test="username != null and username != ''">, v_ws_elenchi_cat_iscritte cat</if>
+   		<include refid="filtriRicercaArticoli"/>
+		<if test="username != null and username != ''"> AND v_ws_articoli_catalogo.ngara = cat.ngara AND cat.usernome = #{username} AND v_ws_articoli_catalogo.codcategoria = cat.codice</if>
+	</select>
+
+  	<select id="getArticolo" parameterType="java.lang.Long" resultMap="resultArticolo">
+		<include refid="selectDettaglioArticolo"/>
+  		<include refid="selectArticolo"/>
+   WHERE id = #{id}
+	</select>
+
+	<select id="getDocumentiArticolo" parameterType="java.util.HashMap" resultMap="it.maggioli.eldasoft.sil.gare.db.mapper.BandiMapper.resultDocumentoBando">
+  SELECT iddoc, null urldoc, descdoc, filedoc, datpub, tipoall
+    FROM v_ws_schede_tecn_articolo
+   WHERE idartcat = #{idartcat}
+     AND tipoall = #{tipoDoc}
+   ORDER BY filedoc ASC
+	</select>
+	
+	<select id="getNumProdottiOEInArticolo" parameterType="java.util.HashMap" resultType="java.lang.Long">
+  SELECT count(1) 
+    FROM v_ws_prodotti
+   WHERE idartcat = #{idArticolo}
+   AND usernome = #{username}
+   AND codstato in (2,4)
+	</select>
+	
+	<select id="getNumProdottiAltriOEInArticolo" parameterType="java.util.HashMap" resultType="java.lang.Long">
+  SELECT count(1) 
+    FROM v_ws_prodotti_in_catalogo
+   WHERE idartcat = #{idArticolo}
+   AND usernome &lt;&gt; #{username}
+	</select>
+	
+	<select id="getPrezzoMiglioreArticolo" parameterType="java.lang.Long" resultType="java.lang.Double">
+  SELECT min(przunit) 
+    FROM v_ws_prodotti_in_catalogo
+   WHERE idartcat = #{idArticolo}
+	</select>
+
+  <select id="isImpresaAbilitataCatalogo" parameterType="java.util.HashMap" resultType="java.lang.Integer">
+  select count(1)
+    from v_ws_oe_abilitati_catalogo 
+   where usernome = #{username} and codice = #{codiceCatalogo}
+  </select>
+
+	<sql id="selectListaProdotti">
+  SELECT descperciva perciva,
+		 descstato stato,
+	</sql>
+	
+	<sql id="selectDettaglioProdotto">
+  SELECT codperciva perciva,
+		 codstato stato,
+	</sql>
+	
+	<sql id="selectProdotto">
+		v_ws_prodotti.id,
+		codgar,
+		codimp,
+		v_ws_prodotti.ngara,
+		idartcat,
+		v_ws_prodotti.qunimisprz,
+		v_ws_prodotti.qunimisacq, 
+		tempocons,
+		marcaprodut,
+		codprodut,
+		nome,
+		codoe,
+		przunit,
+		przunitprod,
+		descagg,
+		dimensioni,
+		garanzia,
+		datscadoff,
+		usernome
+    FROM v_ws_prodotti
+	</sql>
+
+	<sql id="filtriStandardRicercaProdotti">
+   WHERE v_ws_prodotti.ngara = #{codiceCatalogo}
+     AND v_ws_prodotti.idartcat = v_ws_articoli_catalogo.id
+     <if test="stato != null and stato != ''">AND v_ws_prodotti.codstato = #{stato}</if>
+     <if test="username != null and username != ''">AND usernome = #{username}</if>
+     <if test="idArticolo != null and idArticolo != ''">AND idartcat = #{idArticolo}</if>
+     <if test="terminiRicerca != null and terminiRicerca.size() > 0">AND
+     	 <foreach collection="terminiRicerca" item="item" separator="OR" close=")" open="(">
+			(${operatoreUpper}(v_ws_articoli_catalogo.descr) like #{item} OR ${operatoreUpper}(colore) like #{item}  OR ${operatoreUpper}(codoe) like #{item} OR ${operatoreUpper}(nome) like #{item} OR ${operatoreUpper}(descagg) like #{item})
+     	</foreach>
+     </if>
+	</sql>
+
+	<sql id="filtriSemplificatiRicercaProdotti">
+     <if test="terminiRicerca != null and terminiRicerca.size() > 0">AND
+     	 <foreach collection="terminiRicerca" item="item" separator="OR" close=")" open="(">
+     	(${operatoreUpper}(v_ws_articoli_catalogo.descr) like #{item} OR ${operatoreUpper}(colore) like #{item}  OR ${operatoreUpper}(codoe) like #{item} OR ${operatoreUpper}(nome) like #{item} OR ${operatoreUpper}(descagg) like #{item})
+     	</foreach>
+     </if>
+	</sql>
+	
+	<sql id="filtriAvanzatiRicercaProdotti">
+     <if test="tipoArticolo != null and tipoArticolo != ''">AND v_ws_articoli_catalogo.codtipoarticolo = #{tipoArticolo}</if>
+     <if test="descrizioneArticolo != null and descrizioneArticolo != ''">AND ${operatoreUpper}(v_ws_articoli_catalogo.descr) like #{descrizioneArticolo}</if>
+     <if test="coloreArticolo != null and coloreArticolo != ''">AND ${operatoreUpper}(v_ws_articoli_catalogo.colore) like #{coloreArticolo}</if>
+     <if test="codiceProdottoFornitore != null and codiceProdottoFornitore != ''">AND ${operatoreUpper}(codoe) like #{codiceProdottoFornitore}</if>
+     <if test="nomeCommerciale != null and nomeCommerciale != ''">AND ${operatoreUpper}(nome) like #{nomeCommerciale}</if>
+     <if test="descrizioneAggiuntiva != null and descrizioneAggiuntiva != ''">AND ${operatoreUpper}(descagg) like #{descrizioneAggiuntiva}</if>
+     <if test="statoProdotto != null and statoProdotto != ''">AND codstato = #{statoProdotto}</if>
+	</sql>
+
+  	<select id="searchProdotti" parameterType="java.util.HashMap" resultMap="resultProdotto">
+		<include refid="selectListaProdotti"/>
+	  	<include refid="selectProdotto"/>
+	  	, v_ws_articoli_catalogo
+	  	<include refid="filtriStandardRicercaProdotti"/>
+	  	<include refid="filtriSemplificatiRicercaProdotti"/>
+	  	ORDER BY ${operatoreUpper}(descr) ASC, ${operatoreUpper}(codoe) ASC
+  	</select>
+
+  	<select id="countSearchProdotti" parameterType="java.util.HashMap" resultType="java.lang.Integer">
+   SELECT count(1)
+   FROM v_ws_prodotti, v_ws_articoli_catalogo
+   		<include refid="filtriStandardRicercaProdotti"/>
+	  	<include refid="filtriSemplificatiRicercaProdotti"/>
+	</select>
+
+  	<select id="advancedSearchProdotti" parameterType="java.util.HashMap" resultMap="resultProdotto">
+		<include refid="selectListaProdotti"/>
+	  	<include refid="selectProdotto"/>
+	  	, v_ws_articoli_catalogo
+	  	<include refid="filtriStandardRicercaProdotti"/>
+	  	<include refid="filtriAvanzatiRicercaProdotti"/>
+	  	ORDER BY ${operatoreUpper}(descr) ASC, ${operatoreUpper}(codoe) ASC
+  	</select>
+
+  	<select id="countAdvancedSearchProdotti" parameterType="java.util.HashMap" resultType="java.lang.Integer">
+   SELECT count(1)
+   FROM v_ws_prodotti, v_ws_articoli_catalogo
+   		<include refid="filtriStandardRicercaProdotti"/>
+	  	<include refid="filtriAvanzatiRicercaProdotti"/>
+	</select>
+
+  	<select id="getProdotto" parameterType="java.lang.Long" resultMap="resultProdotto">
+		<include refid="selectDettaglioProdotto"/>
+  		<include refid="selectProdotto"/>
+   WHERE id = #{id}
+	</select>
+	
+  	<select id="getAllegatiProdotto" parameterType="java.util.HashMap" resultMap="it.maggioli.eldasoft.sil.gare.db.mapper.BandiMapper.resultDocumentoBando">
+  SELECT iddoc, null urldoc, descdoc, filedoc, datpub 
+    FROM v_ws_prodotti_allegati
+   WHERE idiscrizprod = #{idProdotto} AND tipo = #{tipoDocumento}
+	</select>
+
+   <select id="getCategorieIscritte" parameterType="java.util.HashMap" resultMap="resultCategoriaCatalogo">
+  SELECT codice, descrizione, tipoappalto, titolo, codliv1, codliv2, codliv3, codliv4, livello, foglia
+    FROM v_ws_elenchi_cat_iscritte
+   WHERE ngara = #{codiceCatalogo} AND usernome = #{username}
+   <if test="livello1 != null and livello1 != ''">AND codliv1=#{livello1}</if><if test="livello1 == null or livello1 == ''">AND codliv1 IS NULL</if>
+   <if test="livello2 != null and livello2 != ''">AND codliv2=#{livello2}</if><if test="livello2 == null or livello2 == ''">AND codliv2 IS NULL</if>
+   <if test="livello3 != null and livello3 != ''">AND codliv3=#{livello3}</if><if test="livello3 == null or livello3 == ''">AND codliv3 IS NULL</if>
+   <if test="livello4 != null and livello4 != ''">AND codliv4=#{livello4}</if><if test="livello4 == null or livello4 == ''">AND codliv4 IS NULL</if>
+  ORDER BY tipoappalto ASC, caisord ASC, ordcategorie ASC
+  </select>
+</mapper>

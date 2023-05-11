@@ -1,0 +1,168 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+  
+	<parent>
+		<groupId>it.maggioli.eldasoft.sil</groupId>
+		<artifactId>wsappalti-pom</artifactId>
+		<version>${revision}</version>
+	</parent>
+	<artifactId>webapp</artifactId>
+  	<packaging>war</packaging>
+
+	<organization>
+		<name>Maggioli S.p.A.</name>
+	</organization>
+
+	<name>Webapp framework WS Appalti</name>
+
+	<dependencies>
+
+		<dependency>
+			<groupId>it.maggioli.eldasoft.sil</groupId>
+			<artifactId>wsoperazioni-generali</artifactId>
+			<version>${revision}</version>
+		</dependency>
+		<dependency>
+			<groupId>it.maggioli.eldasoft.sil</groupId>
+			<artifactId>ws-aste</artifactId>
+			<version>${revision}</version>
+		</dependency>
+		<dependency>
+			<groupId>it.maggioli.eldasoft.sil</groupId>
+			<artifactId>ws-lfs</artifactId>
+			<version>${revision}</version>
+		</dependency>
+		<dependency>
+			<groupId>it.maggioli.eldasoft.sil</groupId>
+			<artifactId>ws-pago-pa</artifactId>
+			<version>${revision}</version>
+		</dependency>
+		<dependency>
+			<groupId>it.maggioli.eldasoft.sil</groupId>
+			<artifactId>ws-gare</artifactId>
+			<version>${revision}</version>
+		</dependency>
+		<dependency>
+			<groupId>it.maggioli.eldasoft.sil</groupId>
+			<artifactId>ws-stipule</artifactId>
+			<version>${revision}</version>
+		</dependency>
+
+	</dependencies>
+	
+	<profiles>
+		<profile>
+			<id>env-dev</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+				<property>
+					<!-- Activate: mvn -Denv=dev <phase> -->
+					<name>env</name>
+					<value>dev</value>
+				</property>
+			</activation>
+			<build>
+				<filters>
+					<filter>src/main/filters/sviluppo.properties</filter>
+				</filters>
+			</build>
+		</profile>
+		<profile>
+			<id>env-prod</id>
+			<activation>
+				<property>
+					<!-- Activate: mvn -Denv=prod <phase> -->
+					<name>env</name>
+					<value>prod</value>
+				</property>
+			</activation>
+			<build>
+				<filters>
+					<filter>src/main/filters/rilascio.properties</filter>
+				</filters>
+			</build>
+		</profile>
+
+         <profile>
+            <id>env-test</id>
+            <activation>
+                <property>
+					<!-- Activate: mvn -Denv=test <phase> -->
+                    <name>env</name>
+                    <value>test</value>
+                </property>
+            </activation>
+			<build>
+				<filters>
+					<filter>src/main/filters/test.properties</filter>
+				</filters>
+			</build>
+         </profile>
+	</profiles>
+
+	<build>
+  		<finalName>WSAppalti</finalName>
+  			
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
+
+		<plugins>	
+
+			<plugin>
+				<artifactId>maven-resources-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>generate-context</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>target/</outputDirectory>
+							<resources>          
+								<resource>
+									<directory>src/main/webapp/META-INF</directory>
+									<includes>
+										<include>context.xml</include>
+									</includes>
+									<filtering>true</filtering>
+								</resource>
+							</resources>              
+						</configuration>            
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<version>1.7</version>
+				<executions>                   	   
+					<!-- task per rinominare il file di contesto per l'applicativo -->
+					<execution>
+						<id>process-sources-antrun</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>                        
+						<configuration>
+							<target>
+								<echo>Generazione ${project.build.finalName}.xml in corso...</echo>
+								<move file="${project.build.directory}/context.xml" tofile="${project.build.directory}/${project.build.finalName}.xml" />
+								<echo>Generazione ${project.build.finalName}.xml effettuato...</echo>
+							</target>
+						</configuration>
+					</execution>    
+				</executions>
+			</plugin>
+
+		</plugins>
+
+	</build>
+  
+</project>

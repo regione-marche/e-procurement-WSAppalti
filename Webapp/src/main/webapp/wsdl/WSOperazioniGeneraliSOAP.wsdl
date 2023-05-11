@@ -1,0 +1,1298 @@
+<?xml version='1.0' encoding='UTF-8'?><wsdl:definitions xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://www.eldasoft.it/WSOperazioniGenerali/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:ns1="http://schemas.xmlsoap.org/soap/http" name="WSOperazioniGenerali" targetNamespace="http://www.eldasoft.it/WSOperazioniGenerali/">
+  <wsdl:types>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://www.eldasoft.it/WSOperazioniGenerali/" elementFormDefault="unqualified" targetNamespace="http://www.eldasoft.it/WSOperazioniGenerali/" version="1.0">
+
+  <xs:element name="DeleteComunicazione" type="tns:DeleteComunicazione"/>
+
+  <xs:element name="DeleteComunicazioneResponse" type="tns:DeleteComunicazioneResponse"/>
+
+  <xs:element name="GetComunicazione" type="tns:GetComunicazione"/>
+
+  <xs:element name="GetComunicazioneResponse" type="tns:GetComunicazioneResponse"/>
+
+  <xs:element name="GetDocumento" type="tns:GetDocumento"/>
+
+  <xs:element name="GetDocumentoResponse" type="tns:GetDocumentoResponse"/>
+
+  <xs:element name="GetElencoAliquoteIVA" type="tns:GetElencoAliquoteIVA"/>
+
+  <xs:element name="GetElencoAliquoteIVAResponse" type="tns:GetElencoAliquoteIVAResponse"/>
+
+  <xs:element name="GetElencoComunicazioni" type="tns:GetElencoComunicazioni"/>
+
+  <xs:element name="GetElencoComunicazioniResponse" type="tns:GetElencoComunicazioniResponse"/>
+
+  <xs:element name="GetElencoGradiAbilitazionePreventiva" type="tns:GetElencoGradiAbilitazionePreventiva"/>
+
+  <xs:element name="GetElencoGradiAbilitazionePreventivaResponse" type="tns:GetElencoGradiAbilitazionePreventivaResponse"/>
+
+  <xs:element name="GetElencoModalitaComunicazione" type="tns:GetElencoModalitaComunicazione"/>
+
+  <xs:element name="GetElencoModalitaComunicazioneResponse" type="tns:GetElencoModalitaComunicazioneResponse"/>
+
+  <xs:element name="GetElencoNazioni" type="tns:GetElencoNazioni"/>
+
+  <xs:element name="GetElencoNazioniResponse" type="tns:GetElencoNazioniResponse"/>
+
+  <xs:element name="GetElencoOrganismiCertificatoriISO" type="tns:GetElencoOrganismiCertificatoriISO"/>
+
+  <xs:element name="GetElencoOrganismiCertificatoriISOResponse" type="tns:GetElencoOrganismiCertificatoriISOResponse"/>
+
+  <xs:element name="GetElencoOrganismiCertificatoriSOA" type="tns:GetElencoOrganismiCertificatoriSOA"/>
+
+  <xs:element name="GetElencoOrganismiCertificatoriSOAResponse" type="tns:GetElencoOrganismiCertificatoriSOAResponse"/>
+
+  <xs:element name="GetElencoProvince" type="tns:GetElencoProvince"/>
+
+  <xs:element name="GetElencoProvinceResponse" type="tns:GetElencoProvinceResponse"/>
+
+  <xs:element name="GetElencoSettoriProduttivi" type="tns:GetElencoSettoriProduttivi"/>
+
+  <xs:element name="GetElencoSettoriProduttiviResponse" type="tns:GetElencoSettoriProduttiviResponse"/>
+
+  <xs:element name="GetElencoStatiComunicazione" type="tns:GetElencoStatiComunicazione"/>
+
+  <xs:element name="GetElencoStatiComunicazioneResponse" type="tns:GetElencoStatiComunicazioneResponse"/>
+
+  <xs:element name="GetElencoTipiAlboProfessionale" type="tns:GetElencoTipiAlboProfessionale"/>
+
+  <xs:element name="GetElencoTipiAlboProfessionaleResponse" type="tns:GetElencoTipiAlboProfessionaleResponse"/>
+
+  <xs:element name="GetElencoTipiAltraCarica" type="tns:GetElencoTipiAltraCarica"/>
+
+  <xs:element name="GetElencoTipiAltraCaricaResponse" type="tns:GetElencoTipiAltraCaricaResponse"/>
+
+  <xs:element name="GetElencoTipiCassaPrevidenza" type="tns:GetElencoTipiCassaPrevidenza"/>
+
+  <xs:element name="GetElencoTipiCassaPrevidenzaResponse" type="tns:GetElencoTipiCassaPrevidenzaResponse"/>
+
+  <xs:element name="GetElencoTipiCertificazioneISO" type="tns:GetElencoTipiCertificazioneISO"/>
+
+  <xs:element name="GetElencoTipiCertificazioneISOResponse" type="tns:GetElencoTipiCertificazioneISOResponse"/>
+
+  <xs:element name="GetElencoTipiCollaborazione" type="tns:GetElencoTipiCollaborazione"/>
+
+  <xs:element name="GetElencoTipiCollaborazioneResponse" type="tns:GetElencoTipiCollaborazioneResponse"/>
+
+  <xs:element name="GetElencoTipiComunicazione" type="tns:GetElencoTipiComunicazione"/>
+
+  <xs:element name="GetElencoTipiComunicazioneResponse" type="tns:GetElencoTipiComunicazioneResponse"/>
+
+  <xs:element name="GetElencoTipiImpresa" type="tns:GetElencoTipiImpresa"/>
+
+  <xs:element name="GetElencoTipiImpresaResponse" type="tns:GetElencoTipiImpresaResponse"/>
+
+  <xs:element name="GetElencoTipiIndirizzo" type="tns:GetElencoTipiIndirizzo"/>
+
+  <xs:element name="GetElencoTipiIndirizzoResponse" type="tns:GetElencoTipiIndirizzoResponse"/>
+
+  <xs:element name="GetElencoTipiNaturaGiuridica" type="tns:GetElencoTipiNaturaGiuridica"/>
+
+  <xs:element name="GetElencoTipiNaturaGiuridicaResponse" type="tns:GetElencoTipiNaturaGiuridicaResponse"/>
+
+  <xs:element name="GetElencoTipiTitoloTecnico" type="tns:GetElencoTipiTitoloTecnico"/>
+
+  <xs:element name="GetElencoTipiTitoloTecnicoResponse" type="tns:GetElencoTipiTitoloTecnicoResponse"/>
+
+  <xs:element name="GetUsernameDocumentoRiservato" type="tns:GetUsernameDocumentoRiservato"/>
+
+  <xs:element name="GetUsernameDocumentoRiservatoResponse" type="tns:GetUsernameDocumentoRiservatoResponse"/>
+
+  <xs:element name="IsComunicazioneProcessata" type="tns:IsComunicazioneProcessata"/>
+
+  <xs:element name="IsComunicazioneProcessataResponse" type="tns:IsComunicazioneProcessataResponse"/>
+
+  <xs:element name="ProtocollaComunicazione" type="tns:ProtocollaComunicazione"/>
+
+  <xs:element name="ProtocollaComunicazioneResponse" type="tns:ProtocollaComunicazioneResponse"/>
+
+  <xs:element name="SendComunicazione" type="tns:SendComunicazione"/>
+
+  <xs:element name="SendComunicazioneResponse" type="tns:SendComunicazioneResponse"/>
+
+  <xs:element name="UpdateDataLetturaDestinatarioComunicazione" type="tns:UpdateDataLetturaDestinatarioComunicazione"/>
+
+  <xs:element name="UpdateDataLetturaDestinatarioComunicazioneResponse" type="tns:UpdateDataLetturaDestinatarioComunicazioneResponse"/>
+
+  <xs:element name="UpdateSessionKeyComunicazione" type="tns:UpdateSessionKeyComunicazione"/>
+
+  <xs:element name="UpdateSessionKeyComunicazioneResponse" type="tns:UpdateSessionKeyComunicazioneResponse"/>
+
+  <xs:element name="UpdateStatoComunicazioni" type="tns:UpdateStatoComunicazioni"/>
+
+  <xs:element name="UpdateStatoComunicazioniResponse" type="tns:UpdateStatoComunicazioniResponse"/>
+
+  <xs:complexType name="GetElencoTipiComunicazione">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="GetElencoTipiComunicazioneResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="GetElencoOrganismiCertificatoriSOA">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="GetElencoOrganismiCertificatoriSOAResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="GetElencoTipiIndirizzo">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="GetElencoTipiIndirizzoResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="GetElencoModalitaComunicazione">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="GetElencoModalitaComunicazioneResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="GetElencoOrganismiCertificatoriISO">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="GetElencoOrganismiCertificatoriISOResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="GetElencoComunicazioni">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="testata" type="tns:DettaglioComunicazioneType"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="DettaglioComunicazioneType">
+    <xs:sequence>
+      <xs:element name="applicativo" type="xs:string"/>
+      <xs:element minOccurs="0" name="id" type="xs:long"/>
+      <xs:element minOccurs="0" name="entita" type="xs:string"/>
+      <xs:element minOccurs="0" name="chiave1" type="xs:string"/>
+      <xs:element minOccurs="0" name="chiave2" type="xs:string"/>
+      <xs:element minOccurs="0" name="chiave3" type="xs:string"/>
+      <xs:element minOccurs="0" name="chiave4" type="xs:string"/>
+      <xs:element minOccurs="0" name="chiave5" type="xs:string"/>
+      <xs:element minOccurs="0" name="idOperatore" type="xs:long"/>
+      <xs:element minOccurs="0" name="mittente" type="xs:string"/>
+      <xs:element minOccurs="0" name="stato" type="xs:string"/>
+      <xs:element minOccurs="0" name="oggetto" type="xs:string"/>
+      <xs:element minOccurs="0" name="testo" type="xs:string"/>
+      <xs:element minOccurs="0" name="tipoComunicazione" type="xs:string"/>
+      <xs:element minOccurs="0" name="comunicazionePubblica" type="xs:boolean"/>
+      <xs:element minOccurs="0" name="dataPubblicazione" type="xs:date"/>
+      <xs:element minOccurs="0" name="dataInserimento" type="xs:dateTime"/>
+      <xs:element minOccurs="0" name="dataAggiornamentoStato" type="xs:dateTime"/>
+      <xs:element minOccurs="0" name="dataLettura" type="xs:dateTime"/>
+      <xs:element minOccurs="0" name="dataProtocollo" type="xs:date"/>
+      <xs:element minOccurs="0" name="numeroProtocollo" type="xs:string"/>
+      <xs:element minOccurs="0" name="sessionKey" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="GetElencoComunicazioniResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="tns:GetElencoComunicazioniOutType"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="GetElencoComunicazioniOutType">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="comunicazione" type="tns:DettaglioComunicazioneType"/>
+      <xs:element minOccurs="0" name="errore" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="GetElencoTipiCassaPrevidenza">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="GetElencoTipiCassaPrevidenzaResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="GetElencoSettoriProduttivi">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="GetElencoSettoriProduttiviResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="GetElencoAliquoteIVA">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="GetElencoAliquoteIVAResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="GetElencoProvince">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="GetElencoProvinceResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="GetUsernameDocumentoRiservato">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="idProgramma" type="xs:string"/>
+      <xs:element name="idDocumento" type="xs:long"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="GetUsernameDocumentoRiservatoResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="GetDocumento">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="idProgramma" type="xs:string"/>
+      <xs:element name="idDocumento" type="xs:long"/>
+      <xs:element minOccurs="0" name="tokenRichiedente" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="GetDocumentoResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="tns:DocumentoOutType"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="DocumentoOutType">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="file" type="tns:FileType"/>
+      <xs:element minOccurs="0" name="errore" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="FileType">
+    <xs:sequence>
+      <xs:element name="nome" type="xs:string"/>
+      <xs:element name="file" type="xs:base64Binary"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="UpdateDataLetturaDestinatarioComunicazione">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="applicativo" type="xs:string"/>
+      <xs:element name="idComunicazione" type="xs:long"/>
+      <xs:element name="idDestinatario" type="xs:long"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="UpdateDataLetturaDestinatarioComunicazioneResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="tns:ErroreOutType"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="ErroreOutType">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="errore" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="GetElencoNazioni">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="GetElencoNazioniResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="GetElencoStatiComunicazione">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="GetElencoStatiComunicazioneResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="GetElencoGradiAbilitazionePreventiva">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="GetElencoGradiAbilitazionePreventivaResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="SendComunicazione">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="comunicazione" type="tns:ComunicazioneType"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="ComunicazioneType">
+    <xs:sequence>
+      <xs:element name="dettaglioComunicazione" type="tns:DettaglioComunicazioneType"/>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="allegato" type="tns:AllegatoComunicazioneType"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="AllegatoComunicazioneType">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="id" type="xs:long"/>
+      <xs:element minOccurs="0" name="tipo" type="xs:string"/>
+      <xs:element name="nomeFile" type="xs:string"/>
+      <xs:element minOccurs="0" name="descrizione" type="xs:string"/>
+      <xs:element name="file" type="xs:base64Binary"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="SendComunicazioneResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="tns:SendComunicazioneOutType"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="SendComunicazioneOutType">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="idComunicazione" type="xs:long"/>
+      <xs:element minOccurs="0" name="errore" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="GetElencoTipiCollaborazione">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="GetElencoTipiCollaborazioneResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="DeleteComunicazione">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="applicativo" type="xs:string"/>
+      <xs:element name="id" type="xs:long"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="DeleteComunicazioneResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="tns:ErroreOutType"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="GetElencoTipiImpresa">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="GetElencoTipiImpresaResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="GetElencoTipiAlboProfessionale">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="GetElencoTipiAlboProfessionaleResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="IsComunicazioneProcessata">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="applicativo" type="xs:string"/>
+      <xs:element name="id" type="xs:long"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="IsComunicazioneProcessataResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="tns:IsComunicazioneProcessataOutType"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="IsComunicazioneProcessataOutType">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="comunicazioneProcessata" type="xs:boolean"/>
+      <xs:element minOccurs="0" name="errore" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="GetComunicazione">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="applicativo" type="xs:string"/>
+      <xs:element name="id" type="xs:long"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="GetComunicazioneResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="tns:GetComunicazioneOutType"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="GetComunicazioneOutType">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="comunicazione" type="tns:ComunicazioneType"/>
+      <xs:element minOccurs="0" name="errore" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="UpdateSessionKeyComunicazione">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="applicativo" type="xs:string"/>
+      <xs:element name="id" type="xs:long"/>
+      <xs:element minOccurs="0" name="sessionKey" type="xs:string"/>
+      <xs:element minOccurs="0" name="stato" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="UpdateSessionKeyComunicazioneResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="tns:ErroreOutType"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="GetElencoTipiCertificazioneISO">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="GetElencoTipiCertificazioneISOResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="UpdateStatoComunicazioni">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="comunicazioni" type="tns:DettaglioComunicazioneType"/>
+      <xs:element minOccurs="0" name="stato" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="UpdateStatoComunicazioniResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="tns:ErroreOutType"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="GetElencoTipiTitoloTecnico">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="GetElencoTipiTitoloTecnicoResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="ProtocollaComunicazione">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="applicativo" type="xs:string"/>
+      <xs:element name="id" type="xs:long"/>
+      <xs:element minOccurs="0" name="numeroProtocollo" type="xs:string"/>
+      <xs:element minOccurs="0" name="dataProtocollo" type="xs:dateTime"/>
+      <xs:element minOccurs="0" name="stato" type="xs:string"/>
+      <xs:element minOccurs="0" name="documento" type="tns:WSDocumentoType"/>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="allegato" type="tns:WSAllegatoType"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="WSDocumentoType">
+    <xs:sequence>
+      <xs:element name="entita" type="xs:string"/>
+      <xs:element name="chiave1" type="xs:string"/>
+      <xs:element minOccurs="0" name="chiave2" type="xs:string"/>
+      <xs:element minOccurs="0" name="chiave3" type="xs:string"/>
+      <xs:element minOccurs="0" name="chiave4" type="xs:string"/>
+      <xs:element minOccurs="0" name="numeroDocumento" type="xs:string"/>
+      <xs:element minOccurs="0" name="annoProtocollo" type="xs:long"/>
+      <xs:element minOccurs="0" name="numeroProtocollo" type="xs:string"/>
+      <xs:element name="verso" type="tns:WSDocumentoTypeVerso"/>
+      <xs:element minOccurs="0" name="oggetto" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="WSAllegatoType">
+    <xs:sequence>
+      <xs:element name="entita" type="xs:string"/>
+      <xs:element name="chiave1" type="xs:string"/>
+      <xs:element minOccurs="0" name="chiave2" type="xs:string"/>
+      <xs:element minOccurs="0" name="chiave3" type="xs:string"/>
+      <xs:element minOccurs="0" name="chiave4" type="xs:string"/>
+      <xs:element name="idDocumento" type="xs:long"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="ProtocollaComunicazioneResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="tns:ProtocollaComunicazioneOutType"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="ProtocollaComunicazioneOutType">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="errore" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="GetElencoTipiNaturaGiuridica">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="GetElencoTipiNaturaGiuridicaResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="GetElencoTipiAltraCarica">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="GetElencoTipiAltraCaricaResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:simpleType name="WSDocumentoTypeVerso">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="IN"/>
+      <xs:enumeration value="OUT"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+</xs:schema>
+  </wsdl:types>
+  <wsdl:message name="DeleteComunicazione">
+    <wsdl:part element="tns:DeleteComunicazione" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetDocumentoResponse">
+    <wsdl:part element="tns:GetDocumentoResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetElencoTipiComunicazioneResponse">
+    <wsdl:part element="tns:GetElencoTipiComunicazioneResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetElencoModalitaComunicazioneResponse">
+    <wsdl:part element="tns:GetElencoModalitaComunicazioneResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="IsComunicazioneProcessataResponse">
+    <wsdl:part element="tns:IsComunicazioneProcessataResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="ProtocollaComunicazioneResponse">
+    <wsdl:part element="tns:ProtocollaComunicazioneResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetElencoProvinceResponse">
+    <wsdl:part element="tns:GetElencoProvinceResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="SendComunicazioneResponse">
+    <wsdl:part element="tns:SendComunicazioneResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetElencoOrganismiCertificatoriISOResponse">
+    <wsdl:part element="tns:GetElencoOrganismiCertificatoriISOResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetElencoTipiAlboProfessionale">
+    <wsdl:part element="tns:GetElencoTipiAlboProfessionale" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetElencoTipiTitoloTecnico">
+    <wsdl:part element="tns:GetElencoTipiTitoloTecnico" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="DeleteComunicazioneResponse">
+    <wsdl:part element="tns:DeleteComunicazioneResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetElencoComunicazioni">
+    <wsdl:part element="tns:GetElencoComunicazioni" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetComunicazione">
+    <wsdl:part element="tns:GetComunicazione" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetElencoNazioniResponse">
+    <wsdl:part element="tns:GetElencoNazioniResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetElencoTipiIndirizzoResponse">
+    <wsdl:part element="tns:GetElencoTipiIndirizzoResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetElencoSettoriProduttiviResponse">
+    <wsdl:part element="tns:GetElencoSettoriProduttiviResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetElencoTipiImpresa">
+    <wsdl:part element="tns:GetElencoTipiImpresa" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetElencoTipiImpresaResponse">
+    <wsdl:part element="tns:GetElencoTipiImpresaResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetElencoOrganismiCertificatoriSOA">
+    <wsdl:part element="tns:GetElencoOrganismiCertificatoriSOA" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="IsComunicazioneProcessata">
+    <wsdl:part element="tns:IsComunicazioneProcessata" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetElencoTipiCertificazioneISO">
+    <wsdl:part element="tns:GetElencoTipiCertificazioneISO" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetElencoTipiNaturaGiuridicaResponse">
+    <wsdl:part element="tns:GetElencoTipiNaturaGiuridicaResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="UpdateSessionKeyComunicazione">
+    <wsdl:part element="tns:UpdateSessionKeyComunicazione" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetElencoTipiComunicazione">
+    <wsdl:part element="tns:GetElencoTipiComunicazione" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetElencoAliquoteIVAResponse">
+    <wsdl:part element="tns:GetElencoAliquoteIVAResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetElencoTipiAltraCaricaResponse">
+    <wsdl:part element="tns:GetElencoTipiAltraCaricaResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetElencoComunicazioniResponse">
+    <wsdl:part element="tns:GetElencoComunicazioniResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetElencoTipiCassaPrevidenza">
+    <wsdl:part element="tns:GetElencoTipiCassaPrevidenza" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="UpdateDataLetturaDestinatarioComunicazioneResponse">
+    <wsdl:part element="tns:UpdateDataLetturaDestinatarioComunicazioneResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetElencoTipiAltraCarica">
+    <wsdl:part element="tns:GetElencoTipiAltraCarica" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="UpdateStatoComunicazioni">
+    <wsdl:part element="tns:UpdateStatoComunicazioni" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetElencoOrganismiCertificatoriISO">
+    <wsdl:part element="tns:GetElencoOrganismiCertificatoriISO" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetElencoOrganismiCertificatoriSOAResponse">
+    <wsdl:part element="tns:GetElencoOrganismiCertificatoriSOAResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetElencoTipiAlboProfessionaleResponse">
+    <wsdl:part element="tns:GetElencoTipiAlboProfessionaleResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetElencoModalitaComunicazione">
+    <wsdl:part element="tns:GetElencoModalitaComunicazione" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetComunicazioneResponse">
+    <wsdl:part element="tns:GetComunicazioneResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="UpdateDataLetturaDestinatarioComunicazione">
+    <wsdl:part element="tns:UpdateDataLetturaDestinatarioComunicazione" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetElencoProvince">
+    <wsdl:part element="tns:GetElencoProvince" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetDocumento">
+    <wsdl:part element="tns:GetDocumento" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetElencoTipiCollaborazioneResponse">
+    <wsdl:part element="tns:GetElencoTipiCollaborazioneResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetElencoTipiNaturaGiuridica">
+    <wsdl:part element="tns:GetElencoTipiNaturaGiuridica" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetUsernameDocumentoRiservatoResponse">
+    <wsdl:part element="tns:GetUsernameDocumentoRiservatoResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetElencoTipiCertificazioneISOResponse">
+    <wsdl:part element="tns:GetElencoTipiCertificazioneISOResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetUsernameDocumentoRiservato">
+    <wsdl:part element="tns:GetUsernameDocumentoRiservato" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="ProtocollaComunicazione">
+    <wsdl:part element="tns:ProtocollaComunicazione" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetElencoNazioni">
+    <wsdl:part element="tns:GetElencoNazioni" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetElencoGradiAbilitazionePreventivaResponse">
+    <wsdl:part element="tns:GetElencoGradiAbilitazionePreventivaResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetElencoSettoriProduttivi">
+    <wsdl:part element="tns:GetElencoSettoriProduttivi" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetElencoStatiComunicazione">
+    <wsdl:part element="tns:GetElencoStatiComunicazione" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetElencoStatiComunicazioneResponse">
+    <wsdl:part element="tns:GetElencoStatiComunicazioneResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="SendComunicazione">
+    <wsdl:part element="tns:SendComunicazione" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetElencoTipiCassaPrevidenzaResponse">
+    <wsdl:part element="tns:GetElencoTipiCassaPrevidenzaResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetElencoAliquoteIVA">
+    <wsdl:part element="tns:GetElencoAliquoteIVA" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetElencoTipiIndirizzo">
+    <wsdl:part element="tns:GetElencoTipiIndirizzo" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="UpdateSessionKeyComunicazioneResponse">
+    <wsdl:part element="tns:UpdateSessionKeyComunicazioneResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetElencoGradiAbilitazionePreventiva">
+    <wsdl:part element="tns:GetElencoGradiAbilitazionePreventiva" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetElencoTipiCollaborazione">
+    <wsdl:part element="tns:GetElencoTipiCollaborazione" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetElencoTipiTitoloTecnicoResponse">
+    <wsdl:part element="tns:GetElencoTipiTitoloTecnicoResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="UpdateStatoComunicazioniResponse">
+    <wsdl:part element="tns:UpdateStatoComunicazioniResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="WSOperazioniGeneraliSoap">
+    <wsdl:operation name="GetElencoTipiComunicazione">
+      <wsdl:input message="tns:GetElencoTipiComunicazione" name="GetElencoTipiComunicazione">
+    </wsdl:input>
+      <wsdl:output message="tns:GetElencoTipiComunicazioneResponse" name="GetElencoTipiComunicazioneResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetElencoOrganismiCertificatoriSOA">
+      <wsdl:input message="tns:GetElencoOrganismiCertificatoriSOA" name="GetElencoOrganismiCertificatoriSOA">
+    </wsdl:input>
+      <wsdl:output message="tns:GetElencoOrganismiCertificatoriSOAResponse" name="GetElencoOrganismiCertificatoriSOAResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetElencoTipiIndirizzo">
+      <wsdl:input message="tns:GetElencoTipiIndirizzo" name="GetElencoTipiIndirizzo">
+    </wsdl:input>
+      <wsdl:output message="tns:GetElencoTipiIndirizzoResponse" name="GetElencoTipiIndirizzoResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetElencoModalitaComunicazione">
+      <wsdl:input message="tns:GetElencoModalitaComunicazione" name="GetElencoModalitaComunicazione">
+    </wsdl:input>
+      <wsdl:output message="tns:GetElencoModalitaComunicazioneResponse" name="GetElencoModalitaComunicazioneResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetElencoOrganismiCertificatoriISO">
+      <wsdl:input message="tns:GetElencoOrganismiCertificatoriISO" name="GetElencoOrganismiCertificatoriISO">
+    </wsdl:input>
+      <wsdl:output message="tns:GetElencoOrganismiCertificatoriISOResponse" name="GetElencoOrganismiCertificatoriISOResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetElencoComunicazioni">
+      <wsdl:input message="tns:GetElencoComunicazioni" name="GetElencoComunicazioni">
+    </wsdl:input>
+      <wsdl:output message="tns:GetElencoComunicazioniResponse" name="GetElencoComunicazioniResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetElencoTipiCassaPrevidenza">
+      <wsdl:input message="tns:GetElencoTipiCassaPrevidenza" name="GetElencoTipiCassaPrevidenza">
+    </wsdl:input>
+      <wsdl:output message="tns:GetElencoTipiCassaPrevidenzaResponse" name="GetElencoTipiCassaPrevidenzaResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetElencoSettoriProduttivi">
+      <wsdl:input message="tns:GetElencoSettoriProduttivi" name="GetElencoSettoriProduttivi">
+    </wsdl:input>
+      <wsdl:output message="tns:GetElencoSettoriProduttiviResponse" name="GetElencoSettoriProduttiviResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetElencoAliquoteIVA">
+      <wsdl:input message="tns:GetElencoAliquoteIVA" name="GetElencoAliquoteIVA">
+    </wsdl:input>
+      <wsdl:output message="tns:GetElencoAliquoteIVAResponse" name="GetElencoAliquoteIVAResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetElencoProvince">
+      <wsdl:input message="tns:GetElencoProvince" name="GetElencoProvince">
+    </wsdl:input>
+      <wsdl:output message="tns:GetElencoProvinceResponse" name="GetElencoProvinceResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetUsernameDocumentoRiservato">
+      <wsdl:input message="tns:GetUsernameDocumentoRiservato" name="GetUsernameDocumentoRiservato">
+    </wsdl:input>
+      <wsdl:output message="tns:GetUsernameDocumentoRiservatoResponse" name="GetUsernameDocumentoRiservatoResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetDocumento">
+      <wsdl:input message="tns:GetDocumento" name="GetDocumento">
+    </wsdl:input>
+      <wsdl:output message="tns:GetDocumentoResponse" name="GetDocumentoResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="UpdateDataLetturaDestinatarioComunicazione">
+      <wsdl:input message="tns:UpdateDataLetturaDestinatarioComunicazione" name="UpdateDataLetturaDestinatarioComunicazione">
+    </wsdl:input>
+      <wsdl:output message="tns:UpdateDataLetturaDestinatarioComunicazioneResponse" name="UpdateDataLetturaDestinatarioComunicazioneResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetElencoNazioni">
+      <wsdl:input message="tns:GetElencoNazioni" name="GetElencoNazioni">
+    </wsdl:input>
+      <wsdl:output message="tns:GetElencoNazioniResponse" name="GetElencoNazioniResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetElencoStatiComunicazione">
+      <wsdl:input message="tns:GetElencoStatiComunicazione" name="GetElencoStatiComunicazione">
+    </wsdl:input>
+      <wsdl:output message="tns:GetElencoStatiComunicazioneResponse" name="GetElencoStatiComunicazioneResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetElencoGradiAbilitazionePreventiva">
+      <wsdl:input message="tns:GetElencoGradiAbilitazionePreventiva" name="GetElencoGradiAbilitazionePreventiva">
+    </wsdl:input>
+      <wsdl:output message="tns:GetElencoGradiAbilitazionePreventivaResponse" name="GetElencoGradiAbilitazionePreventivaResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SendComunicazione">
+      <wsdl:input message="tns:SendComunicazione" name="SendComunicazione">
+    </wsdl:input>
+      <wsdl:output message="tns:SendComunicazioneResponse" name="SendComunicazioneResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetElencoTipiCollaborazione">
+      <wsdl:input message="tns:GetElencoTipiCollaborazione" name="GetElencoTipiCollaborazione">
+    </wsdl:input>
+      <wsdl:output message="tns:GetElencoTipiCollaborazioneResponse" name="GetElencoTipiCollaborazioneResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="DeleteComunicazione">
+      <wsdl:input message="tns:DeleteComunicazione" name="DeleteComunicazione">
+    </wsdl:input>
+      <wsdl:output message="tns:DeleteComunicazioneResponse" name="DeleteComunicazioneResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetElencoTipiImpresa">
+      <wsdl:input message="tns:GetElencoTipiImpresa" name="GetElencoTipiImpresa">
+    </wsdl:input>
+      <wsdl:output message="tns:GetElencoTipiImpresaResponse" name="GetElencoTipiImpresaResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetElencoTipiAlboProfessionale">
+      <wsdl:input message="tns:GetElencoTipiAlboProfessionale" name="GetElencoTipiAlboProfessionale">
+    </wsdl:input>
+      <wsdl:output message="tns:GetElencoTipiAlboProfessionaleResponse" name="GetElencoTipiAlboProfessionaleResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="IsComunicazioneProcessata">
+      <wsdl:input message="tns:IsComunicazioneProcessata" name="IsComunicazioneProcessata">
+    </wsdl:input>
+      <wsdl:output message="tns:IsComunicazioneProcessataResponse" name="IsComunicazioneProcessataResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetComunicazione">
+      <wsdl:input message="tns:GetComunicazione" name="GetComunicazione">
+    </wsdl:input>
+      <wsdl:output message="tns:GetComunicazioneResponse" name="GetComunicazioneResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="UpdateSessionKeyComunicazione">
+      <wsdl:input message="tns:UpdateSessionKeyComunicazione" name="UpdateSessionKeyComunicazione">
+    </wsdl:input>
+      <wsdl:output message="tns:UpdateSessionKeyComunicazioneResponse" name="UpdateSessionKeyComunicazioneResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetElencoTipiCertificazioneISO">
+      <wsdl:input message="tns:GetElencoTipiCertificazioneISO" name="GetElencoTipiCertificazioneISO">
+    </wsdl:input>
+      <wsdl:output message="tns:GetElencoTipiCertificazioneISOResponse" name="GetElencoTipiCertificazioneISOResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="UpdateStatoComunicazioni">
+      <wsdl:input message="tns:UpdateStatoComunicazioni" name="UpdateStatoComunicazioni">
+    </wsdl:input>
+      <wsdl:output message="tns:UpdateStatoComunicazioniResponse" name="UpdateStatoComunicazioniResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetElencoTipiTitoloTecnico">
+      <wsdl:input message="tns:GetElencoTipiTitoloTecnico" name="GetElencoTipiTitoloTecnico">
+    </wsdl:input>
+      <wsdl:output message="tns:GetElencoTipiTitoloTecnicoResponse" name="GetElencoTipiTitoloTecnicoResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ProtocollaComunicazione">
+      <wsdl:input message="tns:ProtocollaComunicazione" name="ProtocollaComunicazione">
+    </wsdl:input>
+      <wsdl:output message="tns:ProtocollaComunicazioneResponse" name="ProtocollaComunicazioneResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetElencoTipiNaturaGiuridica">
+      <wsdl:input message="tns:GetElencoTipiNaturaGiuridica" name="GetElencoTipiNaturaGiuridica">
+    </wsdl:input>
+      <wsdl:output message="tns:GetElencoTipiNaturaGiuridicaResponse" name="GetElencoTipiNaturaGiuridicaResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetElencoTipiAltraCarica">
+      <wsdl:input message="tns:GetElencoTipiAltraCarica" name="GetElencoTipiAltraCarica">
+    </wsdl:input>
+      <wsdl:output message="tns:GetElencoTipiAltraCaricaResponse" name="GetElencoTipiAltraCaricaResponse">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="WSOperazioniGeneraliSoapBinding" type="tns:WSOperazioniGeneraliSoap">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="GetElencoOrganismiCertificatoriSOA">
+      <soap:operation soapAction="http://www.eldasoft.it/WSOperazioniGenerali/GetElencoOrganismiCertificatoriSOA" style="document"/>
+      <wsdl:input name="GetElencoOrganismiCertificatoriSOA">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="GetElencoOrganismiCertificatoriSOAResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetElencoTipiComunicazione">
+      <soap:operation soapAction="http://www.eldasoft.it/sil/WSOperazioniGenerali/GetElencoTipiComunicazione" style="document"/>
+      <wsdl:input name="GetElencoTipiComunicazione">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="GetElencoTipiComunicazioneResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetElencoTipiIndirizzo">
+      <soap:operation soapAction="http://www.eldasoft.it/WSOperazioniGenerali/GetElencoTipiIndirizzo" style="document"/>
+      <wsdl:input name="GetElencoTipiIndirizzo">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="GetElencoTipiIndirizzoResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetElencoModalitaComunicazione">
+      <soap:operation soapAction="http://www.eldasoft.it/WSOperazioniGenerali/GetElencoModalitaComunicazione" style="document"/>
+      <wsdl:input name="GetElencoModalitaComunicazione">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="GetElencoModalitaComunicazioneResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetElencoOrganismiCertificatoriISO">
+      <soap:operation soapAction="http://www.eldasoft.it/WSOperazioniGenerali/GetElencoOrganismiCertificatoriISO" style="document"/>
+      <wsdl:input name="GetElencoOrganismiCertificatoriISO">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="GetElencoOrganismiCertificatoriISOResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetElencoComunicazioni">
+      <soap:operation soapAction="http://www.eldasoft.it/WSOperazioniGenerali/GetElencoComunicazioni" style="document"/>
+      <wsdl:input name="GetElencoComunicazioni">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="GetElencoComunicazioniResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetElencoAliquoteIVA">
+      <soap:operation soapAction="http://www.eldasoft.it/WSOperazioniGenerali/GetElencoAliquoteIVA" style="document"/>
+      <wsdl:input name="GetElencoAliquoteIVA">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="GetElencoAliquoteIVAResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetElencoSettoriProduttivi">
+      <soap:operation soapAction="http://www.eldasoft.it/sil/WSOperazioniGenerali/GetElencoSettoriProduttivi" style="document"/>
+      <wsdl:input name="GetElencoSettoriProduttivi">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="GetElencoSettoriProduttiviResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetElencoTipiCassaPrevidenza">
+      <soap:operation soapAction="http://www.eldasoft.it/WSOperazioniGenerali/GetElencoTipiCassaPrevidenza" style="document"/>
+      <wsdl:input name="GetElencoTipiCassaPrevidenza">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="GetElencoTipiCassaPrevidenzaResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetElencoProvince">
+      <soap:operation soapAction="http://www.eldasoft.it/WSOperazioniGenerali/GetElencoProvince" style="document"/>
+      <wsdl:input name="GetElencoProvince">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="GetElencoProvinceResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetUsernameDocumentoRiservato">
+      <soap:operation soapAction="http://www.eldasoft.it/WSOperazioniGenerali/GetUsernameDocumentoRiservato" style="document"/>
+      <wsdl:input name="GetUsernameDocumentoRiservato">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="GetUsernameDocumentoRiservatoResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetDocumento">
+      <soap:operation soapAction="http://www.eldasoft.it/WSOperazioniGenerali/GetDocumento" style="document"/>
+      <wsdl:input name="GetDocumento">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="GetDocumentoResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="UpdateDataLetturaDestinatarioComunicazione">
+      <soap:operation soapAction="http://www.eldasoft.it/WSOperazioniGenerali/UpdateDataLetturaDestinatarioComunicazione" style="document"/>
+      <wsdl:input name="UpdateDataLetturaDestinatarioComunicazione">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="UpdateDataLetturaDestinatarioComunicazioneResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetElencoNazioni">
+      <soap:operation soapAction="http://www.eldasoft.it/sil/WSOperazioniGenerali/GetElencoNazioni" style="document"/>
+      <wsdl:input name="GetElencoNazioni">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="GetElencoNazioniResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetElencoStatiComunicazione">
+      <soap:operation soapAction="http://www.eldasoft.it/sil/WSOperazioniGenerali/GetElencoStatiComunicazione" style="document"/>
+      <wsdl:input name="GetElencoStatiComunicazione">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="GetElencoStatiComunicazioneResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetElencoGradiAbilitazionePreventiva">
+      <soap:operation soapAction="http://www.eldasoft.it/WSOperazioniGenerali/GetElencoGradiAbilitazionePreventiva" style="document"/>
+      <wsdl:input name="GetElencoGradiAbilitazionePreventiva">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="GetElencoGradiAbilitazionePreventivaResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SendComunicazione">
+      <soap:operation soapAction="http://www.eldasoft.it/WSOperazioniGenerali/SendComunicazione" style="document"/>
+      <wsdl:input name="SendComunicazione">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="SendComunicazioneResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetElencoTipiCollaborazione">
+      <soap:operation soapAction="http://www.eldasoft.it/WSOperazioniGenerali/GetElencoTipiCollaborazione" style="document"/>
+      <wsdl:input name="GetElencoTipiCollaborazione">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="GetElencoTipiCollaborazioneResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="DeleteComunicazione">
+      <soap:operation soapAction="http://www.eldasoft.it/WSOperazioniGenerali/DeleteComunicazione" style="document"/>
+      <wsdl:input name="DeleteComunicazione">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="DeleteComunicazioneResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetElencoTipiImpresa">
+      <soap:operation soapAction="http://www.eldasoft.it/WSOperazioniGenerali/GetElencoTipiImpresa" style="document"/>
+      <wsdl:input name="GetElencoTipiImpresa">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="GetElencoTipiImpresaResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetElencoTipiAlboProfessionale">
+      <soap:operation soapAction="http://www.eldasoft.it/WSOperazioniGenerali/GetElencoTipiAlboProfessionale" style="document"/>
+      <wsdl:input name="GetElencoTipiAlboProfessionale">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="GetElencoTipiAlboProfessionaleResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetComunicazione">
+      <soap:operation soapAction="http://www.eldasoft.it/WSOperazioniGenerali/GetComunicazione" style="document"/>
+      <wsdl:input name="GetComunicazione">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="GetComunicazioneResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="IsComunicazioneProcessata">
+      <soap:operation soapAction="http://www.eldasoft.it/WSOperazioniGenerali/IsComunicazioneProcessata" style="document"/>
+      <wsdl:input name="IsComunicazioneProcessata">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="IsComunicazioneProcessataResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="UpdateSessionKeyComunicazione">
+      <soap:operation soapAction="http://www.eldasoft.it/WSOperazioniGenerali/UpdateSessionKeyComunicazione" style="document"/>
+      <wsdl:input name="UpdateSessionKeyComunicazione">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="UpdateSessionKeyComunicazioneResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetElencoTipiCertificazioneISO">
+      <soap:operation soapAction="http://www.eldasoft.it/WSOperazioniGenerali/GetElencoTipiCertificazioneISO" style="document"/>
+      <wsdl:input name="GetElencoTipiCertificazioneISO">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="GetElencoTipiCertificazioneISOResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="UpdateStatoComunicazioni">
+      <soap:operation soapAction="http://www.eldasoft.it/WSOperazioniGenerali/UpdateStatoComunicazioni" style="document"/>
+      <wsdl:input name="UpdateStatoComunicazioni">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="UpdateStatoComunicazioniResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetElencoTipiTitoloTecnico">
+      <soap:operation soapAction="http://www.eldasoft.it/WSOperazioniGenerali/GetElencoTipiTitoloTecnico" style="document"/>
+      <wsdl:input name="GetElencoTipiTitoloTecnico">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="GetElencoTipiTitoloTecnicoResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ProtocollaComunicazione">
+      <soap:operation soapAction="http://www.eldasoft.it/WSOperazioniGenerali/ProtocollaComunicazione" style="document"/>
+      <wsdl:input name="ProtocollaComunicazione">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="ProtocollaComunicazioneResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetElencoTipiNaturaGiuridica">
+      <soap:operation soapAction="http://www.eldasoft.it/WSOperazioniGenerali/GetElencoTipiNaturaGiuridica" style="document"/>
+      <wsdl:input name="GetElencoTipiNaturaGiuridica">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="GetElencoTipiNaturaGiuridicaResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetElencoTipiAltraCarica">
+      <soap:operation soapAction="http://www.eldasoft.it/WSOperazioniGenerali/GetElencoTipiAltraCarica" style="document"/>
+      <wsdl:input name="GetElencoTipiAltraCarica">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="GetElencoTipiAltraCaricaResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="WSOperazioniGenerali">
+    <wsdl:port binding="tns:WSOperazioniGeneraliSoapBinding" name="WSOperazioniGeneraliSOAP">
+      <soap:address location="http://localhost:8080/WSAppalti/services/WSOperazioniGeneraliSOAP"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

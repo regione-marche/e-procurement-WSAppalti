@@ -1,0 +1,47 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:mybatis="http://mybatis.org/schema/mybatis-spring"
+       xsi:schemaLocation="
+		http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+
+		http://www.springframework.org/schema/tx
+		http://www.springframework.org/schema/tx/spring-tx.xsd
+
+		http://www.springframework.org/schema/context
+		http://www.springframework.org/schema/context/spring-context.xsd
+
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+		http://mybatis.org/schema/mybatis-spring http://mybatis.org/schema/mybatis-spring.xsd">
+
+    <context:component-scan base-package="it.maggioli.eldasoft.gene.bl, it.maggioli.eldasoft.gene.db.dao, it.maggioli.eldasoft.gene.db.dao.mybatis"/>
+
+    <bean id="beneficiariLinkTemplate" class="java.lang.String">
+        <constructor-arg value="http://192.168.1.113:8080/PortaleAppalti/do/FrontEnd/AmmTrasp/downloadDocumentiSoggBeneficiari.action?codice={0}&amp;codben={1}" />
+    </bean>
+    <bean id="consulentiLinkTemplate" class="java.lang.String">
+        <constructor-arg value="http://192.168.1.113:8080/PortaleAppalti/do/FrontEnd/Consulenti/downloadDocumenti.action?codice={0}&amp;codiceSoggetto={1}" />
+    </bean>
+
+    <bean id="dataSource"
+          class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName" value="org.h2.Driver" />
+        <property name="url" value="jdbc:h2:./src/test/resources/database" />
+        <property name="username" value="sa" />
+        <property name="password" value="sa" />
+    </bean>
+
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource" />
+    </bean>
+    <tx:annotation-driven transaction-manager="transactionManager" />
+    <bean id="transactionManager"
+          class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <mybatis:scan base-package="it.maggioli.eldasoft.gene.db.mapper" />
+
+</beans>

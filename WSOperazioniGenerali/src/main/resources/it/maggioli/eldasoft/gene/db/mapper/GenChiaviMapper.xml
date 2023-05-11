@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?><!--Converted at: Mon May 23 09:58:06 CEST 2022-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="it.maggioli.eldasoft.gene.db.mapper.GenChiaviMapper">
+
+  <select id="getNextId" resultType="java.lang.Long">
+    SELECT CHIAVE FROM W_GENCHIAVI WHERE TABELLA = #{tabella}
+  </select>
+
+  <update id="updateId">
+    UPDATE W_GENCHIAVI SET CHIAVE = CHIAVE + #{incremento} WHERE TABELLA = #{tabella}
+  </update>
+  
+  <select id="getMaxId" parameterType="java.util.HashMap" resultType="java.lang.Long">
+    SELECT MAX(${chiave}) AS CHIAVE FROM ${tabella} <if test="condizioniExtra != null and condizioniExtra != ''">WHERE ${condizioniExtra}</if>
+  </select>
+
+</mapper>

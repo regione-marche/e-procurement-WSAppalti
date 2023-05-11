@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?><!--Converted at: Mon May 23 09:58:06 CEST 2022-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="it.maggioli.eldasoft.gene.db.mapper.DatiCodificatiMapper">
+
+	<resultMap id="resultDatoCodificato" type="it.maggioli.eldasoft.wsOperazioniGenerali.daticomuni.DatoCodificatoType">
+		<result property="codice" column="codice"/>
+		<result property="descrizione" column="descrizione"/>
+	</resultMap>
+
+  <select id="getTipiTab1" parameterType="java.lang.String" resultMap="resultDatoCodificato">
+  select tab1tip as codice, tab1desc as descrizione from tab1 where tab1cod = #{codice} and (tab1arc is null or tab1arc = '2') order by tab1nord, tab1tip
+  </select>
+
+  <select id="getTipiTab2" parameterType="java.lang.String" resultMap="resultDatoCodificato">
+  select tab2tip as codice, tab2d2 as descrizione from tab2 where tab2cod = #{codice} and (tab2arc is null or tab2arc = '2') order by tab2nord, tab2tip
+  </select>
+
+  <select id="getTipiTab3" parameterType="java.lang.String" resultMap="resultDatoCodificato">
+  select tab3tip as codice, tab3desc as descrizione from tab3 where tab3cod = #{codice} and (tab3arc is null or tab3arc = '2') order by tab3nord, tab3desc
+  </select>
+  
+  <select id="getTipiTab5" parameterType="java.lang.String" resultMap="resultDatoCodificato">
+  select tab5tip as codice, tab5desc as descrizione from tab5 where tab5cod = #{codice} and (tab5arc is null or tab5arc = '2') order by tab5nord, tab5desc
+  </select>
+
+  <select id="getNazioniCodificate" parameterType="java.lang.String" resultMap="resultDatoCodificato">
+  select tab2d2 as codice, tab2d1 as descrizione from tab2 where tab2cod = 'G_z23' and (tab2arc is null or tab2arc = '2') order by tab2nord, tab2tip
+  </select>
+
+    <select id="getFormeGiuridicheCooperative" resultMap="resultDatoCodificato">
+        select tab2d2 as codice, tab2d1 as descrizione from tab2 where tab2cod = 'G_z13'
+    </select>
+
+  <select id="getNazioniCodificateDGUE" resultType="java.lang.String">
+    select tab2d1 from tab2 where tab2cod = 'G_z23' and tab2d2 = #{nazione}
+  </select>
+
+
+</mapper>

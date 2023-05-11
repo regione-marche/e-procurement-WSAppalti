@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8"?><!--Converted at: Wed May 25 16:35:44 CEST 2022-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="it.maggioli.eldasoft.sil.pagopa.db.mapper.PagoPAMapper">
+
+	<sql id="selectPagamentiFull">
+		SELECT ppa.* 
+		FROM PAGOPA_PAGAMENTI PPA
+	</sql>
+  	
+  	<sql id="pagamentiById">
+  		WHERE ppa.ID = #{id}
+  	</sql>
+  	<sql id="pagamentiByIuv">
+  		WHERE ppa.IUV = #{iuv}
+  	</sql>
+  	<sql id="pagamentiByIdDebito">
+  		WHERE ppa.IDDEBITO = #{idDebito}
+  	</sql>
+  	<sql id="pagamentiByCodimpAndStato">
+  		WHERE ppa.CODIMP = #{codimp}
+  		AND STATOTIP = #{stato}
+  	</sql>
+  	
+  	<sql id="selectTab1">
+  		SELECT tab1tip,tab1desc
+  		FROM TAB1
+  		WHERE TAB1COD = #{TAB1COD}
+  		AND (TAB1ARC is null or TAB1ARC = '2') 
+   		ORDER BY TAB1NORD, tab1tip
+  	</sql>
+  	<sql id="selectTab2Codificato">
+  		    select
+				TAB2D2 as codice,
+				TAB2D1 as descrizione
+			from
+				TAB2
+			where
+				TAB2COD = #{TAB2COD}
+				and (TAB2ARC is null
+					or TAB2ARC = '2')
+			order by
+				TAB2NORD,
+				TAB2TIP
+  	</sql>
+  	
+  	<select id="getPagamentiById" parameterType="java.lang.Long" resultType="it.maggioli.eldasoft.sil.pagopa.entities.PagopaPagamento">
+  		<include refid="selectPagamentiFull"/>
+  		<include refid="pagamentiById"/>
+  	</select>
+  	<select id="getPagamentiByFiltroCount" parameterType="it.maggioli.eldasoft.sil.pagopa.ws.PagamentiFilterInType" resultType="java.lang.Long">
+  		SELECT count(*)
+		FROM PAGOPA_PAGAMENTI PPA
+		WHERE ppa.CODIMP = #{codiceimpresa}
+  		<if test="codicegara != null and codicegara != ''">AND
+  			ppa.CODICEGARA in 
+  			 <foreach collection="codicegara" item="item" separator="," close=")" open="(">
+			   #{item}
+			 </foreach>
+  		</if>
+  		<if test="iuv != null and iuv != ''">AND
+  			ppa.IUV in 
+  			 <foreach collection="iuv" item="item" separator="," close=")" open="(">
+			   #{item}
+			 </foreach>
+  		</if>
+  		<if test="iuv == null or iuv == ''">AND
+  			ppa.IUV IS NOT NULL
+  		</if>
+  		<if test="idDebito != null and idDebito != ''">AND
+  			ppa.IDDEBITO in 
+  			 <foreach collection="idDebito" item="item" separator="," close=")" open="(">
+			   #{item}
+			 </foreach>
+  		</if>
+  		<if test="stato != null and stato != ''">AND
+  			ppa.STATOTIP in 
+  			 <foreach collection="stato" item="item" separator="," close=")" open="(">
+			   #{item}
+			 </foreach>
+  		</if>
+  		<if test="causale != null and causale != ''">AND
+  			ppa.CAUSALETIP in 
+  			 <foreach collection="causale" item="item" separator="," close=")" open="(">
+			   #{item}
+			 </foreach>
+  		</if>
+  		<if test="dataScadenzaDa != null and dataScadenzaDa != ''">AND
+  			 ppa.DATASCADENZA &gt;= #{dataScadenzaDa} 
+  		</if>
+  		<if test="dataScadenzaA != null and dataScadenzaA != ''">AND
+  			 ppa.DATASCADENZA &lt; #{dataScadenzaA}  
+  		</if>
+  	</select>
+  	<select id="getPagamentiByFiltro" parameterType="it.maggioli.eldasoft.sil.pagopa.ws.PagamentiFilterInType" resultType="it.maggioli.eldasoft.sil.pagopa.entities.PagopaPagamento">
+  		<include refid="selectPagamentiFull"/>
+  		WHERE ppa.CODIMP = #{codiceimpresa}
+  		<if test="codicegara != null and codicegara != ''">AND
+  			ppa.CODICEGARA in 
+  			 <foreach collection="codicegara" item="item" separator="," close=")" open="(">
+			   #{item}
+			 </foreach>
+  		</if>
+  		<if test="iuv != null and iuv != ''">AND
+  			ppa.IUV in 
+  			 <foreach collection="iuv" item="item" separator="," close=")" open="(">
+			   #{item}
+			 </foreach>
+  		</if>
+  		<if test="iuv == null or iuv == ''">AND
+  			ppa.IUV IS NOT NULL
+  		</if>
+  		<if test="idDebito != null and idDebito != ''">AND
+  			ppa.IDDEBITO in 
+  			 <foreach collection="idDebito" item="item" separator="," close=")" open="(">
+			   #{item}
+			 </foreach>
+  		</if>
+  		<if test="stato != null and stato != ''">AND
+  			ppa.STATOTIP in 
+  			 <foreach collection="stato" item="item" separator="," close=")" open="(">
+			   #{item}
+			 </foreach>
+  		</if>
+  		<if test="causale != null and causale != ''">AND
+  			ppa.CAUSALETIP in 
+  			 <foreach collection="causale" item="item" separator="," close=")" open="(">
+			   #{item}
+			 </foreach>
+  		</if>
+  		<if test="dataScadenzaDa != null and dataScadenzaDa != ''">AND
+  			 ppa.DATASCADENZA &gt;= #{dataScadenzaDa} 
+  		</if>
+  		<if test="dataScadenzaA != null and dataScadenzaA != ''">AND
+  			 ppa.DATASCADENZA &lt; #{dataScadenzaA}  
+  		</if>
+  	</select>
+  	<select id="getCountPagamentiGroupByStato" parameterType="java.lang.String" resultType="java.util.HashMap">
+		SELECT PPA.STATOTIP as stato,COUNT(PPA.STATOTIP) as conteggio
+		FROM PAGOPA_PAGAMENTI PPA
+		WHERE PPA.IUV IS NOT NULL
+		AND PPA.CODIMP = #{codimp}
+		GROUP BY PPA.STATOTIP
+	</select>
+  	
+  	<select id="getMappaTab1" parameterType="java.lang.String" resultType="java.util.HashMap">
+  		<include refid="selectTab1"/>
+  	</select>
+  	<select id="getMappaTab2Codificato" parameterType="java.lang.String" resultType="java.util.HashMap">
+  		<include refid="selectTab2Codificato"/>
+  	</select>
+  	<select id="getRicevutaById" parameterType="java.lang.Long" resultType="it.maggioli.eldasoft.sil.pagopa.entities.PagopaRicevuta">
+  		SELECT PPAR.* 
+  		FROM PAGOPA_RICEVUTE PPAR
+  		WHERE PPAR.PAGOPAPAGAMENTIID = #{id}
+  	</select>
+  	<insert id="insertRicevutaPagamento" parameterType="it.maggioli.eldasoft.sil.pagopa.entities.PagopaRicevuta">
+		<if test="_parameter != null">
+			INSERT INTO PAGOPA_RICEVUTE (PAGOPAPAGAMENTIID,RICEVUTA) VALUES (#{pagopapagamentiid}, #{ricevuta})
+		</if>
+
+	</insert>
+  	<select id="existsPagamentoById" parameterType="java.lang.Long" resultType="java.lang.Long">
+  		SELECT COUNT(*)
+  		FROM PAGOPA_PAGAMENTI PPA
+  		WHERE PPA.ID=#{id}
+  	</select>
+  	<select id="getRiferimentoProceduraByFiltro" parameterType="it.maggioli.eldasoft.sil.pagopa.ws.RiferimentoFilterInType" resultType="it.maggioli.eldasoft.sil.pagopa.entities.PagopaRiferimentoProcedura">
+  		SELECT prp.codice,prp.oggetto,prp.sa,prp.cig,prp.usernome
+  		FROM v_ws_pagopa_rif_proc prp
+  		WHERE (prp.usernome is null or prp.usernome = #{usernome})
+		<trim prefix=" " suffixOverrides=" AND ">
+			<if test="codice != null and codice != ''">prp.codice = #{codice} AND</if>
+			<if test="oggetto != null and oggetto != ''">prp.oggetto = #{oggetto} AND</if>
+			<if test="sa != null and sa != ''">prp.sa = #{sa} AND</if>
+			<if test="cig != null and cig != ''">prp.cig = #{cig} AND</if>
+		</trim>
+	</select>
+  	<select id="getRiferimentoProcedura" parameterType="it.maggioli.eldasoft.sil.pagopa.ws.RiferimentoFilterInType" resultType="it.maggioli.eldasoft.sil.pagopa.entities.PagopaRiferimentoProcedura">
+  		SELECT prp.codice,prp.oggetto,prp.sa,prp.cig,prp.usernome
+  		FROM v_ws_pagopa_rif_proc prp
+  		WHERE (prp.usernome is null or prp.usernome = #{usernome})
+		<if test="codice != null and codice != ''">AND
+			prp.codice = #{codice}
+		</if>
+		<if test="oggetto != null and oggetto != ''">AND
+			prp.oggetto = #{oggetto}
+		</if>
+		<if test="sa != null and sa != ''">AND
+			prp.sa = #{sa}
+		</if>
+		<if test="cig != null and cig != ''">AND
+			prp.cig = #{cig}
+		</if>
+  	</select>
+  	
+  	<insert id="insertPagamento" parameterType="it.maggioli.eldasoft.sil.pagopa.entities.PagopaPagamento">
+		<if test="_parameter != null">
+			<!-- Significa: Esegui la query solo se il parametro non è nullo -->
+			INSERT INTO pagopa_pagamenti
+			(id, codicegara, codimp, username, dcreazione, causalecod, causaletip, servizio, importo, iuv,
+			datageniuv, iddebito, datascadenza, datainiziovalidita, datafinevalidita, idrata, statocod,statotip, errore)
+			VALUES
+			(#{id,jdbcType=NUMERIC}, #{codicegara,jdbcType=VARCHAR}, #{codimp,jdbcType=VARCHAR}, #{username,jdbcType=VARCHAR}, #{dcreazione,jdbcType=TIMESTAMP}, #{causalecod,jdbcType=VARCHAR}, #{causaletip,jdbcType=NUMERIC}, #{servizio,jdbcType=VARCHAR}, #{importo,jdbcType=NUMERIC}, #{iuv,jdbcType=VARCHAR},
+			#{datageniuv,jdbcType=TIMESTAMP}, #{iddebito,jdbcType=VARCHAR}, #{datascadenza,jdbcType=TIMESTAMP}, #{datainiziovalidita,jdbcType=TIMESTAMP}, #{datafinevalidita,jdbcType=TIMESTAMP}, #{idrata,jdbcType=VARCHAR},
+			#{statocod,jdbcType=VARCHAR}, #{statotip,jdbcType=NUMERIC}, #{errore,jdbcType=VARCHAR})
+		</if>
+	</insert>
+	<update id="updatePagamentoById" parameterType="it.maggioli.eldasoft.sil.pagopa.entities.PagopaPagamento">
+		UPDATE pagopa_pagamenti
+		SET
+		<trim prefix=" " suffixOverrides=",">
+			<!-- Il trim server per rendere dinamico il settaggio dei valori  -->
+			<if test="codigara != null and codicegara != ''">codicegara = #{codicegara},</if>
+			<if test="codimp != null and codimp != ''">codimp = #{codimp},</if>
+			<if test="username != null and username != ''">username = #{username},</if>
+			<if test="dcreazione != null and dcreazione != ''">dcreazione = #{dcreazione},</if>
+			<if test="causalecod != null and causalecod != '' and causaletip != null and causaletip != ''">causalecod = #{causalecod},causaletip = #{causaletip},</if>
+			<if test="servizio != null and servizio != ''">servizio = #{servizio},</if>
+			<if test="importo != null and importo != ''">importo = #{importo},</if>
+			<if test="iuv != null and iuv != ''">iuv = #{iuv},</if>
+			<if test="datageniuv != null">datageniuv = #{datageniuv},</if>
+			<if test="iddebito != null and iddebito != ''">iddebito = #{iddebito},</if>
+			<if test="datascadenza != null">datascadenza = #{datascadenza},</if>
+			<if test="datainiziovalidita != null">datainiziovalidita = #{datainiziovalidita},</if>
+			<if test="datafinevalidita != null">datafinevalidita = #{datafinevalidita},</if>
+			<if test="datapagamento != null">datapagamento = #{datapagamento},</if>
+			<if test="idrata != null and idrata != ''">idrata = #{idrata},</if>
+			<if test="statocod != null and statocod != '' and statotip != null and statotip != ''">statocod = #{statocod},statotip = #{statotip},</if>
+			<if test="errore != null and errore != ''">errore = #{errore},</if>
+		</trim>
+		WHERE ID=#{id}
+	</update>
+</mapper>

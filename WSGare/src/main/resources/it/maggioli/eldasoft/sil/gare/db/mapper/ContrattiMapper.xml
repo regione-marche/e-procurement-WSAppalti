@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?><!--Converted at: Wed May 25 17:56:09 CEST 2022-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="it.maggioli.eldasoft.sil.gare.db.mapper.ContrattiMapper">
+
+	<resultMap id="resultContratto" type="it.maggioli.eldasoft.sil.gare.ws.ContrattoType">
+		<result property="stazioneAppaltante" column="sa"/>
+		<result property="codice" column="codice"/>
+		<result property="oggetto" column="oggetto"/>
+		<result property="stato" column="stato"/>
+		<result property="cig" column="codcig"/>
+		<result property="importo" column="imptot"/>
+		<result property="tipoAtto" column="desctipoatto"/>
+		<result property="dataAtto" column="datatto"/>
+		<result property="numeroRepertorio" column="numrepatto"/>
+		<result property="idProgramma" column="idprg"/>
+		<result property="idDocumento" column="iddoc"/>
+		<result property="idComunicazione" column="idcom"/>
+		<result property="idDestinatario" column="idcomdes"/>
+		<result property="dataLettura" column="datlet"/>
+		<result property="dataUltimoAggiornamento" column="dultagg"/>
+	</resultMap>
+
+	<resultMap id="resultAllegati" type="it.maggioli.eldasoft.sil.gare.ws.DocumentoAllegatoType">
+		<result property="descrizione" column="descdoc"/>
+		<result property="nomefile" column="filedoc"/>
+		<result property="id" column="iddoc"/>
+	</resultMap>
+
+	<select id="searchContratti" parameterType="java.util.HashMap" resultMap="resultContratto">
+	SELECT descsa as sa, codice, oggetto, descstato as stato, codcig, imptot, desctipoatto, datatto, numrepatto, idprg, iddoc, idcom, idcomdes, datlet,
+			dultagg   
+	FROM v_ws_oda
+	WHERE usernome = #{username}
+		<if test="stazioneAppaltante != null and stazioneAppaltante != ''">AND codsa = #{stazioneAppaltante}</if> 
+		<if test="oggetto != null and oggetto != ''">AND ${operatoreUpper}(oggetto) like #{oggetto}</if> 
+		<if test="cig != null and cig != ''">AND EXISTS (SELECT codgar FROM v_ws_gare_lotti l WHERE v_ws_oda.codgar = l.codgar AND ${operatoreUpper}(l.codciglotto) like #{cig})</if>  
+		<if test="stato != null and stato != ''">AND codstato = #{stato}</if>
+	ORDER BY datatto DESC
+	</select>
+
+	<select id="getDettaglioContratto" parameterType="java.lang.String" resultMap="resultContratto">
+		SELECT codsa as sa, codice, oggetto, codstato as stato, codcig, imptot, desctipoatto, datatto, numrepatto, idprg, iddoc, idcom, idcomdes, datlet,
+				dultagg
+		FROM v_ws_oda
+	WHERE codice = #{codice}
+	</select>
+	
+	<select id="getAllegatiContratto" parameterType="java.lang.String" resultMap="resultAllegati">
+	SELECT descdoc, filedoc, iddoc   
+	FROM v_ws_gare_documenti
+	WHERE ngara = #{codice} and gruppo = 11
+	ORDER BY numord ASC
+	</select>
+	
+</mapper>

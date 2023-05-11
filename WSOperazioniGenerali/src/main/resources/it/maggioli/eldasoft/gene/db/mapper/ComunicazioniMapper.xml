@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?><!--Converted at: Mon May 23 09:58:06 CEST 2022-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="it.maggioli.eldasoft.gene.db.mapper.ComunicazioniMapper">
+
+	<resultMap id="dettaglioComunicazione" type="it.maggioli.eldasoft.gene.ws.DettaglioComunicazioneType">
+		<result property="applicativo" column="idprg"/>
+		<result property="id" column="idcom"/>
+		<result property="entita" column="coment"/>
+		<result property="chiave1" column="comkey1"/>
+		<result property="chiave2" column="comkey2"/>
+		<result property="chiave3" column="comkey3"/>
+		<result property="chiave4" column="comkey4"/>
+		<result property="chiave5" column="comkey5"/>
+		<result property="idOperatore" column="comcodope"/>
+		<result property="mittente" column="committ"/>
+		<result property="stato" column="comstato"/>
+		<result property="oggetto" column="commsgogg"/>
+		<result property="testo" column="commsgtes"/>
+		<result property="comunicazionePubblica" column="comunicazione_pubblica"/>
+		<result property="tipoComunicazione" column="comtipo"/>
+		<result property="dataPubblicazione" column="comdatapub"/>
+		<result property="dataInserimento" column="comdatins"/>
+		<result property="dataLettura" column="comdatlet"/>
+		<result property="dataProtocollo" column="comdatprot"/>
+		<result property="numeroProtocollo" column="comnumprot"/>
+		<result property="sessionKey" column="comkeysess"/>
+		<result property="dataAggiornamentoStato" column="comdatastato"/>
+		<result property="applicativoRisposta" column="idprgris"/>
+		<result property="idRisposta" column="idcomris"/>
+		<result property="modello" column="commodello"/>
+		<result property="tipoBusta" column="comtipma"/>
+	</resultMap>
+	
+	<resultMap id="allegatoComunicazione" type="it.maggioli.eldasoft.gene.ws.AllegatoComunicazioneType">
+		<result property="id" column="iddocdig"/>
+		<result property="tipo" column="digtipdoc"/>
+		<result property="nomeFile" column="dignomdoc"/>
+		<result property="descrizione" column="digdesdoc"/>
+		<result property="file" column="digogg" jdbcType="BINARY"/>
+<!-- 		<result property="file" column="digogg" columnIndex="5" jdbcType="BINARY" typeHandler="datahandlerHandler" /> -->
+		<result property="uuid" column="digkey3"/>
+		<result property="firmacheck" column="firmacheck"/>
+		<result property="firmacheckts" column="firmacheckts"/>
+	</resultMap>
+
+  <sql id="selectComunicazione">
+  select idprg, idcom, coment, comkey1, comkey2, comkey3, comkey4, comkey5, comcodope, committ, comstato, commsgogg, commsgtes, 
+  CASE WHEN compub is null THEN null ELSE (CASE WHEN compub=1 THEN 1 ELSE 0 END) END AS comunicazione_pubblica, 
+  comtipo, comdatapub, comdatins, comdatlet, comdatprot, comnumprot, comkeysess, comdatastato, idprgris, idcomris, commodello, comtipma
+  </sql>
+  
+  <select id="getMaxIdComunicazione" parameterType="java.lang.String" resultType="java.lang.Long">
+  select max(idcom) from w_invcom where idprg = #{idApplicativo}
+  </select>
+  
+  <insert id="insertComunicazione" parameterType="java.util.HashMap">
+  insert into w_invcom (idprg, idcom, coment, comkey1, comkey2, comkey3, comkey4, comkey5, comcodope, comdatins, committ, 
+  					    comstato, commsgogg, commsgtes, compub, comtipo, comdatastato, comdatapub, comkeysess,
+  					    idprgris, idcomris, commodello, comtipma)
+  values (#{applicativo}, #{id}, #{entita,jdbcType=VARCHAR}, #{chiave1,jdbcType=VARCHAR}, #{chiave2,jdbcType=VARCHAR}, #{chiave3,jdbcType=VARCHAR}, #{chiave4,jdbcType=VARCHAR}, #{chiave5,jdbcType=VARCHAR}, #{idOperatore,jdbcType=NUMERIC}, #{dataInserimento,jdbcType=TIMESTAMP}, #{mittente,jdbcType=VARCHAR}, 
+  		  #{stato,jdbcType=VARCHAR}, #{oggetto,jdbcType=VARCHAR}, #{testo,jdbcType=VARCHAR}, #{comunicazionePubblica,jdbcType=NUMERIC}, #{tipoComunicazione,jdbcType=VARCHAR}, #{dataAggStato,jdbcType=TIMESTAMP}, #{dataPubblicazione,jdbcType=TIMESTAMP}, #{sessionKey,jdbcType=VARCHAR},
+  		  #{applicativoRisposta,jdbcType=VARCHAR}, #{idRisposta,jdbcType=NUMERIC}, #{modello,jdbcType=NUMERIC}, #{tipoBusta,jdbcType=NUMERIC})
+  </insert>
+  
+  <update id="updateComunicazione" parameterType="java.util.HashMap">
+  update w_invcom set coment = #{entita,jdbcType=VARCHAR}, comkey1 = #{chiave1,jdbcType=VARCHAR}, comkey2 = #{chiave2,jdbcType=VARCHAR}, comkey3 = #{chiave3,jdbcType=VARCHAR}, comkey4 = #{chiave4,jdbcType=VARCHAR}, comkey5 = #{chiave5,jdbcType=VARCHAR}, 
+         comcodope = #{idOperatore,jdbcType=NUMERIC}, committ = #{mittente,jdbcType=VARCHAR}, comstato = #{stato,jdbcType=VARCHAR}, commsgogg = #{oggetto,jdbcType=VARCHAR}, commsgtes = #{testo,jdbcType=VARCHAR},
+         compub = #{comunicazionePubblica,jdbcType=NUMERIC}, comtipo = #{tipoComunicazione,jdbcType=VARCHAR}, comdatastato = #{dataAggStato,jdbcType=TIMESTAMP}, comdatapub = #{dataPubblicazione,jdbcType=TIMESTAMP},
+         comkeysess = #{sessionKey,jdbcType=VARCHAR}, idprgris = #{applicativoRisposta,jdbcType=VARCHAR}, idcomris = #{idRisposta,jdbcType=NUMERIC}, commodello = #{modello,jdbcType=NUMERIC}, comtipma = #{tipoBusta,jdbcType=NUMERIC}
+  where idprg = #{applicativo} and idcom = #{id}
+  </update>
+  
+  <delete id="deleteComunicazione" parameterType="java.util.HashMap">
+  delete from w_invcom where idprg = #{applicativo} and idcom = #{idComunicazione}
+  </delete>
+  
+  <select id="getMaxIdAllegato" parameterType="java.lang.String" resultType="java.lang.Long">
+  select max(iddocdig) from w_docdig where idprg = #{idApplicativo}
+  </select>
+
+  <insert id="insertAllegato" parameterType="java.util.HashMap">
+  insert into w_docdig (idprg, iddocdig, digent, digkey1, digkey2, digkey3, digtipdoc, dignomdoc, digdesdoc, digogg, firmacheck, firmacheckts)
+  values (#{applicativo}, #{id}, #{entita}, #{idComunicazione}, #{progressivo}, #{uuid,jdbcType=VARCHAR}, #{tipo,jdbcType=VARCHAR}, #{nomeFile,jdbcType=VARCHAR}, #{descrizione,jdbcType=VARCHAR}, #{file,jdbcType=BINARY}, #{firmacheck,jdbcType=VARCHAR}, #{firmacheckts,jdbcType=TIMESTAMP})
+  </insert>
+  
+  <insert id="updateAllegato" parameterType="java.util.HashMap">
+  update w_docdig set digkey2 = #{progressivo}, digtipdoc = #{tipo,jdbcType=VARCHAR}, dignomdoc = #{nomeFile,jdbcType=VARCHAR}, digdesdoc = #{descrizione,jdbcType=VARCHAR},
+  					  <if test="file != null and file != ''"> digogg = #{file,jdbcType=BINARY}, </if>   					  
+                      digkey3 = #{uuid,jdbcType=VARCHAR}
+                      <if test="firmacheck != null and firmacheck != ''"> , firmacheck = #{firmacheck,jdbcType=VARCHAR} </if>
+                      <if test="firmacheckts != null"> , firmacheckts = #{firmacheckts,jdbcType=TIMESTAMP} </if>
+  where idprg = #{applicativo} and iddocdig = #{id} and digent = #{entita} and digkey1 = #{idComunicazione}
+  </insert>
+  
+  <delete id="deleteAllegato" parameterType="java.util.HashMap">
+  delete from w_docdig where idprg = #{applicativo} and iddocdig = #{id}
+  </delete>
+  
+  <delete id="deleteAllegati" parameterType="java.util.HashMap">
+  delete from w_docdig where idprg = #{applicativo} and digent = #{entita} and digkey1 = #{idComunicazione}
+  </delete>
+  
+  <update id="updateStatoComunicazioni" parameterType="java.util.HashMap">
+  update w_invcom set comstato = #{stato,jdbcType=VARCHAR}
+  where
+	   <foreach collection="comunicazioni" item="item" separator="OR">
+	  (idprg = #{item.applicativo} AND idcom = #{item.id})
+	  </foreach>
+  </update>
+  
+  <update id="updateDataLetturaDestinatarioComunicazione" parameterType="java.util.HashMap">
+  update w_invcomdes set desdatlet = #{dataLettura}
+  where idprg = #{applicativo} and idcom = #{idComunicazione} and idcomdes = #{idDestinatario} 
+  </update>
+  
+  <select id="getDettaglioComunicazione" parameterType="java.util.HashMap" resultMap="dettaglioComunicazione">
+  <include refid="selectComunicazione"/>
+    from w_invcom
+       where idprg = #{applicativo} and idcom = #{idComunicazione}
+  </select>
+  
+  <select id="getAllegatiComunicazione" parameterType="java.util.HashMap" resultMap="allegatoComunicazione">
+  select iddocdig, digtipdoc, dignomdoc, digdesdoc, digogg, digkey3, firmacheck, firmacheckts
+    from w_docdig
+   where idprg = #{applicativo} and digent = #{entita} and digkey1 = #{idComunicazione}
+   <if test="idDocumento != null and idDocumento != ''">and 
+   		 ((dignomdoc = #{idDocumento} and digkey3 is null) or 
+   		  (digkey3 = #{idDocumento} and digtipdoc is null))  
+   </if>
+order by digkey2 
+  </select>
+  
+  <select id="getElencoComunicazioni"
+          parameterType="it.maggioli.eldasoft.gene.ws.DettaglioComunicazioneType"
+          resultMap="dettaglioComunicazione">
+  <include refid="selectComunicazione"/>
+    from w_invcom
+   where idprg = #{applicativo} 
+   <if test="id != null and id != ''">and idcom = #{id}</if>
+   <if test="entita != null and entita != ''">and coment = #{entita}</if>
+   <if test="chiave1 != null and chiave1 != ''">and comkey1 = #{chiave1}</if>
+   <if test="chiave2 != null and chiave2 != ''">and comkey2 = #{chiave2}</if>
+   <if test="chiave3 != null and chiave3 != ''">and comkey3 = #{chiave3}</if>
+   <if test="chiave4 != null and chiave4 != ''">and comkey4 = #{chiave4}</if>
+   <if test="chiave5 != null and chiave5 != ''">and comkey5 = #{chiave5}</if>
+   <if test="idOperatore != null and idOperatore != ''">and comcodope = #{idOperatore}</if>
+   <if test="mittente != null and mittente != ''">and committ = #{mittente}</if>
+   <if test="stato != null and stato != ''">and comstato = #{stato}</if>
+   <if test="oggetto != null and oggetto != ''">and commsgogg like #{oggetto}</if>
+   <if test="testo != null and testo != ''">and commsgtes like #{testo}</if>
+   <if test="comunicazionePubblica != null and comunicazionePubblica != ''">and compub = #{comunicazionePubblica}</if>
+   <if test="tipoComunicazione != null and tipoComunicazione != ''">and comtipo = #{tipoComunicazione}</if>
+   <if test="dataPubblicazione != null">and comdatapub = #{dataPubblicazione}</if>
+   <if test="modello != null and modello != ''">and commodello = #{modello}</if>
+<!-- order by idprg, comkey1, comkey2, comkey3  -->
+order by idprg, idcom
+  </select>
+  
+  <select id="isComunicazioneProcessata" parameterType="java.util.HashMap" resultType="java.lang.Integer">
+  select count(1)
+    from w_invcom
+   where idprg = #{applicativo} and idcom = #{idComunicazione} and comstato in  <foreach collection="stati" item="item" separator="," close=")" open="(">#{item}</foreach>
+  </select>
+  
+  <update id="updateProtocolloComunicazione" parameterType="java.util.HashMap">
+  update w_invcom set <if test="stato != null and stato != ''">comstato = #{stato,jdbcType=VARCHAR},</if> comnumprot = #{numeroProtocollo,jdbcType=VARCHAR}, comdatprot = #{dataProtocollo,jdbcType=TIMESTAMP}
+  where idprg = #{applicativo} and idcom = #{idComunicazione}
+  </update>
+  
+  <insert id="insertDocumentoProtocollo" parameterType="java.util.HashMap">
+  insert into wsdocumento (id, entita, key1, key2, key3, key4, numerodoc, annoprot, numeroprot, oggetto, inout)
+  values (#{id}, #{dt.entita}, #{dt.chiave1}, #{dt.chiave2,jdbcType=VARCHAR}, #{dt.chiave3,jdbcType=VARCHAR}, #{dt.chiave4,jdbcType=VARCHAR}, #{dt.numeroDocumento,jdbcType=VARCHAR}, #{dt.annoProtocollo,jdbcType=NUMERIC}, #{dt.numeroProtocollo,jdbcType=VARCHAR}, #{dt.oggetto,jdbcType=VARCHAR}, #{dt.verso,jdbcType=VARCHAR})
+  </insert>
+
+  <insert id="insertAllegatoProtocollo" parameterType="java.util.HashMap">
+  insert into wsallegati (id, entita, key1, key2, key3, key4, idwsdoc)
+  values (#{id}, #{dt.entita}, #{dt.chiave1}, #{dt.chiave2,jdbcType=VARCHAR}, #{dt.chiave3,jdbcType=VARCHAR}, #{dt.chiave4,jdbcType=VARCHAR}, #{dt.idDocumento,jdbcType=NUMERIC})
+  </insert>
+  
+  <delete id="deleteAllegatoProtocollo" parameterType="java.util.HashMap">
+  delete from wsallegati 
+  where key1 = #{applicativo} and key2 = #{id}
+  <if test="entita != null and entita != ''">and entita=#{entita}</if>
+  </delete>
+  
+  <update id="updateSessionKeyComunicazione" parameterType="java.util.HashMap">
+  update w_invcom set <if test="stato != null and stato != ''">comstato = #{stato,jdbcType=VARCHAR},</if> comkeysess = #{sessionKey,jdbcType=VARCHAR}
+  where idprg = #{applicativo} and idcom = #{idComunicazione}
+  </update>
+  
+
+</mapper>
