@@ -10,13 +10,15 @@
  */
 package it.maggioli.eldasoft.gene.db.dao;
 
+import org.springframework.dao.DataAccessException;
+
 /**
  * Interfaccia DAO per l'accesso ai dati della tabella di memorizzazione dei del
  * campo ID_**** delle tabelle relative al DB di backoffice.
  */
 public interface GenChiaviDao {
 
-	long getNextId(String tabella, int numIdAllocati);
+	long getNextId(String tabella, int numIdAllocati) throws DataAccessException;
 
 	public long getMaxId(String tabella, String chiave, String condizioniExtra);
 }

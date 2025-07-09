@@ -6,6 +6,14 @@ import java.util.Date;
 import javax.xml.bind.DatatypeConverter;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
+/**
+ * Adapter XML per la gestione dei campi di tipo "Date" letti/scritti su db
+ * 
+ * Da utilizzare come annotazione dell'attributo nella classe
+ *  
+ *   @XmlJavaTypeAdapter(DateAdapter.class)
+ *   
+ */
 public class DateAdapter extends XmlAdapter<String, Date> {
 
 	private static final SimpleDateFormat DATEFORMAT = new SimpleDateFormat("yyyy-MM-dd");

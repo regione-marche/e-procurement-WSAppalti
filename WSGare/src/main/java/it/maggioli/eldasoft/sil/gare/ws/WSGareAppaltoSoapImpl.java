@@ -9,22 +9,11 @@ import it.eldasoft.utils.sql.comp.SqlComposerException;
 import it.eldasoft.utils.utility.UtilityDate;
 import it.maggioli.eldasoft.gene.bl.DatiCodificatiManager;
 import it.maggioli.eldasoft.gene.ws.WSOperazioniGeneraliSoapImpl;
-import it.maggioli.eldasoft.sil.gare.bl.AvvisiManager;
-import it.maggioli.eldasoft.sil.gare.bl.BandiManager;
-import it.maggioli.eldasoft.sil.gare.bl.CataloghiManager;
-import it.maggioli.eldasoft.sil.gare.bl.ContrattiManager;
-import it.maggioli.eldasoft.sil.gare.bl.EsitiManager;
-import it.maggioli.eldasoft.sil.gare.bl.ImpreseManager;
-import it.maggioli.eldasoft.sil.gare.db.vo.AttributoAggiuntivoOfferta;
-import it.maggioli.eldasoft.sil.gare.db.vo.ComunicazioneLotto;
-import it.maggioli.eldasoft.sil.gare.db.vo.CriterioValutazioneOffertaLotto;
-import it.maggioli.eldasoft.sil.gare.db.vo.DocumentazioneRichiestaLotto;
-import it.maggioli.eldasoft.sil.gare.db.vo.DocumentoAllegatoLotto;
-import it.maggioli.eldasoft.sil.gare.db.vo.RequisitoRichiestoLotto;
-import it.maggioli.eldasoft.sil.gare.db.vo.SoggettoAderenteLotto;
-import it.maggioli.eldasoft.sil.gare.ws.search.AvvisiTypeSearch;
-import it.maggioli.eldasoft.sil.gare.ws.search.EsitoTypeSearch;
-import it.maggioli.eldasoft.sil.gare.ws.search.GaraTypeSearch;
+import it.maggioli.eldasoft.sil.gare.bl.*;
+import it.maggioli.eldasoft.sil.gare.db.vo.*;
+import it.maggioli.eldasoft.sil.gare.ws.out_type.BooleanOutType;
+import it.maggioli.eldasoft.sil.gare.ws.out_type.StringOutType;
+import it.maggioli.eldasoft.sil.gare.ws.search.*;
 import it.maggioli.eldasoft.wsOperazioniGenerali.daticomuni.DatoCodificatoType;
 import org.apache.commons.lang.StringUtils;
 import org.apache.xmlbeans.XmlError;
@@ -86,6 +75,8 @@ public class WSGareAppaltoSoapImpl implements WSGareAppaltoSoap {
 	private CataloghiManager cataloghiManager;
 	@Autowired
 	private ContrattiManager contrattiManager;
+	@Autowired
+	private ElenchiManager elenchiManager;
 	
 	@Override
 	public it.maggioli.eldasoft.sil.gare.ws.VersionOutType getVersion() throws DataAccessException {
@@ -294,18 +285,13 @@ public class WSGareAppaltoSoapImpl implements WSGareAppaltoSoap {
 		return risultato;
 	}
 
-	@Override
-	public DettaglioGaraOutType getDettaglioGara(String codiceGara) {
-		LOG.debug("dettaglioGara(" + codiceGara + "): inizio metodo");
-
-		DettaglioGaraOutType risultato = new DettaglioGaraOutType();
-
+	private void initDettaglioGara(DettaglioGaraOutType risultato, GaraType datiGeneraliGara) {
 		try {
-			DettaglioGaraType gara =  null; 
-			GaraType datiGeneraliGara = this.bandiManager.getBando(codiceGara);
+			DettaglioGaraType gara = new DettaglioGaraType();
+			
 			if (datiGeneraliGara != null) {
-				gara = new DettaglioGaraType();
-
+				String codiceGara = datiGeneraliGara.getCodice();
+				
 				// ottimizzazione su v_ws_dettaglio_bando
 				//StazioneAppaltanteBandoType stazioneAppaltante = this.bandiManager
 				//	.getStazioneAppaltanteBando(codiceGara);
@@ -315,6 +301,7 @@ public class WSGareAppaltoSoapImpl implements WSGareAppaltoSoap {
 				stazioneAppaltante.rup = datiGeneraliGara.getSARup();
 				stazioneAppaltante.puntoOrdinante = this.bandiManager.getPuntiOrdinanti(codiceGara);
 				stazioneAppaltante.puntoIstruttore = this.bandiManager.getPuntiIstruttori(codiceGara);
+				stazioneAppaltante.responsabileFaseAffidamento = datiGeneraliGara.getSAResponsabileFaseAffidamento();
 				
 				String codiceStazioneAppaltante = (stazioneAppaltante != null ? stazioneAppaltante.getCodice() : null);		
 				
@@ -329,7 +316,7 @@ public class WSGareAppaltoSoapImpl implements WSGareAppaltoSoap {
 					.getSoggettiAderenti(codiceGara);
 
 				// la busta di prequalifica va recuperata solo in caso di 
-				// gara ristretta. "iterGara" può assumere i valori:				
+				// gara ristretta. "iterGara" puï¿½ assumere i valori:				
 				//   APERTA    = { 1 }        
 				//   RISTRETTA = { 2, 4 }     
 				//   NEGOZIATA = { 3, 5, 6 }  
@@ -599,8 +586,8 @@ public class WSGareAppaltoSoapImpl implements WSGareAppaltoSoap {
 					gara.getDatiGeneraliGara().setCostoFisso(garaCostoFisso);
 				}
 
-				// verifica se per la gara è presente un'asta elettronica 
-				// e se l'asta è attiva 
+				// verifica se per la gara e' presente un'asta elettronica 
+				// e se l'asta e' attiva 
 				try {
 					datiGeneraliGara.setInvitataAsta(false);
 					
@@ -620,24 +607,62 @@ public class WSGareAppaltoSoapImpl implements WSGareAppaltoSoap {
 							"Impossibile leggere lo stato dell'asta elettronica",
 							e);
 				}
-				datiGeneraliGara.setRettifichePresentazioneDomanda( bandiManager.getRettifichePresentazioneDomanda(codiceGara) );
-				datiGeneraliGara.setRettifichePresentazioneOfferta(bandiManager.getRettifichePresentazioneOfferta(codiceGara)) ;
-				
+				datiGeneraliGara.setRettifichePresentazioneDomanda(
+						bandiManager.getRettifichePresentazioneDomanda(
+								codiceGara
+								, datiGeneraliGara.getDataTerminePresentazioneDomanda()
+								, datiGeneraliGara.getOraTerminePresentazioneDomanda()
+						)
+				);
+				datiGeneraliGara.setRettifichePresentazioneOfferta(
+						bandiManager.getRettifichePresentazioneOfferta(
+								codiceGara
+								, datiGeneraliGara.getDataTerminePresentazioneOfferta()
+								, datiGeneraliGara.getOraTerminePresentazioneOfferta()
+						)
+				);
 			}
 			
 			// aggiungo le informaizoni relative a 
 			// rettifichePresentazioneDomanda e rettifichePresentazioneOfferta
-			
-			
+						
 			risultato.setGara(gara);
 
 		} catch (DataAccessException e) {
 			LOG.error("Errore inaspettato durante l'interazione con la base dati", e);
 			risultato.setErrore(e.getMessage());
 		}
+	}
 
-		LOG.debug("dettaglioGara: fine metodo");
-
+	@Override
+	public DettaglioGaraOutType getDettaglioGara(String codiceGara) {
+		LOG.debug("getDettaglioGara({}): inizio metodo", codiceGara);
+		DettaglioGaraOutType risultato = new DettaglioGaraOutType();
+		try {
+			GaraType datiGeneraliGara = bandiManager.getBando(codiceGara);
+			if(datiGeneraliGara != null)
+				initDettaglioGara(risultato, datiGeneraliGara);
+		} catch (DataAccessException e) {
+			LOG.error("Errore inaspettato durante l'interazione con la base dati", e);
+			risultato.setErrore(e.getMessage());
+		}
+		LOG.debug("getDettaglioGara: fine metodo");
+		return risultato;
+	}
+	
+	@Override
+	public DettaglioGaraOutType getDettaglioGaraByCig(String cig) {
+		LOG.debug("getDettaglioGaraByCig({}): inizio metodo", cig);
+		DettaglioGaraOutType risultato = new DettaglioGaraOutType();
+		try {
+			GaraType datiGeneraliGara = bandiManager.getBandoByCig(cig);
+			if(datiGeneraliGara != null)
+				initDettaglioGara(risultato, datiGeneraliGara);
+		} catch (DataAccessException e) {
+			LOG.error("Errore inaspettato durante l'interazione con la base dati", e);
+			risultato.setErrore(e.getMessage());
+		}
+		LOG.debug("getDettaglioGaraByCig: fine metodo");
 		return risultato;
 	}
 
@@ -665,7 +690,25 @@ public class WSGareAppaltoSoapImpl implements WSGareAppaltoSoap {
 
 		return risultato;
 	}
-
+	
+	@Override
+	public String getCodiceGaraFromLotto(String codiceLotto) {
+		LOG.debug("getCodiceGaraFromLotto(" + codiceLotto
+				+ "): inizio metodo");
+		
+		String codiceGara = null;
+		try {
+			codiceGara = this.bandiManager
+					.getCodiceGaraFromCodiceLotto(codiceLotto);
+		} catch (DataAccessException e) {
+			LOG.error("Errore inaspettato durante l'interazione con la base dati", e);
+		}
+		
+		LOG.debug("getCodiceGaraFromLotto: fine metodo");
+		
+		return codiceGara;
+	}
+	
 	@Override
 	public EsitoOutType isGaraConOffertaTecnica(String codiceGara) {
 		LOG.debug("isGaraConOffertaTecnica(" + codiceGara + "): inizio metodo");
@@ -1187,16 +1230,13 @@ public class WSGareAppaltoSoapImpl implements WSGareAppaltoSoap {
 		return risultato;
 	}
 
-	@Override
-	public DettaglioEsitoOutType getDettaglioEsito(String codiceGara) {
-		LOG.debug("dettaglioEsito(" + codiceGara + "): inizio metodo");
-
-		DettaglioEsitoOutType risultato = new DettaglioEsitoOutType();
-
+	private void initDettaglioEsito(DettaglioEsitoOutType risultato, EsitoType datiGenerali) {
 		try {
+			String codiceGara = datiGenerali.getCodice();
+			
 			StazioneAppaltanteBandoType stazioneAppaltante = this.esitiManager
 					.getStazioneAppaltanteEsito(codiceGara);
-			EsitoType datiGenerali = this.esitiManager.getEsito(codiceGara);
+			
 			List<DocumentoAllegatoType> documenti = this.esitiManager
 					.getDocumentiEsitoLotto(codiceGara, null);
 			
@@ -1281,14 +1321,71 @@ public class WSGareAppaltoSoapImpl implements WSGareAppaltoSoap {
 			LOG.error("Errore inaspettato durante l'interazione con la base dati", e);
 			risultato.setErrore(e.getMessage());
 		}
+	}
 
-		LOG.debug("dettaglioEsito: fine metodo");
+	@Override
+	public DettaglioEsitoOutType getDettaglioEsito(String codiceGara) {
+		LOG.debug("getDettaglioEsito({}): inizio metodo", codiceGara);
+		DettaglioEsitoOutType risultato = new DettaglioEsitoOutType();
+		try {
+			EsitoType esito = esitiManager.getEsito(codiceGara);
+			if(esito != null)
+				initDettaglioEsito(risultato, esito);
+		} catch (DataAccessException e) {
+			LOG.error("Errore inaspettato durante l'interazione con la base dati", e);
+			risultato.setErrore(e.getMessage());
+		}
+		LOG.debug("getDettaglioEsito: fine metodo");
+		return risultato;
+	}
+
+	@Override
+	public DettaglioEsitoOutType getDettaglioEsitoByCig(String cig) {
+		LOG.debug("getDettaglioEsitoByCig({}): inizio metodo", cig);
+		DettaglioEsitoOutType risultato = new DettaglioEsitoOutType();
+		try {
+			EsitoType esito = esitiManager.getEsitoByCig(cig);
+			if(esito != null)
+				initDettaglioEsito(risultato, esito);
+		} catch (DataAccessException e) {
+			LOG.error("Errore inaspettato durante l'interazione con la base dati", e);
+			risultato.setErrore(e.getMessage());
+		}
+		LOG.debug("getDettaglioEsitoByCig: fine metodo");
+		return risultato;
+	}
+	
+	@Override
+	public ElencoAvvisiOutType searchAvvisiGenerali(AvvisiTypeSearch filtri) {
+		LOG.debug("searchAvvisiGenerali({},{},{},{},{},{},{},{},{},{}): inizio metodo"
+			, filtri.getStazioneAppaltante(), filtri.getOggetto(), filtri.getTipoAvviso()
+			, filtri.getDataPubblicazioneDa(), filtri.getDataPubblicazioneA(), filtri.getDataScadenzaDa()
+			, filtri.getDataScadenzaA(), filtri.getAltriSoggetti(), filtri.getNumAnniPubblicazione()
+			, filtri.getStato());
+
+		ElencoAvvisiOutType risultato = new ElencoAvvisiOutType();
+
+		try {
+			int count = avvisiManager.countAvvisiGenerali(filtri);
+
+			List<AvvisoType> listaAvvisi = avvisiManager.searchAvvisiGenerali(filtri);
+			risultato.setElencoAvvisi(listaAvvisi);
+			risultato.setNumAvvisi(count);
+		} catch (DataAccessException e) {
+			LOG.error("Errore inaspettato durante l'interazione con la base dati", e);
+			risultato.setErrore(e.getMessage());
+		} catch (SqlComposerException e) {
+			LOG.error("DBMS non supportato o non valido", e);
+			risultato.setErrore("DBMS non supportato o non valido");
+		}
+
+		LOG.debug("searchAvvisiGenerali: fine metodo");
 		return risultato;
 	}
 
 	@Override
 	public ElencoAvvisiOutType searchAvvisi(AvvisiTypeSearch filtri) {
-		LOG.debug("searchAvvisi({},{},{};{},{},{},{},{};{}): inizio metodo"
+		LOG.debug("searchAvvisi({},{},{},{},{},{},{},{},{}): inizio metodo"
 			, filtri.getStazioneAppaltante(), filtri.getOggetto(), filtri.getTipoAvviso()
 			, filtri.getDataPubblicazioneDa(), filtri.getDataPubblicazioneA(), filtri.getDataScadenzaDa()
 			, filtri.getDataScadenzaA(), filtri.getAltriSoggetti(), filtri.getNumAnniPubblicazione());
@@ -1363,17 +1460,14 @@ public class WSGareAppaltoSoapImpl implements WSGareAppaltoSoap {
 		return risultato;
 	}
 
-	@Override
-	public DettaglioAvvisoOutType getDettaglioAvviso(String codiceGara) {
-		LOG.debug("dettaglioAvviso(" + codiceGara + "): inizio metodo");
-
-		DettaglioAvvisoOutType risultato = new DettaglioAvvisoOutType();
-
+	private void initDettaglioAvviso(DettaglioAvvisoOutType risultato, AvvisoType datiGenerali) {		
 		try {
+			String codiceGara = datiGenerali.getCodice();
+			
 			StazioneAppaltanteBandoType stazioneAppaltante = this.avvisiManager
 					.getStazioneAppaltanteAvviso(codiceGara);
 			String codiceStazioneAppaltante = (stazioneAppaltante != null ? stazioneAppaltante.getCodice() : null);
-			AvvisoType datiGenerali = this.avvisiManager.getAvviso(codiceGara);
+		
 			// i documenti di un avviso hanno codice gara = codice lotto e sono
 			// sull'avviso perche' i lotti non esistono
 			List<DocumentoAllegatoType> documenti = this.bandiManager
@@ -1395,11 +1489,40 @@ public class WSGareAppaltoSoapImpl implements WSGareAppaltoSoap {
 			LOG.error("Errore inaspettato durante l'interazione con la base dati", e);
 			risultato.setErrore(e.getMessage());
 		}
+	}
 
-		LOG.debug("dettaglioAvviso: fine metodo");
+	@Override
+	public DettaglioAvvisoOutType getDettaglioAvviso(String codiceGara, int numAnniPubblicazione) {
+		LOG.debug("getDettaglioAvviso({}): inizio metodo", codiceGara);
+		DettaglioAvvisoOutType risultato = new DettaglioAvvisoOutType();
+		try {
+			AvvisoType avviso = avvisiManager.getAvviso(codiceGara, numAnniPubblicazione);
+			if(avviso != null)
+				initDettaglioAvviso(risultato, avviso);
+		} catch (DataAccessException e) {
+			LOG.error("Errore inaspettato durante l'interazione con la base dati", e);
+			risultato.setErrore(e.getMessage());
+		}
+		LOG.debug("getDettaglioAvviso: fine metodo");
 		return risultato;
 	}
 
+	@Override
+	public DettaglioAvvisoOutType getDettaglioAvvisoByCig(String cig, int numAnniPubblicazione) {
+		LOG.debug("getDettaglioAvvisoByCig({}): inizio metodo", cig);
+		DettaglioAvvisoOutType risultato = new DettaglioAvvisoOutType();
+		try {
+			AvvisoType avviso = avvisiManager.getAvvisoByCig(cig, numAnniPubblicazione);
+			if(avviso != null)
+				initDettaglioAvviso(risultato, avviso);
+		} catch (DataAccessException e) {
+			LOG.error("Errore inaspettato durante l'interazione con la base dati", e);
+			risultato.setErrore(e.getMessage());
+		}
+		LOG.debug("getDettaglioAvvisoByCig: fine metodo");
+		return risultato;
+	}
+	
 	@Override
 	public ElencoBandiIscrizioneOutType searchBandiIscrizione(String token,
 			Integer stato, String stazioneAppaltante, Boolean isAttivo) {
@@ -1516,7 +1639,8 @@ public class WSGareAppaltoSoapImpl implements WSGareAppaltoSoap {
 			String codice, 
 			String codice2,
 			String entita,
-			String stazioneAppaltante) {
+			String stazioneAppaltante
+	) {
 		LOG.debug("getStatisticheComunicazioniPersonali(" + tokenRichiedente + ","
 				+ codice + "," + stazioneAppaltante
 				+ "): inizio metodo");
@@ -2908,15 +3032,17 @@ public class WSGareAppaltoSoapImpl implements WSGareAppaltoSoap {
 			
 			// carica l'elenco dei fac simile certificati (tipo=1)
 			// e l'elenco degli altri documenti (tipo=2)
-			List<DocumentoAllegatoType> facsimilecert = this.cataloghiManager
-					.getDocumentiArticolo(id, 1);
-			List<DocumentoAllegatoType> documenti = this.cataloghiManager
-					.getDocumentiArticolo(id, 2);
-			
-			risultato.setArticolo(dettaglio);
-			dettaglio.setFacSimileCertificazioni(facsimilecert);
-			dettaglio.setDocumentiUlteriori(documenti);
-
+			if(dettaglio != null) {
+				List<DocumentoAllegatoType> facsimilecert = this.cataloghiManager.getDocumentiArticolo(id, 1);
+				List<DocumentoAllegatoType> documenti = this.cataloghiManager.getDocumentiArticolo(id, 2);
+				dettaglio.setFacSimileCertificazioni(facsimilecert);
+				dettaglio.setDocumentiUlteriori(documenti);
+				risultato.setArticolo(dettaglio);
+			} else {
+				String err = "Errore inaspettato durante l'interazione con la base dati: dettaglio articolo non trovato per id=" + id; 
+				LOG.error(err);
+				risultato.setErrore(err);
+			}
 		} catch (DataAccessException e) {
 			LOG.error("Errore inaspettato durante l'interazione con la base dati", e);
 			risultato.setErrore(e.getMessage());
@@ -3657,14 +3783,18 @@ public class WSGareAppaltoSoapImpl implements WSGareAppaltoSoap {
 	
 	@Override
 	public GetEspletamentoGaraElencoOperatoriOutType getEspletamentoGaraDocAmmElencoOperatori(
-			String codiceGara, String tokenRichiedente) throws DataAccessException {
-		LOG.debug("getEspletamentoGaraDocAmmElencoOperatori(" + codiceGara + "," + tokenRichiedente +"): inizio metodo");
+			EspletamentoElencoOperatoriSearch search
+	) throws DataAccessException {
+		LOG.debug(
+			"getEspletamentoGaraDocAmmElencoOperatori({},{},{}): inizio metodo"
+			, search.getCodice()
+			, search.getCodiceOperatore()
+			, search.getUsername()
+		);
 
 		GetEspletamentoGaraElencoOperatoriOutType risultato = new GetEspletamentoGaraElencoOperatoriOutType();
 		try {
-			List<EspletGaraOperatoreType> elenco = 
-				(List<EspletGaraOperatoreType>) this.bandiManager
-					.getEspletamentoGaraDocAmmElencoOperatori(codiceGara, tokenRichiedente);
+			List<EspletGaraOperatoreType> elenco = bandiManager.getEspletamentoGaraDocAmmElencoOperatori(search);
 			risultato.setElenco(elenco);
 		} catch (Exception e) {
 			LOG.error("Errore inaspettato durante l'interazione con la base dati", e);
@@ -3675,17 +3805,22 @@ public class WSGareAppaltoSoapImpl implements WSGareAppaltoSoap {
 		
 		return risultato;
 	}
-	
+
 	@Override
 	public GetEspletamentoGaraElencoOperatoriOutType getEspletamentoGaraValTecElencoOperatori(
-			String codice, String codiceLotto, String tokenRichiedente) throws DataAccessException {
-		LOG.debug("getEspletamentoGaraValTecElencoOperatori(" + codice + "," + codiceLotto + "," + tokenRichiedente +"): inizio metodo");
+			EspletamentoElencoOperatoriSearch search
+	) throws DataAccessException {
+		LOG.debug(
+			"getEspletamentoGaraValTecElencoOperatori({},{},{},{}): inizio metodo"
+			, search.getCodice()
+			, search.getCodiceLotto()
+			, search.getCodiceOperatore()
+			, search.getUsername()
+		);
 
 		GetEspletamentoGaraElencoOperatoriOutType risultato = new GetEspletamentoGaraElencoOperatoriOutType();
 		try {
-			List<EspletGaraOperatoreType> elenco = 
-				(List<EspletGaraOperatoreType>) this.bandiManager
-					.getEspletamentoGaraValTecElencoOperatori(codice, codiceLotto, tokenRichiedente);
+			List<EspletGaraOperatoreType> elenco = bandiManager.getEspletamentoGaraValTecElencoOperatori(search);
 			risultato.setElenco(elenco);
 		} catch (Exception e) {
 			LOG.error("Errore inaspettato durante l'interazione con la base dati", e);
@@ -3720,14 +3855,19 @@ public class WSGareAppaltoSoapImpl implements WSGareAppaltoSoap {
 	
 	@Override
 	public GetEspletamentoGaraElencoOperatoriOutType getEspletamentoGaraOffEcoElencoOperatori(
-			String codice, String codiceLotto, String tokenRichiedente) throws DataAccessException {
-		LOG.debug("getEspletamentoGaraOffEcoElencoOperatori(" + codice + "," + codiceLotto + "," + tokenRichiedente +"): inizio metodo");
+			EspletamentoElencoOperatoriSearch search
+	) throws DataAccessException {
+		LOG.debug(
+			"getEspletamentoGaraOffEcoElencoOperatori({},{},{},{}): inizio metodo"
+				, search.getCodice()
+				, search.getCodiceLotto()
+				, search.getCodiceOperatore()
+				, search.getUsername()
+		);
 
 		GetEspletamentoGaraElencoOperatoriOutType risultato = new GetEspletamentoGaraElencoOperatoriOutType();
 		try {
-			List<EspletGaraOperatoreType> elenco = 
-				(List<EspletGaraOperatoreType>) this.bandiManager
-					.getEspletamentoGaraOffEcoElencoOperatori(codice, codiceLotto, tokenRichiedente);
+			List<EspletGaraOperatoreType> elenco = bandiManager.getEspletamentoGaraOffEcoElencoOperatori(search);
 			risultato.setElenco(elenco);
 		} catch (Exception e) {
 			LOG.error("Errore inaspettato durante l'interazione con la base dati", e);
@@ -3762,14 +3902,18 @@ public class WSGareAppaltoSoapImpl implements WSGareAppaltoSoap {
 
 	@Override
 	public GetEspletamentoGaraElencoOperatoriOutType getEspletamentoGaraGraduatoriaElencoOperatori(
-			String codiceGara, String tokenRichiedente) throws DataAccessException {
-		LOG.debug("getEspletamentoGaraGraduatoriaElencoOperatori(" + codiceGara + "," + tokenRichiedente +"): inizio metodo");
+			EspletamentoElencoOperatoriSearch search
+	) throws DataAccessException {
+		LOG.debug(
+			"getEspletamentoGaraGraduatoriaElencoOperatori({},{},{}): inizio metodo"
+			, search.getCodice()
+			, search.getCodiceOperatore()
+			, search.getUsername()
+		);
 
 		GetEspletamentoGaraElencoOperatoriOutType risultato = new GetEspletamentoGaraElencoOperatoriOutType();
 		try {
-			List<EspletGaraOperatoreType> elenco = 
-				(List<EspletGaraOperatoreType>) this.bandiManager
-					.getEspletamentoGaraGraduatoriaElencoOperatori(codiceGara, tokenRichiedente);
+			List<EspletGaraOperatoreType> elenco = bandiManager.getEspletamentoGaraGraduatoriaElencoOperatori(search);
 			risultato.setElenco(elenco);
 		} catch (Exception e) {
 			LOG.error("Errore inaspettato durante l'interazione con la base dati", e);
@@ -3777,6 +3921,60 @@ public class WSGareAppaltoSoapImpl implements WSGareAppaltoSoap {
 		} 
 		
 		LOG.debug("getEspletamentoGaraGraduatoriaElencoOperatori: fine metodo");
+		
+		return risultato;
+	}
+	
+	@Override
+	public GetEspletamentoGaraElencoOperatoriOutType getEspletamentoGaraAccessoDocumentiElencoOperatori(
+			EspletamentoElencoOperatoriSearch search
+	) throws DataAccessException {
+		LOG.debug(
+			"getEspletamentoGaraAccessoDocumentiElencoOperatori({},{},{}): inizio metodo"
+			, search.getCodice()
+			, search.getCodiceOperatore()
+			, search.getUsername()
+		);
+
+		GetEspletamentoGaraElencoOperatoriOutType risultato = new GetEspletamentoGaraElencoOperatoriOutType();
+		try {
+			List<EspletGaraOperatoreType> elenco = bandiManager.getEspletamentoGaraAccessoDocumentiElencoOperatori(search);
+			risultato.setElenco(elenco);
+		} catch (Exception e) {
+			LOG.error("Errore inaspettato durante l'interazione con la base dati", e);
+			risultato.setErrore(e.getMessage());
+		} 
+		
+		LOG.debug("getEspletamentoGaraAccessoDocumentiElencoOperatori: fine metodo");
+		
+		return risultato;
+	}
+	
+	
+	@Override
+	public GetEspletamentoGaraAccessoDocumentiOutType getEspletamentoGaraAccessoDocumentiAtti(
+			String codice
+			, String tokenRichiedente
+	) throws DataAccessException {
+		LOG.debug(
+			"getEspletamentoGaraAccessoDocumentiAtti({},{}): inizio metodo"
+			, codice
+			, tokenRichiedente
+		);
+		
+		GetEspletamentoGaraAccessoDocumentiOutType risultato = new GetEspletamentoGaraAccessoDocumentiOutType();
+		try {
+			List<EspletGaraAccessoDocumentiDocumentoType> documenti = bandiManager.getEspletamentoGaraAccessoDocumentiAtti(
+					codice
+					, tokenRichiedente
+			);
+			risultato.setDocumenti(documenti);
+		} catch (Exception e) {
+			LOG.error("Errore inaspettato durante l'interazione con la base dati", e);
+			risultato.setErrore(e.getMessage());
+		} 
+		
+		LOG.debug("getEspletamentoGaraAccessoDocumentiAtti: fine metodo");
 		
 		return risultato;
 	}
@@ -3985,14 +4183,14 @@ public class WSGareAppaltoSoapImpl implements WSGareAppaltoSoap {
 //		DatoCodificatoType test9 = DatoCodificatoType.Factory.newInstance();
 //		DatoCodificatoType test10 = DatoCodificatoType.Factory.newInstance();
 //		
-//		test1.setCodice("1"); 	test1.setDescrizione("Consorzio di società cooperative (art.45 c.2 lettera b )"); 
+//		test1.setCodice("1"); 	test1.setDescrizione("Consorzio di societï¿½ cooperative (art.45 c.2 lettera b )"); 
 //		test2.setCodice("2"); 	test2.setDescrizione("Consorzio stabile (art 45 c2 lettera c)");
 //		test3.setCodice("3"); 	test3.setDescrizione("RTI costituito (art 45 c2 lettera d)");
 //		test4.setCodice("4"); 	test4.setDescrizione("RTI costituendo (art 45 c2 lettera d)");
 //		test5.setCodice("5"); 	test5.setDescrizione("Consorzio ordinario costituito (art.45 c.2 lettera e )");
 //		test6.setCodice("6"); 	test6.setDescrizione("Consorzio ordinario costituendo (art.45 c.2 lettera e )");
-//		test7.setCodice("7"); 	test7.setDescrizione("Rete d'impresa con soggettività giuridica (art. 45 c2 lettera f)");
-//		test8.setCodice("8"); 	test8.setDescrizione("Rete d'impresa senza soggettività giuridica (art. 45 c2 lettera f)");
+//		test7.setCodice("7"); 	test7.setDescrizione("Rete d'impresa con soggettivitï¿½ giuridica (art. 45 c2 lettera f)");
+//		test8.setCodice("8"); 	test8.setDescrizione("Rete d'impresa senza soggettivitï¿½ giuridica (art. 45 c2 lettera f)");
 //		test9.setCodice("9"); 	test9.setDescrizione("GEIE costituito (art 45 c2 lettera g)");
 //		test10.setCodice("10");	test10.setDescrizione("GEIE costituendo (art 45 c2 lettera g)");
 //		
@@ -4094,6 +4292,7 @@ public class WSGareAppaltoSoapImpl implements WSGareAppaltoSoap {
 			String cig, 
 			Date dataPubblicazioneDa, 
 			Date dataPubblicazioneA,
+			String codgara,
 			Boolean sommaUrgenza,
 			int indicePrimoRecord, int maxNumRecord) 
 	{
@@ -4102,22 +4301,26 @@ public class WSGareAppaltoSoapImpl implements WSGareAppaltoSoap {
 				+ stazioneAppaltante + "," + oggetto + ","	+ tipoAppalto + "," + cig + ","
 				+ (dataPubblicazioneDa != null ? dataPubblicazioneDa : "") + ","
 				+ (dataPubblicazioneA != null ? dataPubblicazioneA : "") + ","
+				+ (codgara != null ? codgara : "") + ","
 				+ sommaUrgenza + ","
 				+ indicePrimoRecord + "," + maxNumRecord + ","
 				+ "): inizio metodo");
 
 		DelibereOutType risultato = new DelibereOutType();
-
 		try {
-			risultato.setNumElementiTotali(this.bandiManager.countDelibere(
-					annoInizio, 
-					stazioneAppaltante, 
-					oggetto, 
-					tipoAppalto, 
-					cig, 
-					dataPubblicazioneDa, 
-					dataPubblicazioneA,
-					sommaUrgenza));
+			risultato.setNumElementiTotali(
+					this.bandiManager.countDelibere(
+						annoInizio,
+						stazioneAppaltante,
+						oggetto,
+						tipoAppalto,
+						cig,
+						dataPubblicazioneDa,
+						dataPubblicazioneA,
+						codgara,
+						sommaUrgenza
+					)
+			);
 			
 			if (risultato.getNumElementiTotali() > 0) {
 				List<DeliberaType> delibere = this.bandiManager.getDelibere(
@@ -4128,8 +4331,10 @@ public class WSGareAppaltoSoapImpl implements WSGareAppaltoSoap {
 						cig, 
 						dataPubblicazioneDa, 
 						dataPubblicazioneA,
+						codgara,
 						sommaUrgenza, 
-						indicePrimoRecord, maxNumRecord);
+						indicePrimoRecord, maxNumRecord
+				);
 				risultato.setDelibere(delibere);
 			}
 		} catch (DataAccessException e) {
@@ -4142,6 +4347,34 @@ public class WSGareAppaltoSoapImpl implements WSGareAppaltoSoap {
 		}
 
 		LOG.debug("getDelibere: fine metodo");
+
+		return risultato;
+	}
+
+	@Override
+	public DettaglioDeliberaOutType getDettaglioDelibera(
+			String codgara) 
+	{
+		LOG.debug("	public DelibereOutType getDettaglioDelibera(\r\n"
+				+ "("
+				+ (codgara != null ? codgara : "") + ","
+				+ "): inizio metodo");
+
+		DettaglioDeliberaOutType risultato = new DettaglioDeliberaOutType();
+		try {
+			DeliberaType delibera = this.bandiManager.getDettaglioDelibera(codgara);			
+			risultato.setDelibera(delibera);
+		} catch (DataAccessException e) {
+			LOG.error("Errore inaspettato durante l'interazione con la base dati",
+					  e);
+			risultato.setErrore(e.getMessage());
+		} catch (SqlComposerException e) {
+			LOG.error("DBMS non supportato o non valido", e);
+			risultato.setErrore("DBMS non supportato o non valido");
+		}
+
+		LOG.debug("	public DelibereOutType getDettaglioDelibera(\r\n"
+				+ ": fine metodo");
 
 		return risultato;
 	}
@@ -4445,4 +4678,176 @@ public class WSGareAppaltoSoapImpl implements WSGareAppaltoSoap {
 		return risultato;
 	}
 
+	@Override
+	public ElencoOperatoriAbilitatiElenchiOutType getElencoOperatoriAbilitatiElenco(ElencoOperatoriAbilitatiSearch search, boolean isRer) {
+		ElencoOperatoriAbilitatiElenchiOutType result = new ElencoOperatoriAbilitatiElenchiOutType();
+
+		LOG.debug("getElencoOperatoriAbilitatiElenco({};{}): inizio metodo", search, isRer);
+
+		try {
+			result.setTotaleOPAbilitati(elenchiManager.countElencoOperatoriAbilitatiElenchi(search, isRer));
+			result.setResult(
+					result.getTotaleOPAbilitati() == 0
+					? new ArrayList<>()
+					: elenchiManager.getElencoOperatoriAbilitatiElenchi(search, isRer)
+			);
+		} catch (Exception e) {
+			LOG.error("Errore inaspettato durante l'interazione con la base dati", e);
+			result.setErrore("Errore inaspettato durante l'interazione con la base dati");
+		}
+		
+		LOG.debug("getElencoOperatoriAbilitatiElenco: fine metodo");
+
+		return result;
+	}
+
+	@Override
+	public BooleanOutType isConcorsoCrypted(String username, String ngara) {
+		LOG.debug("isConcorsoCrypted({};{}): inizio metodo", username, ngara);
+		try {
+			return BooleanOutType.result(bandiManager.isConcorsoCrypted(username, ngara));
+		} catch (Exception e) {
+			final String ERROR_MESSAGE = "Errore inaspettato durante l'interazione con la base dati";
+			LOG.error(ERROR_MESSAGE, e);
+			return BooleanOutType.error(ERROR_MESSAGE);
+		} finally {
+			LOG.debug("isConcorsoCrypted: fine metodo");
+		}
+	}
+
+	@Override
+	public StringOutType getDenominazioneConcorsoAllegato(String username, String ngara) {
+		LOG.debug("getDenominazioneConcorsoAllegato({};{}): inizio metodo", username, ngara);
+		try {
+			return StringOutType.result(bandiManager.getDenominazioneConcorsoAllegato(username, ngara));
+		} catch (Exception e) {
+			final String ERROR_MESSAGE = "Errore inaspettato durante l'interazione con la base dati";
+			LOG.error(ERROR_MESSAGE, e);
+			return StringOutType.error(ERROR_MESSAGE);
+		} finally {
+			LOG.debug("getDenominazioneConcorsoAllegato: fine metodo");
+		}
+	}
+
+	@Override
+	public StringOutType getPartecipantiRaggruppamento(String username, String ngara) {
+		LOG.debug("getPartecipantiRaggruppamento({};{}): inizio metodo", username, ngara);
+		try {
+			return StringOutType.result(bandiManager.getPartecipantiRaggruppamento(username, ngara));
+		} catch (Exception e) {
+			final String ERROR_MESSAGE = "Errore inaspettato durante l'interazione con la base dati";
+			LOG.error(ERROR_MESSAGE, e);
+			return StringOutType.error(ERROR_MESSAGE);
+		} finally {
+			LOG.debug("getPartecipantiRaggruppamento: fine metodo");
+		}
+	}
+
+	@Override
+	public StringOutType getRagioneSocialeAnonima(String username, String ngara) {
+		LOG.debug("getRagioneSocialeAnonima({}, {}): inizio metodo", username, ngara);
+
+		try {
+			return StringOutType.result(bandiManager.getRagioneSocialeAnonima(username, ngara));
+		} catch (Exception e) {
+			final String ERROR_MESSAGE = "Errore inaspettato durante l'interazione con la base dati";
+			LOG.error(ERROR_MESSAGE, e);
+			return StringOutType.error(ERROR_MESSAGE);
+		} finally {
+			LOG.debug("getRagioneSocialeAnonima: fine metodo");
+		}
+	}
+
+	/**
+	 * Username non Ã¨ piÃ¹ utilizzato
+	 *
+	 * @param username
+	 * @param codice
+	 * @return
+	 */
+	@Override
+	public StringOutType getCodiceSecondoGrado(String username, String codice) {
+		LOG.debug("getCodiceSecondoGrado({}, {}): inizio metodo", username, codice);
+
+		try {
+			return StringOutType.result(bandiManager.getCodiceSecondoGrado(codice));
+		} catch (Exception e) {
+			final String ERROR_MESSAGE = "Errore inaspettato durante l'interazione con la base dati";
+			LOG.error(ERROR_MESSAGE, e);
+			return StringOutType.error(ERROR_MESSAGE);
+		} finally {
+			LOG.debug("getCodiceSecondoGrado: fine metodo");
+		}
+	}
+
+	@Override
+	public BooleanOutType canShowRankingFirstGradeCompetition(String ngara) {
+		LOG.debug("canShowRankingFirstGradeCompetition({}): inizio metodo", ngara);
+
+		try {
+			return BooleanOutType.result(bandiManager.canShowRankingFirstGradeCompetition(ngara));
+		} catch (Exception e) {
+			final String ERROR_MESSAGE = "Errore inaspettato durante l'interazione con la base dati";
+			LOG.error(ERROR_MESSAGE, e);
+			return BooleanOutType.error(ERROR_MESSAGE);
+		} finally {
+			LOG.debug("canShowRankingFirstGradeCompetition: fine metodo");
+		}
+	}
+
+	@Override
+	public String getTipiAvvalimento() {
+		LOG.debug("getTipiAvvalimento: inizio metodo");
+
+		List<DatoCodificatoType> lista = this.datiCodificatiManager.getTipiAvvalimento();
+		String documentoXML = WSOperazioniGeneraliSoapImpl.buildXML(lista);
+
+		LOG.debug("getTipiAvvalimento: fine metodo");
+
+		return documentoXML;
+	}
+
+	@Override
+	public ImpreseAusiliarieOutType getImpreseAusiliarie(String username, String codice, String progressivoOfferta) {
+		LOG.debug("getImpreseAusiliarie("
+				+ username + "," + codice + "," + progressivoOfferta
+				+ "): inizio metodo");
+
+		ImpreseAusiliarieOutType risultato = new ImpreseAusiliarieOutType();
+		try {
+			List<ImpresaAusiliariaType> imprese = this.bandiManager.getImpreseAusiliarie(
+					username, 
+					codice, 
+					progressivoOfferta);
+			
+			risultato.setNumElementiTotali( (imprese != null ? imprese.size() : 0) );
+			if (risultato.getNumElementiTotali() > 0) {
+				risultato.setImpreseAusiliarie(imprese);
+			}
+		} catch (DataAccessException e) {
+			LOG.error("Errore inaspettato durante l'interazione con la base dati",
+					  e);
+			risultato.setErrore(e.getMessage());
+		} catch (SqlComposerException e) {
+			LOG.error("DBMS non supportato o non valido", e);
+			risultato.setErrore("DBMS non supportato o non valido");
+		}
+
+		LOG.debug("getImpreseAusiliarie: fine metodo");
+
+		return risultato;
+	}
+
+	@Override
+	public String getTipiImpresaNaturaGiuridica() {
+		LOG.debug("getTipiImpresaNaturaGiuridica: inizio metodo");
+
+		List<DatoCodificatoType> lista = this.datiCodificatiManager.getTipiImpresaNaturaGiuridica();
+		String documentoXML = WSOperazioniGeneraliSoapImpl.buildXML(lista);
+
+		LOG.debug("getTipiImpresaNaturaGiuridica: fine metodo");
+		return documentoXML;
+	}
+
+	
 }

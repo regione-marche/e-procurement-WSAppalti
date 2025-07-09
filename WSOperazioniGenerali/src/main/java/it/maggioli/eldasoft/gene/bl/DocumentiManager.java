@@ -10,27 +10,45 @@
  */
 package it.maggioli.eldasoft.gene.bl;
 
+import it.maggioli.eldasoft.gene.bean.ObjectStorageConfiguration;
+import it.maggioli.eldasoft.gene.bean.rest.ObjectStorageClient;
 import it.maggioli.eldasoft.gene.db.dao.DocumentiDao;
 import it.maggioli.eldasoft.gene.ws.FileType;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import lombok.val;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+
+import static it.maggioli.eldasoft.gene.xml.CriptazioneByteAdapter.CIFRA;
+import static it.maggioli.eldasoft.gene.xml.CriptazioneByteAdapter.getFactoryCriptazioneByte;
 
 /**
  * Manager per la gestione dei documenti digitali.
  * 
  * @author Stefano.Sabbadin
  */
+@RequiredArgsConstructor
 @Service
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
 public class DocumentiManager {
 
-	@Autowired
-	private DocumentiDao documentiDao;
+	private final DocumentiDao documentiDao;
+	private final ObjectStorageClient client;
+	private final ObjectStorageConfiguration obs_conf;
 	
-	public FileType getDocumentoDigitale(String idProgramma, long idDocumento, String tokenRichiedente) {
-		return this.documentiDao.getDocumentoDigitale(idProgramma, idDocumento, tokenRichiedente);
+	public FileType getDocumentoDigitale(final String idProgramma, final long idDocumento, final String tokenRichiedente) {
+		val file = documentiDao.getDocumentoDigitale(
+				idProgramma
+				, idDocumento
+				, tokenRichiedente
+				, getFactoryCriptazioneByte(tokenRichiedente, CIFRA)
+		);
+		if (StringUtils.isNotEmpty(file.getBucket_uuid()))
+			file.setFile(client.download(file.getBucket_ref(), file.getBucket_uuid()));
+
+		return file;
 	}
 	
 	public String getUsernameDocumentoRiservato(String idProgramma, long idDocumento) {

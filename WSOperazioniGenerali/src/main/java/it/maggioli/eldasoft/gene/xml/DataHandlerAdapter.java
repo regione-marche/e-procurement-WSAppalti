@@ -7,6 +7,14 @@ import javax.activation.DataHandler;
 import javax.mail.util.ByteArrayDataSource;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
+/**
+ * Adapter per la gestione degli stream binari tramite MTOM 
+ * 
+ * Da utilizzare come annotazione dell'attributo nella classe
+ *  
+ *   @XmlJavaTypeAdapter(DataHandlerAdapter.class)
+ *   
+ */
 public class DataHandlerAdapter extends XmlAdapter<byte[], DataHandler> {
 
 	@Override
@@ -19,7 +27,7 @@ public class DataHandlerAdapter extends XmlAdapter<byte[], DataHandler> {
 				value.writeTo(os);
 				result = os.toByteArray();
 			} catch (IOException e) {
-//				throw new SQLException ("Unexpected value " + s + " found where "+YES+" or "+NO+" was expected.");
+//				throw new SQLException ("Unexpected value " + "..." + " found where ... was expected.");
 			}	
 			os = null;
 	        return result;	        
@@ -36,7 +44,7 @@ public class DataHandlerAdapter extends XmlAdapter<byte[], DataHandler> {
 			ds = new ByteArrayDataSource(value, "*/*");
 			result = new DataHandler(ds);			
 		} catch(Exception e) {
-//			throw new SQLException ("Unexpected value " + s + " found where "+YES+" or "+NO+" was expected.");			
+//			throw new SQLException ("Unexpected value " + "..." + " found where ... was expected.");			
 		} 	
 		ds = null;
 		return result;

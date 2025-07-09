@@ -34,10 +34,13 @@ public interface BandiMapper {
 			, @Param("dataPubblicazioneA") Date dataPubblicazioneA
 			, @Param("dataScadenzaDa") Date dataScadenzaDa
 			, @Param("dataScadenzaA") Date dataScadenzaA
-			, @Param("proceduraTelematica") Boolean proceduraTelematica
+			, @Param("proceduraTelematica") Integer proceduraTelematica
 			, @Param("stato") Integer stato
+			, @Param("esito") String esito
 			, @Param("altriSoggetti") Integer altriSoggetti
-			, @Param("sommaUrgenza") Boolean sommaUrgenza
+			, @Param("sommaUrgenza") Integer sommaUrgenza
+			, @Param("visualizzaNegoziate") Boolean visualizzaNegoziate
+			, @Param("garaPrivatistica") Integer garaPrivatistica
 			, @Param("isGreen") String isGreen
 			, @Param("isRecycle") String isRecycle
 			, @Param("isPnrr") String isPnrr
@@ -57,10 +60,13 @@ public interface BandiMapper {
 			, @Param("dataPubblicazioneA") Date dataPubblicazioneA
 			, @Param("dataScadenzaDa") Date dataScadenzaDa
 			, @Param("dataScadenzaA") Date dataScadenzaA
-			, @Param("proceduraTelematica") Boolean proceduraTelematica
+			, @Param("proceduraTelematica") Integer proceduraTelematica
 			, @Param("stato") Integer stato
+			, @Param("esito") String esito
 			, @Param("altriSoggetti") Integer altriSoggetti
-			, @Param("sommaUrgenza") Boolean sommaUrgenza
+			, @Param("sommaUrgenza") Integer sommaUrgenza
+			, @Param("visualizzaNegoziate") Boolean visualizzaNegoziate
+			, @Param("garaPrivatistica") Integer garaPrivatistica
 			, @Param("isGreen") String isGreen
 			, @Param("isRecycle") String isRecycle
 			, @Param("isPnrr") String isPnrr
@@ -77,10 +83,10 @@ public interface BandiMapper {
 			, @Param("dataPubblicazioneA") Date dataPubblicazioneA
 			, @Param("dataScadenzaDa") Date dataScadenzaDa
 			, @Param("dataScadenzaA") Date dataScadenzaA
-			, @Param("proceduraTelematica") Boolean proceduraTelematica
+			, @Param("proceduraTelematica") Integer proceduraTelematica
 			, @Param("stato") Integer stato
 			, @Param("altriSoggetti") Integer altriSoggetti
-			, @Param("sommaUrgenza") Boolean sommaUrgenza
+			, @Param("sommaUrgenza") Integer sommaUrgenza
 			, @Param("garaPrivatistica") Integer garaPrivatistica
 			, @Param("isGreen") String isGreen
 			, @Param("isRecycle") String isRecycle
@@ -100,10 +106,10 @@ public interface BandiMapper {
 			, @Param("dataPubblicazioneA") Date dataPubblicazioneA
 			, @Param("dataScadenzaDa") Date dataScadenzaDa
 			, @Param("dataScadenzaA") Date dataScadenzaA
-			, @Param("proceduraTelematica") Boolean proceduraTelematica
+			, @Param("proceduraTelematica") Integer proceduraTelematica
 			, @Param("stato") Integer stato
 			, @Param("altriSoggetti") Integer altriSoggetti
-			, @Param("sommaUrgenza") Boolean sommaUrgenza
+			, @Param("sommaUrgenza") Integer sommaUrgenza
 			, @Param("garaPrivatistica") Integer garaPrivatistica
 			, @Param("isGreen") String isGreen
 			, @Param("isRecycle") String isRecycle
@@ -122,11 +128,11 @@ public interface BandiMapper {
 			, @Param("dataPubblicazioneA") Date dataPubblicazioneA
 			, @Param("dataScadenzaDa") Date dataScadenzaDa
 			, @Param("dataScadenzaA") Date dataScadenzaA
-			, @Param("proceduraTelematica") Boolean proceduraTelematica
+			, @Param("proceduraTelematica") Integer proceduraTelematica
 			, @Param("stato") Integer stato
 			, @Param("esito") String esito
 			, @Param("altriSoggetti") Integer altriSoggetti
-			, @Param("sommaUrgenza") Boolean sommaUrgenza
+			, @Param("sommaUrgenza") Integer sommaUrgenza
 			, @Param("visualizzaNegoziate") Boolean visualizzaNegoziate
 			, @Param("garaPrivatistica") Integer garaPrivatistica
 			, @Param("isGreen") String isGreen
@@ -148,11 +154,11 @@ public interface BandiMapper {
 			, @Param("dataPubblicazioneA") Date dataPubblicazioneA
 			, @Param("dataScadenzaDa") Date dataScadenzaDa
 			, @Param("dataScadenzaA") Date dataScadenzaA
-			, @Param("proceduraTelematica") Boolean proceduraTelematica
+			, @Param("proceduraTelematica") Integer proceduraTelematica
 			, @Param("stato") Integer stato
 			, @Param("esito") String esito
 			, @Param("altriSoggetti") Integer altriSoggetti
-			, @Param("sommaUrgenza") Boolean sommaUrgenza
+			, @Param("sommaUrgenza") Integer sommaUrgenza
 			, @Param("visualizzaNegoziate") Boolean visualizzaNegoziate
 			, @Param("garaPrivatistica") Integer garaPrivatistica
 			, @Param("isGreen") String isGreen
@@ -171,6 +177,10 @@ public interface BandiMapper {
     
     public GaraType getBando(
 			@Param("codice") String codice
+	);
+    
+    public GaraType getBandoByCig(
+			@Param("cig") String cig
 	);
     
     public List<DocumentoAllegatoType> getDocumentiBandoLotto(
@@ -275,9 +285,10 @@ public interface BandiMapper {
 			, @Param("dataInvioDa") Date dataInvioDa
 			, @Param("dataInvioA") Date dataInvioA
 			, @Param("stazioneAppaltante") String stazioneAppaltante
-		  	, @Param("modello") String modello
+		  	, @Param("modello") Integer modello
 			, @Param("entita") String entita
 			, @Param("entita2") String entita2
+		  	, @Param("cryptedUsername") String cryptedUsername
 			, RowBounds bounds
 	);
     
@@ -296,7 +307,7 @@ public interface BandiMapper {
 			, @Param("dataInvioA") Date dataInvioA
 			, @Param("entita") String entita
 			, @Param("stazioneAppaltante") String stazioneAppaltante
-			, @Param("modello") String modello
+			, @Param("modello") Integer modello
 			, RowBounds bounds
 	);
     
@@ -316,9 +327,21 @@ public interface BandiMapper {
 			, @Param("dataInvioA") Date dataInvioA
 			, @Param("soloDaLeggere") Boolean soloDaLeggere
 			, @Param("stazioneAppaltante") String stazioneAppaltante
-			, @Param("modello") String modello
+			, @Param("modello") Integer modello
 			, @Param("entita") String entita
 			, @Param("entita2") String entita2
+			, @Param("cryptedUsername") String cryptedUsername
+	);
+    
+    public List<StatisticheComunicazioni> countComunicazioniRicevuteFull(
+			  @Param("username") String username
+			, @Param("codice") String codice
+			, @Param("codice2") String codice2
+			, @Param("dataInvioDa") Date dataInvioDa
+			, @Param("stazioneAppaltante") String stazioneAppaltante
+		  	, @Param("entita") String entita
+			, @Param("entita2") String entita2
+			, @Param("cryptedUsername") String cryptedUsername
 	);
     
     public Integer countComunicazioniRicevuteLotti(
@@ -328,7 +351,7 @@ public interface BandiMapper {
 			, @Param("dataInvioA") Date dataInvioA
 			, @Param("soloDaLeggere") Boolean soloDaLeggere
 			, @Param("stazioneAppaltante") String stazioneAppaltante
-			, @Param("modello") String modello
+			, @Param("modello") Integer modello
 			, @Param("entita") String entita
 	);
     
@@ -353,6 +376,7 @@ public interface BandiMapper {
     
     public ComunicazioneType getComunicazioneRicevuta(
 			  @Param("username") String username
+		    , @Param("cryptedUsername") String cryptedUsername
 			, @Param("id") Long id
 			, @Param("idDestinatario") Long idDestinatario
 			, @Param("idprg") String idprg
@@ -406,6 +430,7 @@ public interface BandiMapper {
     
     public List<GaraType> getElencoBandiPerRichiesteOfferta(
 			  @Param("username") String username
+			, @Param("usernameCrypted") String usernameCrypted
 			, @Param("adesso") Date adesso
 			, @Param("stazioneAppaltante") String stazioneAppaltante
 			, @Param("operatoreUpper") String operatoreUpper
@@ -416,10 +441,10 @@ public interface BandiMapper {
 			, @Param("dataPubblicazioneA") Date dataPubblicazioneA
 			, @Param("dataScadenzaDa") Date dataScadenzaDa
 			, @Param("dataScadenzaA") Date dataScadenzaA
-			, @Param("proceduraTelematica") Boolean proceduraTelematica
+			, @Param("proceduraTelematica") Integer proceduraTelematica
 			, @Param("stato") Integer stato
 			, @Param("altriSoggetti") Integer altriSoggetti
-			, @Param("sommaUrgenza") Boolean sommaUrgenza
+			, @Param("sommaUrgenza") Integer sommaUrgenza
 			, @Param("garaPrivatistica") Integer garaPrivatistica
 			, @Param("isGreen") String isGreen
 			, @Param("isRecycle") String isRecycle
@@ -431,6 +456,7 @@ public interface BandiMapper {
     
     public Integer countElencoBandiPerRichiesteOfferta(
 			  @Param("username") String username
+			, @Param("usernameCrypted") String usernameCrypted
 			, @Param("adesso") Date adesso
 			, @Param("stazioneAppaltante") String stazioneAppaltante
 			, @Param("operatoreUpper") String operatoreUpper
@@ -441,10 +467,10 @@ public interface BandiMapper {
 			, @Param("dataPubblicazioneA") Date dataPubblicazioneA
 			, @Param("dataScadenzaDa") Date dataScadenzaDa
 			, @Param("dataScadenzaA") Date dataScadenzaA
-			, @Param("proceduraTelematica") Boolean proceduraTelematica
+			, @Param("proceduraTelematica") Integer proceduraTelematica
 			, @Param("stato") Integer stato
 			, @Param("altriSoggetti") Integer altriSoggetti
-			, @Param("sommaUrgenza") Boolean sommaUrgenza
+			, @Param("sommaUrgenza") Integer sommaUrgenza
 			, @Param("garaPrivatistica") Integer garaPrivatistica
 			, @Param("isGreen") String isGreen
 			, @Param("isRecycle") String isRecycle
@@ -463,10 +489,10 @@ public interface BandiMapper {
 			, @Param("dataPubblicazioneA") Date dataPubblicazioneA
 			, @Param("dataScadenzaDa") Date dataScadenzaDa
 			, @Param("dataScadenzaA") Date dataScadenzaA
-			, @Param("proceduraTelematica") Boolean proceduraTelematica
+			, @Param("proceduraTelematica") Integer proceduraTelematica
 			, @Param("stato") Integer stato
 			, @Param("altriSoggetti") Integer altriSoggetti
-			, @Param("sommaUrgenza") Boolean sommaUrgenza
+			, @Param("sommaUrgenza") Integer sommaUrgenza
 			, @Param("isGreen") String isGreen
 			, @Param("isRecycle") String isRecycle
 			, @Param("isPnrr") String isPnrr
@@ -487,10 +513,10 @@ public interface BandiMapper {
 			, @Param("dataPubblicazioneA") Date dataPubblicazioneA
 			, @Param("dataScadenzaDa") Date dataScadenzaDa
 			, @Param("dataScadenzaA") Date dataScadenzaA
-			, @Param("proceduraTelematica") Boolean proceduraTelematica
+			, @Param("proceduraTelematica") Integer proceduraTelematica
 			, @Param("stato") Integer stato
 			, @Param("altriSoggetti") Integer altriSoggetti
-			, @Param("sommaUrgenza") Boolean sommaUrgenza
+			, @Param("sommaUrgenza") Integer sommaUrgenza
 			, @Param("isGreen") String isGreen
 			, @Param("isRecycle") String isRecycle
 			, @Param("isPnrr") String isPnrr
@@ -510,11 +536,11 @@ public interface BandiMapper {
 			, @Param("dataPubblicazioneA") Date dataPubblicazioneA
 			, @Param("dataScadenzaDa") Date dataScadenzaDa
 			, @Param("dataScadenzaA") Date dataScadenzaA
-			, @Param("proceduraTelematica") Boolean proceduraTelematica
+			, @Param("proceduraTelematica") Integer proceduraTelematica
 			, @Param("stato") Integer stato
 			, @Param("altriSoggetti") Integer altriSoggetti
-			, @Param("sommaUrgenza") Boolean sommaUrgenza
-			, @Param("garaPrivatistica") Boolean garaPrivatistica
+			, @Param("sommaUrgenza") Integer sommaUrgenza
+			, @Param("garaPrivatistica") Integer garaPrivatistica
 			, @Param("isGreen") String isGreen
 			, @Param("isRecycle") String isRecycle
 			, @Param("isPnrr") String isPnrr
@@ -535,11 +561,11 @@ public interface BandiMapper {
 			, @Param("dataPubblicazioneA") Date dataPubblicazioneA
 			, @Param("dataScadenzaDa") Date dataScadenzaDa
 			, @Param("dataScadenzaA") Date dataScadenzaA
-			, @Param("proceduraTelematica") Boolean proceduraTelematica
+			, @Param("proceduraTelematica") Integer proceduraTelematica
 			, @Param("stato") Integer stato
 			, @Param("altriSoggetti") Integer altriSoggetti
-			, @Param("sommaUrgenza") Boolean sommaUrgenza
-			, @Param("garaPrivatistica") Boolean garaPrivatistica
+			, @Param("sommaUrgenza") Integer sommaUrgenza
+			, @Param("garaPrivatistica") Integer garaPrivatistica
 			, @Param("isGreen") String isGreen
 			, @Param("isRecycle") String isRecycle
 			, @Param("isPnrr") String isPnrr
@@ -554,6 +580,7 @@ public interface BandiMapper {
     public Integer getAbilitazionePresentazioneOfferta(
 			  @Param("username") String username
 			, @Param("codice") String codice
+			, @Param("cryptedUser") String crypterUser
 	);
     
     public Integer getAbilitazioneCheckDocumentazione(
@@ -589,17 +616,18 @@ public interface BandiMapper {
 			, @Param("dataPubblicazioneA") Date dataPubblicazioneA
 			, @Param("dataScadenzaDa") Date dataScadenzaDa
 			, @Param("dataScadenzaA") Date dataScadenzaA
-			, @Param("proceduraTelematica") Boolean proceduraTelematica
+			, @Param("proceduraTelematica") Integer proceduraTelematica
 			, @Param("stato") Integer stato
 			, @Param("esito") String esito
 			, @Param("altriSoggetti") Integer altriSoggetti
-			, @Param("sommaUrgenza") Boolean sommaUrgenza
+			, @Param("sommaUrgenza") Integer sommaUrgenza
 			, @Param("garaPrivatistica") Integer garaPrivatistica
 			, @Param("isGreen") String isGreen
 			, @Param("isRecycle") String isRecycle
 			, @Param("isPnrr") String isPnrr
 			, @Param("codice") String codice
 			, @Param("orderCriteria") String orderCriteria
+			, @Param("cryptedUsername") String cryptedUsername
 			, RowBounds bounds
 	);
     
@@ -614,16 +642,17 @@ public interface BandiMapper {
 			, @Param("dataPubblicazioneA") Date dataPubblicazioneA
 			, @Param("dataScadenzaDa") Date dataScadenzaDa
 			, @Param("dataScadenzaA") Date dataScadenzaA
-			, @Param("proceduraTelematica") Boolean proceduraTelematica
+			, @Param("proceduraTelematica") Integer proceduraTelematica
 			, @Param("stato") Integer stato
 			, @Param("esito") String esito
 			, @Param("altriSoggetti") Integer altriSoggetti
-			, @Param("sommaUrgenza") Boolean sommaUrgenza
+			, @Param("sommaUrgenza") Integer sommaUrgenza
 			, @Param("garaPrivatistica") Integer garaPrivatistica
 			, @Param("isGreen") String isGreen
 			, @Param("isRecycle") String isRecycle
 			, @Param("isPnrr") String isPnrr
 			, @Param("codice") String codice
+			, @Param("cryptedUsername") String cryptedUsername
 	);
     
     public List<GaraType> searchBandiConEsito(
@@ -637,11 +666,11 @@ public interface BandiMapper {
 			, @Param("dataPubblicazioneA") Date dataPubblicazioneA
 			, @Param("dataScadenzaDa") Date dataScadenzaDa
 			, @Param("dataScadenzaA") Date dataScadenzaA
-			, @Param("proceduraTelematica") Boolean proceduraTelematica
+			, @Param("proceduraTelematica") Integer proceduraTelematica
 			, @Param("stato") Integer stato
 			, @Param("esito") String esito
 			, @Param("altriSoggetti") Integer altriSoggetti
-			, @Param("sommaUrgenza") Boolean sommaUrgenza
+			, @Param("sommaUrgenza") Integer sommaUrgenza
 			, @Param("isGreen") String isGreen
 			, @Param("isRecycle") String isRecycle
 			, @Param("isPnrr") String isPnrr
@@ -661,11 +690,11 @@ public interface BandiMapper {
 			, @Param("dataPubblicazioneA") Date dataPubblicazioneA
 			, @Param("dataScadenzaDa") Date dataScadenzaDa
 			, @Param("dataScadenzaA") Date dataScadenzaA
-			, @Param("proceduraTelematica") Boolean proceduraTelematica
+			, @Param("proceduraTelematica") Integer proceduraTelematica
 			, @Param("stato") Integer stato
 			, @Param("esito") String esito
 			, @Param("altriSoggetti") Integer altriSoggetti
-			, @Param("sommaUrgenza") Boolean sommaUrgenza
+			, @Param("sommaUrgenza") Integer sommaUrgenza
 			, @Param("isGreen") String isGreen
 			, @Param("isRecycle") String isRecycle
 			, @Param("isPnrr") String isPnrr
@@ -782,20 +811,21 @@ public interface BandiMapper {
 	);
 
 	public List<EspletGaraOperatoreType> getEspletamentoGaraSoccorsiElencoOperatori(
-			  @Param("fase") String fase
+			  @Param("fase") Integer fase
 			, @Param("codice") String codice
 			, @Param("codiceLotto") String codiceLotto
 			, @Param("username") String username
+			, @Param("cryptedUsername") String cryptedUsername
 	);
     
     public List<EspletGaraOperatoreType> getEspletamentoGaraDocAmmElencoOperatori(
 			  @Param("codice") String codice
-			, @Param("username") String username
+			, @Param("codiceOperatore") String codiceOperatore
 	);
-    
+
     public List<EspletGaraOperatoreType> getEspletamentoGaraValTecElencoOperatori(
 			  @Param("codice") String codice
-			, @Param("username") String username
+			, @Param("codiceOperatore") String codiceOperatore
 	);
     
     public List<EspletGaraOperatoreLotto> getEspletamentoGaraValTecElencoOperatoriLotto(
@@ -805,7 +835,7 @@ public interface BandiMapper {
     
     public List<EspletGaraOperatoreType> getEspletamentoGaraOffEcoElencoOperatori(
 			  @Param("codice") String codice
-			, @Param("username") String username
+			, @Param("codiceOperatore") String codiceOperatore
 	);
     
     public List<EspletGaraOperatoreLotto> getEspletamentoGaraOffEcoElencoOperatoriLotto(
@@ -819,15 +849,32 @@ public interface BandiMapper {
 		  	, @Param("orderby") String orderby
 	);
     
-    public List<EspletGaraLottoType> getEspletamentoGaraLotti(
+    public List<EspletGaraOperatoreType> getEspletamentoGaraAccessoDocumentiElencoOperatori(
 			  @Param("codice") String codice
 			, @Param("username") String username
+		  	, @Param("aggiudicataria") String aggiudicataria
+	);
+
+    public List<EspletGaraLottoType> getEspletamentoGaraAccessoDocumentiLotti(
+			  @Param("codice") String codice
+			//, @Param("username") String username
+			, @Param("codiceOperatore") String codiceOperatore
+	);
+    
+    public List<EspletGaraAccessoDocumentiDocumentoType> getEspletamentoGaraAccessoDocumentiAtti(
+			  @Param("codice") String codice
+			, @Param("username") String username
+	);
+    
+    public List<EspletGaraLottoType> getEspletamentoGaraLotti(
+			  @Param("codice") String codice
+			, @Param("codiceOperatore") String codiceOperatore
 	);
     
     public List<EspletGaraDocumentoType> getEspletamentoGaraDocumenti(
 			  @Param("codice") String codice
 			, @Param("codiceLotto") String codiceLotto
-			, @Param("username") String username
+			, @Param("codiceOperatore") String codiceOperatore
 			, @Param("busta") String busta
 //			, @Param("partecipaLotto") String partecipaLotto
 	);
@@ -893,7 +940,15 @@ public interface BandiMapper {
 			, @Param("username") String username
 			, @Param("tipoBusta") String tipoBusta
 	);
-    
+	public List<DocumentoAllegatoLotto> checkDocumentiLotto(
+			@Param("operatoreWinvcomIdCom") String operatoreWinvcomIdCom
+			, @Param("operatoreUpper") String operatoreUpper
+			, @Param("codiceGara") String codiceGara
+			, @Param("codiceGara2") String codiceGara2
+			, @Param("username") String username
+			, @Param("tipoBusta") String tipoBusta
+	);
+
     public List<DocumentoAllegatoLotto> checkDimensioneDocumenti(
 			@Param("operatoreWinvcomIdCom") String operatoreWinvcomIdCom
 			, @Param("operatoreUpper") String operatoreUpper
@@ -904,15 +959,17 @@ public interface BandiMapper {
 			, @Param("tipoBusta") String tipoBusta
 	);
     
-    public List<DeliberaType> getDelibere(
+    // NB: a causa dell'ordinamento per "datapub", si estrae un elenco di DeliberaInfo da rielaborare come un elenco di DeliberaType 
+    public List<DeliberaInfo> getDelibere(
 			  @Param("annoInizio") Integer annoInizio
 			, @Param("stazioneAppaltante") String stazioneAppaltante
-			, @Param("tipoAppalto") String tipoAppalto
+			, @Param("tipoAppalto") Integer tipoAppalto
 			, @Param("operatoreUpper") String operatoreUpper
 			, @Param("oggetto") String oggetto
 			, @Param("cig") String cig
 			, @Param("dataPubblicazioneDa") Date dataPubblicazioneDa
 			, @Param("dataPubblicazioneA") Date dataPubblicazioneA
+		    , @Param("codgara") String codgara
 			, @Param("sommaUrgenza") Integer sommaUrgenza
 			, RowBounds bounds
 	);
@@ -920,15 +977,26 @@ public interface BandiMapper {
     public Integer countDelibere(
 			  @Param("annoInizio") Integer annoInizio
 			, @Param("stazioneAppaltante") String stazioneAppaltante
-			, @Param("tipoAppalto") String tipoAppalto
+			, @Param("tipoAppalto") Integer tipoAppalto
 			, @Param("operatoreUpper") String operatoreUpper
 			, @Param("oggetto") String oggetto
 			, @Param("cig") String cig
 			, @Param("dataPubblicazioneDa") Date dataPubblicazioneDa
 			, @Param("dataPubblicazioneA") Date dataPubblicazioneA
+			, @Param("codgara") String codgara
 			, @Param("sommaUrgenza") Integer sommaUrgenza
 	);
     
+    public DeliberaType getDettaglioDelibera(
+			  @Param("codgara") String codgara
+	);
+    
+    public List<DocumentoDeliberaType> getDocumentiDelibera(
+			  @Param("codgara") String codgara
+			  , @Param("codgaraDa") String codgaraDa
+			  , @Param("codgaraA") String codgaraA
+	);
+			
     public List<SommaUrgenzaType> getElencoSommaUrgenza(
 //			  String stazioneAppaltante
 //			, String oggetto
@@ -966,9 +1034,59 @@ public interface BandiMapper {
     
     public List<QuestionarioType> getQuestionari(
 			  @Param("codice") String codice
-			, @Param("tipologia") String tipologia
-			, @Param("busta") String busta
+			, @Param("tipologia") Integer tipologia
+			, @Param("busta") Integer busta
 	);
     
     public List<ParametroQuestionarioType> getParametriQuestionario();
+
+	/**
+	 * Ritorna true se il concorso di progettazione � ancora in fase di acquisizione.
+	 *
+	 * @param cryptedUsername
+	 * @param ngara
+	 * @return
+	 */
+	Boolean isConcorsoCrypted(
+			@Param("cryptedUsername") String cryptedUsername
+			, @Param("ngara") String ngara
+	);
+
+	/**
+	 * Utilizzato per recuperare l'id anonimo dei concorsi di progettazione di secondo grado.
+	 *
+	 * L'id anonimo dei concorsi di progettazione di secondo grado contengono:
+	 * &lt;ngara_gara_collegata&gt;#&lt;codice_impresa&gt; cifrati.
+	 * @param cryptedUsername
+	 * @param ngara
+	 * @return
+	 */
+	String getIdAnonimo(
+			@Param("cryptedUsername") String cryptedUsername
+			, @Param("ngara") String ngara
+	);
+
+	String getRagioneSocialeAnonima(
+			@Param("cryptedUsername") String cryptedUsername
+			, @Param("ngara") String ngara
+	);
+
+	String getCodiceSecondoGrado(
+			@Param("ngara") String ngara
+	);
+	Boolean canShowRankingFirstGradeCompetition(
+			@Param("ngara") String idAnonimo
+	);
+
+	List<ImpresaAusiliariaType> getImpreseAusiliarie(
+			@Param("username") String username
+			,@Param("codice") String codice
+			,@Param("progressivoOfferta") String progressivoOfferta
+	);
+
+	WConfigType getWConfig(
+			@Param("applicativo") String applicativo
+			, @Param("chiave") String chiave
+	);
+
 }

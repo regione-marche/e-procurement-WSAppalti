@@ -90,6 +90,17 @@ public interface EsitiDao {
      * @throws DataAccessException
      */
 	EsitoType getEsito(String codiceGara) throws DataAccessException;
+	
+    /**
+     * Ritorna il dettaglio dei dati di un esito di gara individuato dal cig.
+     * 
+     * @param cig
+     *            cig relativo al bando di gara
+     * @return dettaglio dell'esito
+     * @throws DataAccessException
+     */
+	EsitoType getEsitoByCig(String cig) throws DataAccessException;
+
 
     /**
      * Ritorna l'elenco dei lotti di gara per cui &egrave; stato pubblicato un esito

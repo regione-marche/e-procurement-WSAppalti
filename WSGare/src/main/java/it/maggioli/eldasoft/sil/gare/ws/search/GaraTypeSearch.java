@@ -3,11 +3,7 @@ package it.maggioli.eldasoft.sil.gare.ws.search;
 import it.maggioli.eldasoft.gene.xml.DateAdapter;
 import it.maggioli.eldasoft.sil.gare.ws.OrderCriteria;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlSchemaType;
-import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.*;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.io.Serializable;
 import java.util.Date;
@@ -78,6 +74,8 @@ public class GaraTypeSearch implements Serializable {
     private OrderCriteria orderCriteria;
 
     private  String codice;
+    @XmlTransient
+    private String cryptedUsername;
 
     public String getStazioneAppaltante() {
         return stazioneAppaltante;
@@ -269,5 +267,13 @@ public class GaraTypeSearch implements Serializable {
 
     public void setCodice(String codice) {
         this.codice = codice;
+    }
+
+    public String getCryptedUsername() {
+        return cryptedUsername;
+    }
+
+    public void setCryptedUsername(String cryptedUsername) {
+        this.cryptedUsername = cryptedUsername;
     }
 }

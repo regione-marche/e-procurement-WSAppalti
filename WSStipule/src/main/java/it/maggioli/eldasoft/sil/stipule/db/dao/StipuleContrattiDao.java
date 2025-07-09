@@ -16,7 +16,6 @@ import it.maggioli.eldasoft.sil.stipule.ws.DocumentazioneStipulaContrattiType;
 import it.maggioli.eldasoft.sil.stipule.ws.StipulaContrattoType;
 import org.springframework.dao.DataAccessException;
 
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -81,7 +80,9 @@ public interface StipuleContrattiDao {
 	
 	public StipulaContrattoType getDettaglioStipulaContrattoById(String idstipula, String usernome);
 
-	public void insertAllegato(String nomeFile, Long idDocStipula,
-							   byte[] allegato,String firmacheck, Date firmacheckts) throws DataAccessException;
+	void insertAllegato(
+			Long idDocStipula
+			, AllegatoComunicazioneType allegato
+	) throws DataAccessException;
 	
 }

@@ -18,7 +18,7 @@ public interface CataloghiMapper {
             , @Param("codiceCatalogo") String codiceCatalogo
             , @Param("codiceCategoria") String codiceCategoria
             , @Param("codice") String codice
-            , @Param("tipo") String tipo
+            , @Param("tipo") Integer tipo
 			, @Param("operatoreUpper") String operatoreUpper
             , @Param("descrizione") String descrizione
             , @Param("colore") String colore
@@ -30,7 +30,7 @@ public interface CataloghiMapper {
             , @Param("codiceCatalogo") String codiceCatalogo
             , @Param("codiceCategoria") String codiceCategoria
             , @Param("codice") String codice
-            , @Param("tipo") String tipo
+            , @Param("tipo") Integer tipo
 			, @Param("operatoreUpper") String operatoreUpper
 			, @Param("descrizione") String descrizione
             , @Param("colore") String colore
@@ -72,7 +72,7 @@ public interface CataloghiMapper {
     
     public List<ProdottoType> searchProdotti(
 			  @Param("codiceCatalogo") String codiceCatalogo
-            , @Param("stato") String stato
+            , @Param("stato") Long stato
             , @Param("username") String username
             , @Param("idArticolo") Long idArticolo
 			, @Param("terminiRicerca") List<String> terminiRicerca
@@ -82,7 +82,7 @@ public interface CataloghiMapper {
     
     public Integer countSearchProdotti(
 			  @Param("codiceCatalogo") String codiceCatalogo
-            , @Param("stato") String stato
+            , @Param("stato") Long stato
             , @Param("username") String username
             , @Param("idArticolo") Long idArticolo
 			, @Param("terminiRicerca") List<String> terminiRicerca

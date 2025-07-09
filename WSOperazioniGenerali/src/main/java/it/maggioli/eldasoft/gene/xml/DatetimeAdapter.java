@@ -7,6 +7,14 @@ import java.util.TimeZone;
 import javax.xml.bind.DatatypeConverter;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
+/**
+ * Adapter XML per la gestione dei campi di tipo "Datetime" letti/scritti su db
+ * 
+ * Da utilizzare come annotazione dell'attributo nella classe
+ *  
+ *   @XmlJavaTypeAdapter(DatetimeAdapter.class)
+ *   
+ */
 public class DatetimeAdapter extends XmlAdapter<String, Date> {
 
 	/**

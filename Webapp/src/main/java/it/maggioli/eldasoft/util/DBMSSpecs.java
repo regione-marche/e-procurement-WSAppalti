@@ -11,6 +11,7 @@
 package it.maggioli.eldasoft.util;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -76,7 +77,21 @@ public class DBMSSpecs {
 			}
 		}
 	}
-	
+
+	@Bean(name = "trimFun")
+	public String trimFun(@Autowired DataSource dataSource) throws SQLException {
+		try (Connection c = dataSource.getConnection()) {
+			this.productName = c.getMetaData().getDatabaseProductName();
+			if ("Oracle".equalsIgnoreCase(productName))
+				return "(TRIM";
+			else if ("Microsoft SQL Server".equalsIgnoreCase(productName))
+				return "LTRIM(RTRIM";
+			else if ("PostgreSQL".equalsIgnoreCase(productName))
+				return "(trim";
+			else
+				return "(trim";
+		}
+	}
 	/**
 	 * @return the dataSource
 	 */

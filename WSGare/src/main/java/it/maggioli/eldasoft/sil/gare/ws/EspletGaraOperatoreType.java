@@ -1,12 +1,8 @@
 package it.maggioli.eldasoft.sil.gare.ws;
 
+import javax.xml.bind.annotation.*;
 import java.io.Serializable;
 import java.util.List;
-
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlType;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "EspletGaraOperatoreType", propOrder = {
@@ -34,7 +30,9 @@ import javax.xml.bind.annotation.XmlType;
     "esitoProceduraInversa",
     "componentiRTI",
     "lotti",
-    "documenti"
+    "documenti",
+    "accessoDocumenti",
+    "faseGara"
 })
 public class EspletGaraOperatoreType implements Serializable {
 	/**
@@ -66,9 +64,16 @@ public class EspletGaraOperatoreType implements Serializable {
 	protected String graduatoria;
 	protected boolean proceduraInversa;					// { 1 = procedura inversa | 0 = procedura non inversa }
 	protected String esitoProceduraInversa;				// { 1 = Idoneo | 0 = Non idoneo | 10 = soccorso istruttorio }
-    protected List<EspletGaraComponenteRtiType> componentiRTI;    
+    protected List<EspletGaraComponenteRtiType> componentiRTI;
     protected List<EspletGaraLottoType> lotti;
     protected List<EspletGaraDocumentoType> documenti;
+    protected List<EspletGaraAccessoDocumentiDocumentoType> accessoDocumenti;	// accesso documenti art 36
+    protected Long faseGara;
+    
+	@XmlTransient
+	protected boolean isAnonimo;
+	@XmlTransient
+	protected String usernome;
     
     public EspletGaraOperatoreType() {
     }
@@ -97,6 +102,8 @@ public class EspletGaraOperatoreType implements Serializable {
 	    this.componentiRTI = source.componentiRTI;
 	    this.lotti = source.lotti;
 	    this.documenti = source.documenti;
+	    this.accessoDocumenti = source.accessoDocumenti;
+	    this.faseGara = source.faseGara;
 	}
 
 	public Integer getNumeroPlico() {
@@ -299,6 +306,38 @@ public class EspletGaraOperatoreType implements Serializable {
 	
 	public void setDocumenti(List<EspletGaraDocumentoType> documenti) {
 		this.documenti = documenti;
+	}
+
+	public void setIdanonimo(String idAnonimo) {
+		isAnonimo = idAnonimo != null;
+	}
+
+	public boolean isAnonimo() {
+		return isAnonimo;
+	}
+	
+	public String getUsernome() {
+		return usernome;
+	}
+	
+	public void setUsernome(String usernome) {
+		this.usernome = usernome;
+	}
+
+	public List<EspletGaraAccessoDocumentiDocumentoType> getAccessoDocumenti() {
+		return accessoDocumenti;
+	}
+
+	public void setAccessoDocumenti(List<EspletGaraAccessoDocumentiDocumentoType> accessoDocumenti) {
+		this.accessoDocumenti = accessoDocumenti;
+	}
+
+	public Long getFaseGara() {
+		return faseGara;
+	}
+
+	public void setFaseGara(Long faseGara) {
+		this.faseGara = faseGara;
 	}
 
 }

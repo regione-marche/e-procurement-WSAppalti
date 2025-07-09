@@ -10,53 +10,65 @@
  */
 package it.maggioli.eldasoft.sil.gare.bl;
 
+import it.eldasoft.sil.portgare.datatypes.TipoPartecipazioneDocument;
 import it.eldasoft.utils.sql.comp.SqlComposerException;
+import it.maggioli.eldasoft.gene.bean.rest.ObjectStorageClient;
+import it.maggioli.eldasoft.gene.db.dao.ComunicazioniDao;
+import it.maggioli.eldasoft.gene.ws.DettaglioComunicazioneType;
 import it.maggioli.eldasoft.sil.gare.db.dao.BandiDao;
+import it.maggioli.eldasoft.sil.gare.db.dao.ImpreseDao;
 import it.maggioli.eldasoft.sil.gare.db.vo.*;
 import it.maggioli.eldasoft.sil.gare.ws.*;
+import it.maggioli.eldasoft.sil.gare.ws.search.EspletamentoElencoOperatoriSearch;
 import it.maggioli.eldasoft.sil.gare.ws.search.GaraTypeSearch;
 import it.maggioli.eldasoft.wsOperazioniGenerali.daticomuni.DatoCodificatoType;
+import lombok.RequiredArgsConstructor;
+import lombok.val;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
+import org.apache.xmlbeans.XmlBeans;
+import org.apache.xmlbeans.XmlException;
+import org.apache.xmlbeans.XmlOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.function.BiFunction;
+import java.util.stream.Collectors;
+
+import static it.maggioli.eldasoft.gene.xml.CriptazioneByteAdapter.*;
+import static java.lang.String.format;
 
 /**
  * @author Stefano.Sabbadin
  */
 @Service
+@RequiredArgsConstructor
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
 public class BandiManager {
 
-	/** Codice applicazione per l'applicativo di backoffice Appalti. */
-	public static final String CODICE_APPLICATIVO_APPALTI = "PG";
-
-	/** Codice applicazione per l'applicativo di frontend portale Appalti. */
-	public static final String CODICE_APPLICATIVO_PORTALE = "PA";
+	public static final Logger logger = LoggerFactory.getLogger(BandiManager.class);
 	
-	public static final String CODICE_APPLICATIVO_LAVORI = "PA";
+	public static final String CODICE_APPLICATIVO_APPALTI 				= "PG";		// codice applicativo Appalti (backoffice)
+	public static final String CODICE_APPLICATIVO_PORTALE 				= "PA";		// codice applicativo Portale Appalti (fontoffice)
+	public static final String CODICE_APPLICATIVO_LAVORI 				= "PA";		// codice applicativo ...
 
 	/**
 	 * Numero di giorni a partire dalla data odierna entro cui le comunicazioni
 	 * si intendono ricevute e non archiviate.
 	 */
-	private static final int NUM_GIORNI_COMUNICAZIONI_RICEVUTE = -90;
+	private static final int NUM_GIORNI_COMUNICAZIONI_RICEVUTE 			= -90;
+	private static final int NUM_GIORNI_NEWS 							= -60;
+	private static final int GENERE_BANDO_ISCRIZIONE 					= 10;
 	
-	private static final int NUM_GIORNI_NEWS = -60;
-
-	private static final int GENERE_BANDO_ISCRIZIONE = 10;
-
-	private static final Logger logger = LoggerFactory.getLogger(BandiManager.class);
-
-	@Autowired
-    private BandiDao bandiDao;
+    private final BandiDao bandiDao;
+	private final ImpreseDao impreseDao;
+	private final ComunicazioniDao comunicazioniDao;
+	private final ObjectStorageClient obs_client;
 
     public List<DatoCodificatoType> getElencoStazioniAppaltanti() {
     	return this.bandiDao.getElencoStazioniAppaltanti();
@@ -87,15 +99,102 @@ public class BandiManager {
 	public static Integer toInt(String value, String errorMessage) {
 		Integer res = null;
 		try {
-			if (value != null && !"".equals(value))
-				res = Integer.valueOf(value);
+			res = (StringUtils.isNotEmpty(value) ? Integer.valueOf(value) : null);
 		} catch (NumberFormatException e) {
 			logger.error(errorMessage + " (" + value + ")", e);
 		}	
 		return res;
 	}
 	
-    /**
+	public static Long toLong(String value, String errorMessage) {
+		Long res = null;
+		try {
+			res = (StringUtils.isNotEmpty(value) ? Long.valueOf(value) : null);
+		} catch (NumberFormatException e) {
+			logger.error(errorMessage + " (" + value + ")", e);
+		}	
+		return res;
+	}
+	
+	public static Integer boolToInt(Boolean value) {
+		return (value != null && value ? 1 : null);
+	}
+	
+	/**
+	 * Estrae le info da DITG.IDANONIMO inoltre deanonimizza il record del richiedente e offusca il codice fiscale.
+	 */
+	private void deanonimizeCurrentAndRetrieveComstato(
+			final List<EspletGaraOperatoreType> operatori
+			, final String username
+			, String espletamentoBustaType
+			, final String codice
+	) {
+		deanonimizeCurrent(operatori, username);
+		// Imposto un codice fiscale fittizio alle altre ditte
+		operatori.stream()
+			// Filtro tutte le ditte (tranne la richiedente)
+			.filter(it -> StringUtils.isEmpty(it.getCodiceFiscale()))
+		// Imposto un codice fittizio
+		.forEach(it -> it.setCodiceFiscale("******"));
+
+		if (espletamentoBustaType != null) {
+			if (espletamentoBustaType.equals(EspletGaraDocumentoType.ESPLETAMENTO_GARA_BUSTA_AMMINISTRATIVA))
+				espletamentoBustaType = "FS11A";
+			else if (espletamentoBustaType.equals(EspletGaraDocumentoType.ESPLETAMENTO_GARA_BUSTA_ECONOMICA))
+				espletamentoBustaType = "FS11C";
+			else
+				espletamentoBustaType = "FS11B";
+
+			final String com_busta_type = espletamentoBustaType;
+			/**
+			 * Recupero il comstato per ogni operatore.
+			 */
+			operatori.stream()
+				.map(it -> {
+					// per ogni operatore, crea le coppie <operatore, stato comunicazione associata>
+					DettaglioComunicazioneType filtri = new DettaglioComunicazioneType(); 
+					filtri.setApplicativo(CODICE_APPLICATIVO_PORTALE);
+					filtri.setChiave1(getFactoryCriptazioneByte(it.getUsernome(), DECIFRA));
+					filtri.setChiave2(codice);
+					filtri.setTipoComunicazione(com_busta_type);
+					List<DettaglioComunicazioneType> comunicazioni = comunicazioniDao.getElencoComunicazioni(filtri);
+					String stato = null;
+					if(comunicazioni != null) 
+						stato = comunicazioni.stream()
+							.map(DettaglioComunicazioneType::getStato)
+							.filter(st -> "5,6,7,13".indexOf(st) >= 0)
+							.findFirst()
+							.orElse(null);
+					return new AbstractMap.SimpleEntry<>(it, stato);
+				})	
+				.forEach(it -> {
+					// per ogni operatore imposta los tato della busta in base allo stato della comunicazione associata
+					// <key, value> => <operatore, stato comunicazione associata>
+					it.getKey().setRti(false);
+					if (it.getValue() == null)
+						it.getKey().setStatoBusta(0);
+					else if (it.getValue().equals("5") || it.getValue().equals("13"))
+						it.getKey().setStatoBusta(1);
+					else
+						it.getKey().setStatoBusta(2);
+				});
+		}
+	}
+
+	private void deanonimizeCurrent(List<EspletGaraOperatoreType> operatori, String username) {
+		String cryptedUsername = getFactoryCriptazioneByte(username, CIFRA);
+		// La ditta del richiedente deve essere un chiaro
+		operatori.stream()
+			.filter(it -> StringUtils.startsWith(it.getUsernome(), cryptedUsername))
+			.map(it -> new AbstractMap.SimpleEntry<>(it, impreseDao.getImpresa(impreseDao.getIdImpresa(username))))
+		// Metto il CF e la ragione sogiale in chiaro
+		.forEach(it -> {
+			it.getKey().setCodiceFiscale(it.getValue().getCodiceFiscale());
+			it.getKey().setRagioneSociale(format("%s (%s)", it.getKey().getRagioneSociale(), it.getValue().getRagioneSociale()));
+		});
+	}
+
+	/**
      * Ritorna l'elenco dei bandi di gara filtrati in base ai parametri in input.
      * 
      * @return lista dei bandi, di tipo GaraType
@@ -126,7 +225,7 @@ public class BandiManager {
      * Ritorna l'elenco dei bandi di gara in corso di validit&agrave;.
      * 
      * @return lista dei bandi, di tipo GaraType
-     * @throws DataAccessException 
+     * @throws DataAccessException
      * @throws SqlComposerException
      */
 	public List<GaraType> getElencoBandi(GaraTypeSearch filtri) throws DataAccessException, SqlComposerException {
@@ -155,23 +254,7 @@ public class BandiManager {
 	/**
 	 * Ritorna l'elenco dei bandi di gara scaduti.
 	 * 
-	 * @param stazioneAppaltante
-	 * @param oggetto
-	 * @param cig
-	 * @param tipoAppalto
-	 * @param dataPubblicazioneDa
-	 * @param dataPubblicazioneA
-	 * @param dataScadenzaDa
-	 * @param dataScadenzaA
-	 * @param proceduraTelematica
-	 * @param stato
-	 * @param esito
-	 * @param altriSoggetti
-	 * @param sommaUrgenza
-	 * @param visualizzaNegoziate
-	 * @param garaPrivatistica
-	 * @param numAnniPubblicazione
-	 *            numero di anni per cui va mantenuta la procedura pubblicata
+	 * @param filtri
 	 * @return lista dei bandi, di tipo GaraType
 	 * @throws DataAccessException 
 	 * @throws SqlComposerException
@@ -207,6 +290,10 @@ public class BandiManager {
 
 	public GaraType getBando(String codiceGara) {
     	return this.bandiDao.getBando(codiceGara);
+    }
+	
+	public GaraType getBandoByCig(String cig) {
+    	return this.bandiDao.getBandoByCig(cig);
     }
 
 	public List<DocumentoAllegatoType> getDocumentiBandoLotto(
@@ -312,6 +399,7 @@ public class BandiManager {
 			String entita,
 			String stazioneAppaltante) 
 	{
+
 		List<ComunicazioneType> risultato = this.bandiDao.getComunicazioniRicevute(
 				null, 
 				codice,
@@ -319,7 +407,8 @@ public class BandiManager {
 				false,
 				entita,
 				0, 0, 
-				stazioneAppaltante);
+				stazioneAppaltante,
+				null);
 		List<DocumentoAllegatoType> docs = null;
 		for (ComunicazioneType comunicazione : risultato) {
 			docs = this.bandiDao.getDocumentiComunicazione(comunicazione.getApplicativo(), comunicazione
@@ -390,66 +479,51 @@ public class BandiManager {
 		StatisticheComunicazioniPersonaliType risultato = new StatisticheComunicazioniPersonaliType();
 		Date dataInvioDa = DateUtils.round(DateUtils.addDays(new Date(),
 				NUM_GIORNI_COMUNICAZIONI_RICEVUTE), Calendar.DAY_OF_MONTH);
-		risultato.setNumComunicazioniRicevute(this.bandiDao.countComunicazioniRicevute(
+		String cryptedUsername = tokenRichiedente == null ? tokenRichiedente : getFactoryCriptazioneByte(
+				tokenRichiedente, CIFRA
+		);
+		
+		List<StatisticheComunicazioni> statistiche = this.bandiDao.countComunicazioniRicevuteFull(
 				tokenRichiedente, 
 				codice, 
 				codice2,
-				dataInvioDa, null,
-				false,
+				dataInvioDa,
 				entita,
-				false, 
-				stazioneAppaltante));
-		if (risultato.getNumComunicazioniRicevute() > 0) {
-			risultato.setNumComunicazioniRicevuteDaLeggere(this.bandiDao.countComunicazioniRicevute(
-					tokenRichiedente, 
-					codice, 
-					codice2,
-					dataInvioDa, null, 
-					false,
-					entita,
-					true, 
-					stazioneAppaltante));
+				stazioneAppaltante,
+				cryptedUsername);
+		risultato = new StatisticheComunicazioniPersonaliType();
+		risultato.setNumComunicazioniRicevute(0);
+		risultato.setNumComunicazioniRicevuteDaLeggere(0);
+		risultato.setNumComunicazioniArchiviate(0);
+		risultato.setNumComunicazioniArchiviateDaLeggere(0);
+		risultato.setNumSoccorsiIstruttori(0);
+		risultato.setNumSoccorsiIstruttoriDaLeggere(0);
+		risultato.setNumComunicazioniInviate(0);
+		if(statistiche != null) {
+			for(StatisticheComunicazioni s : statistiche) {
+				boolean ricevute = (s.getDal() == 1 && s.getSoccorsoNo() == 1) 
+								   || (s.getDal() == 1 && s.getSoccorsoNo() == 0 && s.getSoccorsoSi() == 0);
+				boolean archiviate = (s.getAl() == 1 && s.getSoccorsoNo() == 1);
+				boolean soccorsi = (s.getDal() == 1 && s.getSoccorsoSi() == 1);
+				
+				if(ricevute) {
+					risultato.setNumComunicazioniRicevute(risultato.getNumComunicazioniRicevute() + s.getCount());
+					if(s.getDaLeggere() == 1)
+						risultato.setNumComunicazioniRicevuteDaLeggere(risultato.getNumComunicazioniRicevuteDaLeggere() + s.getCount());
+				}
+				if(archiviate) {
+					risultato.setNumComunicazioniArchiviate(risultato.getNumComunicazioniArchiviate() + s.getCount());
+					if(s.getDaLeggere() == 1)
+						risultato.setNumComunicazioniArchiviateDaLeggere(risultato.getNumComunicazioniArchiviateDaLeggere() + s.getCount());
+				}
+				if(soccorsi) {
+					risultato.setNumSoccorsiIstruttori(risultato.getNumSoccorsiIstruttori() + s.getCount());
+					if(s.getDaLeggere() == 1)
+						risultato.setNumSoccorsiIstruttoriDaLeggere(risultato.getNumSoccorsiIstruttoriDaLeggere() + s.getCount());
+				}
+			}
 		}
-		risultato.setNumComunicazioniArchiviate(this.bandiDao.countComunicazioniRicevute(
-				tokenRichiedente, 
-				codice, 
-				codice2,
-				null, dataInvioDa, 
-				false, 
-				entita,
-				false, 
-				stazioneAppaltante));
-		if (risultato.getNumComunicazioniArchiviate() > 0) {
-			risultato.setNumComunicazioniArchiviateDaLeggere(this.bandiDao.countComunicazioniRicevute(
-					tokenRichiedente, 
-					codice, 
-					codice2,
-					null, dataInvioDa, 
-					false,
-					entita,
-					true, 
-					stazioneAppaltante));
-		}
-		risultato.setNumSoccorsiIstruttori(this.bandiDao.countComunicazioniRicevute(
-				tokenRichiedente, 
-				codice, 
-				codice2,
-				dataInvioDa, null, 
-				true, 
-				entita,
-				false, 
-				stazioneAppaltante));
-		if (risultato.getNumSoccorsiIstruttori() > 0) {
-			risultato.setNumSoccorsiIstruttoriDaLeggere(this.bandiDao.countComunicazioniRicevute(
-					tokenRichiedente, 
-					codice, 
-					codice2,
-					dataInvioDa, null, 
-					true,
-					entita,
-					true, 
-					stazioneAppaltante));
-		}
+		
 		risultato.setNumComunicazioniInviate(this.bandiDao.countComunicazioniInviate(
 				tokenRichiedente, 
 				codice, 
@@ -542,7 +616,9 @@ public class BandiManager {
 	{
 		Date dataInvioDa = DateUtils.round(DateUtils.addDays(new Date(),
 				NUM_GIORNI_COMUNICAZIONI_RICEVUTE), Calendar.DAY_OF_MONTH);
-		
+		String cryptedUsername = tokenRichiedente == null ? tokenRichiedente : getFactoryCriptazioneByte(
+				tokenRichiedente, CIFRA
+		);
 		return this.bandiDao.getComunicazioniRicevute(
 				tokenRichiedente, 
 				codice,
@@ -550,7 +626,9 @@ public class BandiManager {
 				soccorsoIstruttorio,
 				entita,
 				indicePrimoRecord, maxNumRecord, 
-				stazioneAppaltante);
+				stazioneAppaltante,
+				cryptedUsername
+		);
 	}
 	
 	public List<ComunicazioneType> getComunicazioniRicevuteGaraLotti(
@@ -583,6 +661,9 @@ public class BandiManager {
 	{
 		Date dataInvioA = DateUtils.round(DateUtils.addDays(new Date(),
 				NUM_GIORNI_COMUNICAZIONI_RICEVUTE), Calendar.DAY_OF_MONTH);
+		String cryptedUsername = tokenRichiedente == null ? tokenRichiedente : getFactoryCriptazioneByte(
+				tokenRichiedente, CIFRA
+		);
 		return this.bandiDao.getComunicazioniRicevute(
 				tokenRichiedente, 
 				codice,
@@ -590,7 +671,9 @@ public class BandiManager {
 				soccorsoIstruttorio,
 				entita,
 				indicePrimoRecord, maxNumRecord, 
-				stazioneAppaltante);
+				stazioneAppaltante,
+				cryptedUsername
+		);
 	}
 
 	public List<ComunicazioneType> getComunicazioniArchiviateGaraLotti(
@@ -639,6 +722,9 @@ public class BandiManager {
 	{
 		Date dataInvioDa = DateUtils.round(DateUtils.addDays(new Date(),
 				NUM_GIORNI_COMUNICAZIONI_RICEVUTE), Calendar.DAY_OF_MONTH);
+		String cryptedUsername = tokenRichiedente == null ? tokenRichiedente : getFactoryCriptazioneByte(
+				tokenRichiedente, CIFRA
+		);
 		return this.bandiDao.countComunicazioniRicevute(
 				tokenRichiedente, 
 				codice, 
@@ -647,7 +733,9 @@ public class BandiManager {
 				soccorsoIstruttorio,
 				entita,
 				soloDaLeggere, 
-				stazioneAppaltante);
+				stazioneAppaltante,
+				cryptedUsername
+		);
 	}
 
 	public int countComunicazioniRicevuteGaraLotti(
@@ -681,6 +769,9 @@ public class BandiManager {
 	{
 		Date dataInvioA = DateUtils.round(DateUtils.addDays(new Date(),
 				NUM_GIORNI_COMUNICAZIONI_RICEVUTE), Calendar.DAY_OF_MONTH);
+		String cryptedUsername = tokenRichiedente == null ? tokenRichiedente : getFactoryCriptazioneByte(
+				tokenRichiedente, CIFRA
+		);
 		return this.bandiDao.countComunicazioniRicevute(
 				tokenRichiedente, 
 				codice,
@@ -689,7 +780,9 @@ public class BandiManager {
 				soccorsoIstruttorio,
 				entita,
 				soloDaLeggere,
-				stazioneAppaltante);
+				stazioneAppaltante,
+				cryptedUsername
+		);
 	}
 
 	public int countComunicazioniArchiviateGaraLotti(
@@ -734,7 +827,13 @@ public class BandiManager {
 			String idprg) 
 	{
 		ComunicazioneType comunicazione = this.bandiDao
-				.getComunicazioneRicevuta(tokenRichiedente, idComunicazione, idDestinatario, idprg);
+				.getComunicazioneRicevuta(
+						tokenRichiedente
+						, getFactoryCriptazioneByte(tokenRichiedente, CIFRA)
+						, idComunicazione
+						, idDestinatario
+						, idprg
+				);
 		if (comunicazione != null) {
 			List<DocumentoAllegatoType> docs = this.bandiDao
 					.getDocumentiComunicazione(comunicazione.getApplicativo(),
@@ -864,18 +963,20 @@ public class BandiManager {
 //    }
 
     public List<GaraType> getElencoBandiPerRichiesteOfferta(GaraTypeSearch filtri) throws SqlComposerException {
+		filtri.setCryptedUsername(getFactoryCriptazioneByte(filtri.getTokenRichiedente(), CIFRA));
     	return bandiDao.getElencoBandiPerRichiesteOfferta(filtri);
     }
     
     public int countElencoBandiPerRichiesteOfferta(GaraTypeSearch filtri) throws SqlComposerException {
-    	return bandiDao.countElencoBandiPerRichiesteOfferta(filtri);
+		filtri.setCryptedUsername(getFactoryCriptazioneByte(filtri.getTokenRichiedente(), CIFRA));
+		return bandiDao.countElencoBandiPerRichiesteOfferta(filtri);
     }
 
 //    public List<GaraType> getElencoBandiPerRichiesteCheckDocumentazione(
 //	    String tokenRichiedente) {
 //		return this.bandiDao.getElencoBandiPerRichiesteCheckDocumentazione(tokenRichiedente);
 //    }
-    
+
     public List<GaraType> getElencoBandiPerRichiesteCheckDocumentazione(GaraTypeSearch filtri) throws SqlComposerException {
 		return bandiDao.getElencoBandiPerRichiesteCheckDocumentazione(filtri);
 	}
@@ -896,9 +997,17 @@ public class BandiManager {
 			String codice) {
 		AbilitazioniGaraType abilitazioni = new AbilitazioniGaraType();
 		abilitazioni.setRichPartecipazione(this.bandiDao
-				.getAbilitazionePartecipazioneGara(tokenRichiedente, codice));
+				.getAbilitazionePartecipazioneGara(
+						tokenRichiedente
+						, codice
+				)
+		);
 		abilitazioni.setRichInvioOfferta(this.bandiDao
-				.getAbilitazionePresentazioneOfferta(tokenRichiedente, codice));
+				.getAbilitazionePresentazioneOfferta(
+						tokenRichiedente
+						, codice
+						, getFactoryCriptazioneByte(tokenRichiedente, CIFRA)
+				));
 		abilitazioni.setRichComprovaRequisiti(this.bandiDao
 				.getAbilitazioneCheckDocumentazione(tokenRichiedente, codice));
 		return abilitazioni;
@@ -924,10 +1033,12 @@ public class BandiManager {
 	}
 
 	public List<GaraType> searchBandiPerProcInAggiudicazione(GaraTypeSearch filtri) throws SqlComposerException {
+		filtri.setCryptedUsername(getFactoryCriptazioneByte(filtri.getTokenRichiedente(), CIFRA));
 		return bandiDao.searchBandiPerProcInAggiudicazione(filtri);
 	}
 	
 	public int countBandiPerProcInAggiudicazione(GaraTypeSearch filtri) throws SqlComposerException {
+		filtri.setCryptedUsername(getFactoryCriptazioneByte(filtri.getTokenRichiedente(), CIFRA));
 		return bandiDao.countBandiPerProcInAggiudicazione(filtri);
 	}
 		
@@ -1046,221 +1157,402 @@ public class BandiManager {
 		// recupera il singolo operatore o l'elenco degli operatori economici 
 		// per la gara...
 		List<EspletGaraOperatoreType> elenco = bandiDao
-			.getEspletamentoGaraSoccorsiElencoOperatori(codiceGara, codiceLotto, fase, tokenRichiedente);
+			.getEspletamentoGaraSoccorsiElencoOperatori(
+					codiceGara
+					, codiceLotto
+					, fase
+					, tokenRichiedente
+					, getFactoryCriptazioneByte(tokenRichiedente, CIFRA)
+			);
 		return elenco;
 	}
 
-	public List<EspletGaraOperatoreType> getEspletamentoGaraDocAmmElencoOperatori(String codiceGara, String tokenRichiedente) {
-		// recupera il singolo operatore o l'elenco degli operatori economici 
-		// per la gara...
-		List<EspletGaraOperatoreType> elenco = bandiDao
-			.getEspletamentoGaraDocAmmElencoOperatori(codiceGara, tokenRichiedente);
-		
-		// recupera i dati di dettaglio del singolo operatore economico
-		if(tokenRichiedente != null 
-		   && elenco != null && elenco.size() == 1) {
-			
-			// se c'è un raggruppamento RTI carica i componenti...
-			if(elenco.get(0).isRti()) {
-				List<EspletGaraComponenteRtiType> componentiRti = this.bandiDao
-					.getEspletamentoGaraComponentiRti(codiceGara, tokenRichiedente);			
-				elenco.get(0).setComponentiRTI(componentiRti);
-			}
-			
-			// se è una gara a lotti, carica i lotti...
-			if(true) {
-				List<EspletGaraLottoType> lotti = this.bandiDao
-					.getEspletamentoGaraLotti(codiceGara, tokenRichiedente);
-				elenco.get(0).setLotti(lotti);
-			}
-			
-			// carica i documenti...
-			List<EspletGaraDocumentoType> documenti = this.bandiDao
-				.getEspletamentoGaraDocumenti(codiceGara, codiceGara, tokenRichiedente, EspletGaraDocumentoType.ESPLETAMENTO_GARA_BUSTA_AMMINISTRATIVA, true);			
-			elenco.get(0).setDocumenti(documenti);
+	public List<EspletGaraOperatoreType> getEspletamentoGaraDocAmmElencoOperatori(
+			EspletamentoElencoOperatoriSearch search
+	) {
+		// Viene fatto questo giochetto con il search perche' la busta amministrativa non e' a lotti.
+		String codiceLottoBackup = search.getCodiceLotto();
+		search.setCodiceLotto(null);
+		try {
+			return getEspletamentoGaraOperatori(
+					search
+					, bandiDao::getEspletamentoGaraDocAmmElencoOperatori
+					, EspletGaraDocumentoType.ESPLETAMENTO_GARA_BUSTA_AMMINISTRATIVA
+			);
+		} finally {
+			search.setCodiceLotto(codiceLottoBackup);
 		}
-		
-		return elenco;
 	}
 
 	public List<EspletGaraOperatoreType> getEspletamentoGaraValTecElencoOperatori(
-			String codice, String codiceLotto, String tokenRichiedente) {
-		// recupera il singolo operatore o l'elenco degli operatori economici 
-		// per la gara...
-		String codiceGara = (!StringUtils.isEmpty(codiceLotto) ? codiceLotto : codice);
-		List<EspletGaraOperatoreType> elenco = this.bandiDao
-			.getEspletamentoGaraValTecElencoOperatori(codiceGara, tokenRichiedente);
-		
-		// recupera i dati di dettaglio del singolo operatore economico
-		if(tokenRichiedente != null 
-		   && elenco != null && elenco.size() == 1) {
-			
-			// se c'è un raggruppamento RTI carica i componenti...
-			if(elenco.get(0).isRti()) {
-				List<EspletGaraComponenteRtiType> componentiRti = this.bandiDao
-					.getEspletamentoGaraComponentiRti(codiceGara, tokenRichiedente);
-				elenco.get(0).setComponentiRTI(componentiRti);
-			}
-			
-			// carica i documenti...
-			List<EspletGaraDocumentoType> documenti = this.bandiDao
-				.getEspletamentoGaraDocumenti(
-						codice,
-						codiceLotto,
-						tokenRichiedente, 
-						EspletGaraDocumentoType.ESPLETAMENTO_GARA_BUSTA_TECNICA, 
-						true);
-			elenco.get(0).setDocumenti(documenti);
-		}
-		
-		return elenco;
+			EspletamentoElencoOperatoriSearch search
+	) {
+		return getEspletamentoGaraOperatori(
+				search
+				, bandiDao::getEspletamentoGaraValTecElencoOperatori
+				, EspletGaraDocumentoType.ESPLETAMENTO_GARA_BUSTA_TECNICA
+		);
 	}
 
 
 	/* Ottimizzazione per gestione dei lotti */
 	public List<EspletGaraOperatoreType> getEspletamentoGaraValTecElencoOperatoriLotto(
-			String codice, String tokenRichiedente) {
-		List<EspletGaraOperatoreType> elenco = null;
-		
-//		GaraType dettaglio = this.bandiDao.getBando(codice);
-				
-		// verifica il tipo di gara (OEPV o con offerta tecnica)...
-		boolean offertaTec = this.isGaraConOffertaTecnica(codice);
-		
-		List<EspletGaraOperatoreLotto> lottiElenco = null;
-		if(offertaTec) {
-			// recupera le coppie (operatore, lotto) per la gara...
-			// (FASGAR >= 5)
-			lottiElenco = this.bandiDao
-				.getEspletamentoGaraValTecElencoOperatoriLotto(codice, tokenRichiedente);
-		}
+			String codice
+			, String tokenRichiedente
+	) {
+		return getEspletamentoGaraOperatoriLotto(
+				codice
+				, tokenRichiedente
+				, this::getEspletamentoGaraValTecElencoOperatoriLottoWithCheck
+		);
+	}
 
-		// crea la lista di lotti-operatore...
-		// la è lista ordinata per (operatore, lotto)...
-		if(lottiElenco != null) {
-			elenco = new ArrayList<EspletGaraOperatoreType>();
-			
-			String lastKey = "";
-			for(int i = 0; i < lottiElenco.size(); i++) {
-				
-				String key = lottiElenco.get(i).getCodiceOperatore();
-				
-				EspletGaraOperatoreType operatore = null;
-				if(!key.equals(lastKey)) {
-					// trovato un nuovo operatore...
-					operatore = new EspletGaraOperatoreType(lottiElenco.get(i));
-					operatore.setLotti( new ArrayList<EspletGaraLottoType>() );
-					elenco.add(operatore);
-					lastKey = key;
-				} else {
-					operatore = elenco.get(elenco.size() - 1);
-				}
-				
-				// associa all'operatore solo il codiceInterno del lotto
-				// gli altri dati non servono per sapere se un dato operatore 
-				// è abilitato pee un certo lotto...
-				EspletGaraLottoType lotto = new EspletGaraLottoType();
-				lotto.setLotto( lottiElenco.get(i).getCodiceLotto() );
-				operatore.getLotti().add(lotto);
+	/**
+	 *
+	 * @param search criteri di ricerca
+	 * @param getElenchi metodo del <i>DAO/Manager</i> che recupera la lista di operatori.<br>
+	 *                   I parametri sono: <i>codiceGara</i> e <i>codiceOperatore</i>.
+	 * @param espletamentoBustaType tipo di busta tecnica/economica.
+	 *                                 Vedi: EspletGaraDocumentoType.ESPLETAMENTO_GARA_BUSTA_TECNICA
+	 * @return
+	 */
+	public List<EspletGaraOperatoreType> getEspletamentoGaraOperatori(
+			EspletamentoElencoOperatoriSearch search
+			, BiFunction<String, String, List<EspletGaraOperatoreType>> getElenchi
+			, String espletamentoBustaType
+	) {
+		String codiceGara = !StringUtils.isEmpty(search.getCodiceLotto())
+				? search.getCodiceLotto()
+				: search.getCodice();
+		/*
+		  Recupera il singolo operatore o l'elenco degli operatori economici
+		  per la gara...
+		 */
+		List<EspletGaraOperatoreType> elenco = getElenchi.apply(
+				codiceGara
+				, search.getCodiceOperatore()
+		);
+		/*
+		  Se abbiamo gli idanonimi vuol dire che siamo in una gara con concorso di progettazione e siamo ancora nella
+		  fase anonima, quindi, avra' i record a database anonimi e dovra' valorizzare il record della ditta
+		  corrente.
+
+		  Il controllo viene fatto anche per le fase economica, ma, non e' prevista la fase economica per i concorsi
+		  di progettazione.
+		 */
+		if (elenco != null && !elenco.isEmpty() && elenco.get(0).isAnonimo())
+			deanonimizeCurrentAndRetrieveComstato(elenco, search.getUsername(), espletamentoBustaType, search.getCodice());
+
+		// recupera i dati di dettaglio del singolo operatore economico
+		if (search.getCodiceOperatore() != null
+				&& elenco != null && elenco.size() == 1) {
+
+			// se c'e' un raggruppamento RTI carica i componenti...
+			if (elenco.get(0).isRti()) {
+				List<EspletGaraComponenteRtiType> componentiRti = this.bandiDao
+						.getEspletamentoGaraComponentiRti(codiceGara, search.getCodiceOperatore());
+				elenco.get(0).setComponentiRTI(componentiRti);
 			}
+
+			// carica i documenti...
+			List<EspletGaraDocumentoType> documenti =
+					bandiDao.getEspletamentoGaraDocumenti(
+							search.getCodice(),
+							search.getCodiceLotto(),
+							search.getCodiceOperatore(),
+							espletamentoBustaType,
+							true
+					);
+			elenco.get(0).setDocumenti(documenti);
 		}
 
 		return elenco;
+
+	}
+
+	private List<EspletGaraOperatoreLotto> getEspletamentoGaraValTecElencoOperatoriLottoWithCheck(
+			String codice
+			, String tokenRichiedente
+	) {
+		return isGaraConOffertaTecnica(codice)
+				? bandiDao.getEspletamentoGaraValTecElencoOperatoriLotto(codice, tokenRichiedente)
+				: null;
 	}
 
 	public List<EspletGaraOperatoreType> getEspletamentoGaraOffEcoElencoOperatori(
-			String codice, String codiceLotto, String tokenRichiedente) {
-		// recupera il singolo operatore o l'elenco degli operatori economici 
-		// per la gara...
-		String codiceGara = (!StringUtils.isEmpty(codiceLotto) ? codiceLotto : codice);
-
-		List<EspletGaraOperatoreType> elenco = this.bandiDao
-			.getEspletamentoGaraOffEcoElencoOperatori(codiceGara, tokenRichiedente);
-		
-		// recupera i dati di dettaglio del singolo operatore economico
-		if(tokenRichiedente != null 
-		   && elenco != null && elenco.size() == 1) {
-			
-			// se c'è un raggruppamento RTI carica i componenti...
-			// se v_ws_apertura_val_tecnica.rti = 1 
-			// allora carica l'elenco dei componenti rti 
-			// PS: v_ws_apertura_val_tecnica e v_ws_apertura_off_economica
-			//     utilizzano le stesse viste/tabelle, quindi  
-			//     si utilizza v_ws_apertura_off_economica.rti == 1 come test
-			boolean rti = elenco.get(0).isRti();
-			if(rti) {
-				List<EspletGaraComponenteRtiType> componentiRti = this.bandiDao
-					.getEspletamentoGaraComponentiRti(codiceGara, tokenRichiedente);
-				elenco.get(0).setComponentiRTI(componentiRti);
-			}
-			
-			// carica i documenti...
-			List<EspletGaraDocumentoType> documenti = this.bandiDao
-				.getEspletamentoGaraDocumenti(
-						codice,
-						codiceLotto,
-						tokenRichiedente, 
-						EspletGaraDocumentoType.ESPLETAMENTO_GARA_BUSTA_ECONOMICA, 
-						true);
-			elenco.get(0).setDocumenti(documenti);
-		}
-		
-		return elenco;
+			EspletamentoElencoOperatoriSearch search
+	) {
+		return getEspletamentoGaraOperatori(
+				search
+				, bandiDao::getEspletamentoGaraOffEcoElencoOperatori
+				, EspletGaraDocumentoType.ESPLETAMENTO_GARA_BUSTA_ECONOMICA
+		);
 	}
-	
-	/* Ottimizzazione per gestione dei lotti */
-	public List<EspletGaraOperatoreType> getEspletamentoGaraOffEcoElencoOperatoriLotto(
-			String codice, String tokenRichiedente) {
+
+	/**
+	 * Funziona sia per la busta economica che per la busta tecnica.
+	 *
+	 * @param codice Codice della gara.
+	 * @param tokenRichiedente Attualmente corrisponde al codice dell'operatore.
+	 * @param getLotti Il metodo del DAO/Manager per recuperare i lotti.
+	 * @return
+	 */
+	private List<EspletGaraOperatoreType> getEspletamentoGaraOperatoriLotto(
+			String codice
+			, String tokenRichiedente
+			, BiFunction<String, String, List<EspletGaraOperatoreLotto>> getLotti
+	) {
 		List<EspletGaraOperatoreType> elenco = null;
-				
-//		GaraType dettaglio = this.bandiDao.getBando(codice);
-		
-		// recupera le coppie (operatore, lotto) per la gara...
-		// (FASGAR >= 6)
-		List<EspletGaraOperatoreLotto> lottiElenco = this.bandiDao
-			.getEspletamentoGaraOffEcoElencoOperatoriLotto(codice, tokenRichiedente);
-				
+
+		List<EspletGaraOperatoreLotto> lottiElenco = getLotti.apply(codice, tokenRichiedente);
 		// crea la lista di lotti-operatore...
-		// la è lista ordinata per (operatore, lotto)...
-		if(lottiElenco != null) {
-			elenco = new ArrayList<EspletGaraOperatoreType>();
-			
+		// la e' lista ordinata per (operatore, lotto)...
+		if (lottiElenco != null) {
+			elenco = new ArrayList<>();
+
 			String lastKey = "";
-			for(int i = 0; i < lottiElenco.size(); i++) {
-				
-				String key = lottiElenco.get(i).getCodiceOperatore();
-				
+			for (EspletGaraOperatoreLotto espletGaraOperatoreLotto : lottiElenco) {
+
+				String key = espletGaraOperatoreLotto.getCodiceOperatore();
+
 				EspletGaraOperatoreType operatore = null;
-				if(!key.equals(lastKey)) {
+				if (!key.equals(lastKey)) {
 					// trovato un nuovo operatore...
-					operatore = new EspletGaraOperatoreType(lottiElenco.get(i));
-					operatore.setLotti( new ArrayList<EspletGaraLottoType>() );
+					operatore = new EspletGaraOperatoreType(espletGaraOperatoreLotto);
+					operatore.setLotti(new ArrayList<>());
 					elenco.add(operatore);
 					lastKey = key;
-				} else {
+				} else
 					operatore = elenco.get(elenco.size() - 1);
-				}
-				
+
 				// associa all'operatore solo il codiceInterno del lotto
-				// gli altri dati non servono per sapere se un dato operatore 
-				// è abilitato pee un certo lotto...
-				EspletGaraLottoType lotto = new EspletGaraLottoType();
-				lotto.setLotto( lottiElenco.get(i).getCodiceLotto() );
+				// gli altri dati non servono per sapere se un dato operatore
+				// e' abilitato per un certo lotto...
+				EspletGaraLottoType lotto = new EspletGaraLottoType(espletGaraOperatoreLotto);
+				
 				operatore.getLotti().add(lotto);
 			}
 		}
 
 		return elenco;
-	}	
-	
+	}
 
-	public List<EspletGaraOperatoreType> getEspletamentoGaraGraduatoriaElencoOperatori(String codiceGara, String tokenRichiedente) {
+	/* Ottimizzazione per gestione dei lotti */
+	public List<EspletGaraOperatoreType> getEspletamentoGaraOffEcoElencoOperatoriLotto(
+			String codice
+			, String tokenRichiedente
+	) {
+		return getEspletamentoGaraOperatoriLotto(
+				codice
+				, tokenRichiedente
+				, bandiDao::getEspletamentoGaraOffEcoElencoOperatoriLotto
+		);
+	}
+	
+	public List<EspletGaraOperatoreType> getEspletamentoGaraGraduatoriaElencoOperatori(
+			EspletamentoElencoOperatoriSearch search
+	) {
 		// recupera il singolo operatore o l'elenco degli operatori economici 
 		// per la gara...
-		List<EspletGaraOperatoreType> elenco = this.bandiDao
-			.getEspletamentoGaraGraduatoriaElencoOperatori(codiceGara, tokenRichiedente);
+		List<EspletGaraOperatoreType> elenco =
+				bandiDao.getEspletamentoGaraGraduatoriaElencoOperatori(
+						search.getCodice()
+						, search.getCodiceOperatore()
+				);
+		if (elenco != null && !elenco.isEmpty() && elenco.get(0).isAnonimo())
+			deanonimizeCurrentAndRetrieveComstato(elenco, search.getUsername(), null, search.getCodice());
+
+		return elenco;
+	}
+	
+	/**
+	 * restituisce l'elenco delle imprese ammesse/classificate per la pubblicazione degli atti
+	 */
+	private List<EspletGaraOperatoreType> getImpreseAmmesse(String codice, String username) {
+		List<EspletGaraOperatoreType> ammesse =
+				bandiDao.getEspletamentoGaraAccessoDocumentiElencoOperatori(
+					codice 
+					, username
+					, false
+			);
+//		// filtra solo le prime 4 classificate dopo l'aggiudicataria
+//		if(classificate != null) {
+//			int n = Math.min(4, classificate.size());
+//			List<EspletGaraOperatoreType> lista = new ArrayList<EspletGaraOperatoreType>();
+//			for (int i = 0; i < n; i++)
+//				lista.add(classificate.get(i));
+//			classificate = lista;
+//		}
+		return ammesse;
+	}
+	
+	/**
+	 * restituisce l'elenco delle aggiudicatarie, classificate e ammesse alla pubblicazione degli atti
+	 */
+	public List<EspletGaraOperatoreType> getEspletamentoGaraAccessoDocumentiElencoOperatori(
+			EspletamentoElencoOperatoriSearch search
+	) {
+		List<EspletGaraOperatoreType> elenco = new ArrayList<EspletGaraOperatoreType>();
+		
+		boolean isRichiedenteAggiudicataria = false;
+		boolean isRichiedenteClassificata = false;
+		//boolean isPrime4Classificate = false;
+		boolean isRichiedenteAmmessa = false;
+
+		// verifica se si tratta di un concorso di progettazione...
+		// se e' presente il II grado i dati di pubblicazione da presentare sono quelli del secondo grado
+		String codiceSecondoGrado = bandiDao.getCodiceSecondoGrado(search.getCodice());
+		String codiceDocumenti = search.getCodice();
+		search.setCodice( (StringUtils.isNotEmpty(codiceSecondoGrado) ? codiceSecondoGrado : search.getCodice()) );
+		
+		// recupera l'aggiudicatarie...
+		List<EspletGaraOperatoreType> aggiudicatarie = bandiDao.getEspletamentoGaraAccessoDocumentiElencoOperatori(
+				search.getCodice()
+				, null
+				, true
+		);
+		if (aggiudicatarie != null && aggiudicatarie.size() > 0) {
+			if(StringUtils.isNotEmpty(search.getUsername()))
+				isRichiedenteAggiudicataria = aggiudicatarie.stream()
+												.anyMatch(a -> search.getUsername().equalsIgnoreCase(a.getUsernome()));  
+		}
+
+		// recupera le ditte ammesse e classificate dopo l'aggiudicataria
+		List<EspletGaraOperatoreType> ammesse = getImpreseAmmesse(
+				search.getCodice()
+				, null
+		);		
+		if(ammesse != null && ammesse.size() > 0) {
+			EspletGaraOperatoreType richiedente = null;
+			if(StringUtils.isNotEmpty(search.getUsername())) 
+				richiedente = ammesse.stream()
+						.filter(i -> search.getUsername().equalsIgnoreCase(i.getUsernome()))
+						.findFirst()
+						.orElse(null);
+			if(richiedente != null) {
+				// codiceAmmissione=0 se ammessa, 1 se la ditta e' classificata
+				isRichiedenteAmmessa = "0".equals(richiedente.getCodiceAmmissione());
+				isRichiedenteClassificata = "1".equals(richiedente.getCodiceAmmissione());
+			}
+		}
+		
+		// se il richiedente e' l'aggiudicataria o una classificata o un'ammessa allora visualizza i dati della pubblicazione
+		if(isRichiedenteAggiudicataria || isRichiedenteClassificata || isRichiedenteAmmessa) {
+			// aggiungi le aggiudicatarie all'elenco delle imprese in pubblicazione...
+			if (aggiudicatarie != null) {
+				aggiudicatarie.stream().forEach(a -> elenco.add(a));
+			}
+				
+			// se il richiedente e' una classificata (o l'aggiudicataria) 
+			// aggiungi tutte le classificate (prime 4) all'elenco delle imprese in pubblicazione...
+			if(isRichiedenteClassificata || isRichiedenteAggiudicataria) {
+				ammesse.stream()
+					.filter(i -> "1".equals(i.getCodiceAmmissione()))
+					.forEach(i -> elenco.add(i));
+			}
+			
+			// recupera i lotti a cui il richiedente ha partecipate ed e' ammesso
+			List<String> lottiAmmessiRichiedente = null;
+			if(StringUtils.isNotEmpty(search.getUsername())) {
+				// NB: la stessa ditta (come mandataria) puo' partecipare con RTI diverse su lotti diversi...
+				lottiAmmessiRichiedente = ammesse.stream()
+					.filter(i -> search.getUsername().equalsIgnoreCase(i.getUsernome()))
+					.map(r -> bandiDao.getEspletamentoGaraAccessoDocumentiLotti(search.getCodice(), r.getCodiceOperatore()))
+					//.map(lotti -> lotti.forEach(l -> lottiAmmessiRichiedente.add(l.getLotto())));
+					.flatMap(List::stream)					// converti List<List<Obj>> => List<Obj>
+					.map(EspletGaraLottoType::getLotto)
+					.collect(Collectors.toList());
+			}
+			
+			// aggiorna i dati aggiuntivi di ogni impresa (documenti, lotti, rti)
+			for(EspletGaraOperatoreType impresa : elenco) {
+				List<EspletGaraAccessoDocumentiDocumentoType> documenti = bandiDao.getEspletamentoGaraAccessoDocumentiAtti(
+						codiceDocumenti
+						, impresa.getUsernome()
+				);
+				impresa.setAccessoDocumenti(documenti);
+
+				List<EspletGaraLottoType> lotti = bandiDao.getEspletamentoGaraAccessoDocumentiLotti(
+						search.getCodice()
+						, impresa.getCodiceOperatore()
+				);
+				if(lottiAmmessiRichiedente != null && lotti != null) {
+					// filtra solo i lotti a cui il richiedente e' stato ammesso
+					List<EspletGaraLottoType> tmp = new ArrayList<EspletGaraLottoType>();
+					for(EspletGaraLottoType lotto : lotti) 
+						if(lottiAmmessiRichiedente.indexOf(lotto.getLotto()) >= 0)
+							tmp.add(lotto);
+					lotti = tmp;
+				} 
+				impresa.setLotti(lotti);
+				
+				if(impresa.isRti()) {
+					List<EspletGaraComponenteRtiType> componentiRti = bandiDao.getEspletamentoGaraComponentiRti(
+							search.getCodice() 
+							, impresa.getCodiceOperatore()
+					);
+					impresa.setComponentiRTI(componentiRti);
+				}
+			}
+		}
 		
 		return elenco;
+	}
+
+	/**
+	 * restituisce i documenti della pubblicazione atti di un'impresa per una data gara 
+	 */
+	public List<EspletGaraAccessoDocumentiDocumentoType> getEspletamentoGaraAccessoDocumentiAtti(
+			String codice
+			, String tokenRichiedente
+	) {
+		List<EspletGaraAccessoDocumentiDocumentoType> documenti = null;  
+		
+		// verifica se si tratta di un concorso di progettazione...
+		// se e' presente il II grado i dati di pubblicazione da presentare sono quelli del secondo grado
+		String codiceSecondoGrado = bandiDao.getCodiceSecondoGrado(codice);
+		String codiceDocumenti = codice;
+		codice = (StringUtils.isNotEmpty(codiceSecondoGrado) ? codiceSecondoGrado : codice);
+		
+		// recupera l'aggiudicataria
+		List<EspletGaraOperatoreType> aggiudicataria =
+				bandiDao.getEspletamentoGaraAccessoDocumentiElencoOperatori(
+						codice
+						, null
+						, true
+		);
+		String usernameAggiudicataria = (aggiudicataria != null && aggiudicataria.size() > 0 
+				? aggiudicataria.get(0).getUsernome() 
+				: null);
+
+		// carica i documenti 
+		boolean visualizza = true;
+		if(StringUtils.isEmpty(tokenRichiedente)) {
+			// documenti di gara
+		} else {
+			if(tokenRichiedente.equalsIgnoreCase(usernameAggiudicataria)) {
+				// documenti dell'aggiudicataria
+			} else {
+				// documenti di una ammessa/classificata
+				// recupera le ditte ammesse/classificate dopo l'aggiudicataria
+				List<EspletGaraOperatoreType> ammesse = getImpreseAmmesse(codice, null);
+				if (ammesse != null && ammesse.size() > 0) {
+					// codiceAmmissione=0 se ammessa, 1 se la ditta e' classificata 
+					visualizza = ammesse.stream()
+							.anyMatch(i -> "1".equals(i.getCodiceAmmissione()) && tokenRichiedente.equalsIgnoreCase(i.getUsernome()));
+				}
+			}
+		}
+		
+		if(visualizza) {
+			// recupera i documenti associati ad un'impresa o la documentazione di gara (tokenRichiedente=null ==> documenti di gara)
+			documenti = bandiDao.getEspletamentoGaraAccessoDocumentiAtti(
+					codiceDocumenti					// in caso di concorso di progettazione i documenti sono sempre nel I grado 
+					, tokenRichiedente  
+			);
+		}
+		
+		return documenti; 
 	}
 	
 	public Long getFaseGara(String codice) {
@@ -1297,14 +1589,22 @@ public class BandiManager {
 		return this.bandiDao.getElencoCategorieOperatoriIscritti(codiceGara);
 	}
 	
-	public List<RettificaGaraType> getRettifichePresentazioneDomanda(String codiceGara)throws DataAccessException {
+	public List<RettificaGaraType> getRettifichePresentazioneDomanda(
+			String codiceGara
+			, Date dataScadenza
+			, String oraScadenza
+	)throws DataAccessException {
 		// TIPPER=1 
-		return this.bandiDao.getRettifichePresentazioneDomandaOfferta(codiceGara, 1);
+		return this.bandiDao.getRettifichePresentazioneDomandaOfferta(codiceGara, 1, dataScadenza, oraScadenza);
 	}
 	
-	public List<RettificaGaraType> getRettifichePresentazioneOfferta(String codiceGara)throws DataAccessException {
+	public List<RettificaGaraType> getRettifichePresentazioneOfferta(
+			String codiceGara
+			, Date dataScadenza
+			, String oraScadenza
+	)throws DataAccessException {
 		// TIPPER=2
-		return this.bandiDao.getRettifichePresentazioneDomandaOfferta(codiceGara, 2);
+		return this.bandiDao.getRettifichePresentazioneDomandaOfferta(codiceGara, 2, dataScadenza, oraScadenza);
 	}
 		
 	private void aggiornaCriterioValutazione(
@@ -1363,7 +1663,7 @@ public class BandiManager {
 					if(tipo == 1 || tipo == 2) {
 						criterio.setValoreMin(minval);
 						criterio.setValoreMax(maxval);
-						criterio.setNumeroDecimali(2);
+						criterio.setNumeroDecimali(numDecimali);
 					}
 					break;
 				case 3:
@@ -1495,25 +1795,48 @@ public class BandiManager {
 	}
 
 	public List<DocumentoAllegatoLotto> checkDocumentiNulli(
-			String codiceGara, String username, String tipoBusta) throws DataAccessException, SqlComposerException {
-		List<DocumentoAllegatoLotto> documentiNulli = this.bandiDao
-			.checkDocumentiNulli(
-					codiceGara, 
-					(StringUtils.isEmpty(username) ? null : username),
-					(StringUtils.isEmpty(tipoBusta) ? null : tipoBusta));
-		
-		return documentiNulli;
+			final String codiceGara
+			, final String username
+			, final String tipoBusta
+	) throws DataAccessException, SqlComposerException {
+		if (obs_client.is_enabled()) {
+			val allegati = bandiDao.checkDocumentiLotto(
+					codiceGara
+					, (StringUtils.isEmpty(username) ? null : username)
+					, (StringUtils.isEmpty(tipoBusta) ? null : tipoBusta)
+			);
+			return allegati.stream()
+				.filter(it -> !obs_client.first_chunk_size(it.getBucket_ref(), it.getBucket_uuid()).isPresent())
+			.collect(Collectors.toList());
+		} else {
+			return bandiDao.checkDocumentiNulli(
+						codiceGara
+						, (StringUtils.isEmpty(username) ? null : username)
+						, (StringUtils.isEmpty(tipoBusta) ? null : tipoBusta)
+			);
+		}
 	}
 		
 	public List<DocumentoAllegatoLotto> checkDimensioneDocumenti(
 			String codiceGara, String username, String tipoBusta) throws DataAccessException, SqlComposerException {
-		List<DocumentoAllegatoLotto> documenti = this.bandiDao
-			.checkDimensioneDocumenti(
-					codiceGara, 
-					(StringUtils.isEmpty(username) ? null : username),
-					(StringUtils.isEmpty(tipoBusta) ? null : tipoBusta));
-		
-		return documenti;
+		if (obs_client.is_enabled()) {
+			val allegati = bandiDao.checkDocumentiLotto(
+					codiceGara
+					, (StringUtils.isEmpty(username) ? null : username)
+					, (StringUtils.isEmpty(tipoBusta) ? null : tipoBusta)
+			);
+			allegati.forEach(it -> {
+				val chunk_size = obs_client.first_chunk_size(it.getBucket_ref(), it.getBucket_uuid());
+				it.setDimensione(chunk_size.orElse(0L));
+			});
+			return allegati;
+		} else {
+			return bandiDao.checkDimensioneDocumenti(
+							codiceGara
+							, (StringUtils.isEmpty(username) ? null : username)
+							, (StringUtils.isEmpty(tipoBusta) ? null : tipoBusta)
+					);
+		}
 	}
 
 	public List<DeliberaType> getDelibere(
@@ -1524,13 +1847,22 @@ public class BandiManager {
 			String cig, 
 			Date dataPubblicazioneDa, 
 			Date dataPubblicazioneA,
+			String codgara,
 			Boolean sommaUrgenza,
 			int indicePrimoRecord, 
 			int maxNumRecord) throws DataAccessException, SqlComposerException
 	{
 		return this.bandiDao.getDelibere(
-				annoInizio, stazioneAppaltante, oggetto, tipoAppalto, cig, dataPubblicazioneDa, dataPubblicazioneA, sommaUrgenza, 
-				indicePrimoRecord, maxNumRecord);
+				annoInizio
+				, stazioneAppaltante
+				, oggetto
+				, tipoAppalto
+				, cig
+				, dataPubblicazioneDa, dataPubblicazioneA
+				, codgara
+				, sommaUrgenza
+				, indicePrimoRecord, maxNumRecord
+		);		
 	}
 
 	public int countDelibere(
@@ -1540,13 +1872,34 @@ public class BandiManager {
 			String tipoAppalto, 
 			String cig, 
 			Date dataPubblicazioneDa, 
-			Date dataPubblicazioneA, 
-			Boolean sommaUrgenza) throws DataAccessException, SqlComposerException 
+			Date dataPubblicazioneA,
+			String codgara,
+			Boolean sommaUrgenza
+	) throws DataAccessException, SqlComposerException
 	{
 		return this.bandiDao.countDelibere(
-				annoInizio, stazioneAppaltante, oggetto, tipoAppalto, cig, dataPubblicazioneDa, dataPubblicazioneA, sommaUrgenza);
+				annoInizio
+				, stazioneAppaltante
+				, oggetto
+				, tipoAppalto
+				, cig
+				, dataPubblicazioneDa, dataPubblicazioneA
+				, codgara
+				, sommaUrgenza
+		);
 	}
-	
+
+	public DeliberaType getDettaglioDelibera(
+			String codgara
+	) throws DataAccessException, SqlComposerException
+	{
+		DeliberaType delibera = this.bandiDao.getDettaglioDelibera(codgara);
+		if(delibera != null) {
+			delibera.setDocumenti( this.bandiDao.getDocumentiDelibera(codgara, null, null) );
+		}
+		return delibera;
+	}
+
 	public List<SommaUrgenzaType> getElencoSommaUrgenza(
 			String stazioneAppaltante,
 			String oggetto, 
@@ -1604,6 +1957,86 @@ public class BandiManager {
 	public List<ParametroQuestionarioType> getParametriQuestionario() throws DataAccessException, SqlComposerException 
 	{
 		return this.bandiDao.getParametriQuestionario();
+	}
+
+	public String getRagioneSocialeAnonima(String username, String ngara) {
+		return bandiDao.getRagioneSocialeAnonima(
+				getFactoryCriptazioneByte(username, CIFRA)
+				, ngara
+		);
+	}
+
+	public boolean isConcorsoCrypted(String username, String ngara) {
+		return bandiDao.isConcorsoCrypted(
+				getFactoryCriptazioneByte(username, CIFRA)
+				, ngara
+		);
+	}
+
+	public String getPartecipantiRaggruppamento(String username, String ngara) throws XmlException {
+		String result = null;
+
+		String idAnonimo = bandiDao.getIdAnonimo(
+				getFactoryCriptazioneByte(username, CIFRA)
+				, ngara
+		);
+
+		if (StringUtils.isNotEmpty(idAnonimo)) {
+			String decrypted = getFactoryCriptazioneByte(idAnonimo, DECIFRA);
+			result = comunicazioniDao.getRichiestaPartecipazione(username, decrypted.split("#")[0]);
+		}
+
+		return result;
+	}
+
+	public String getDenominazioneConcorsoAllegato(String username, String ngara) throws XmlException {
+		String result = null;
+
+		String idAnonimo = bandiDao.getIdAnonimo(
+				getFactoryCriptazioneByte(username, CIFRA)
+				, ngara
+		);
+
+		if (StringUtils.isNotEmpty(idAnonimo)) {
+			String decrypted = getFactoryCriptazioneByte(idAnonimo, DECIFRA);
+			String xml = comunicazioniDao.getRichiestaPartecipazione(username, decrypted.split("#")[0]);
+
+
+			it.eldasoft.sil.portgare.datatypes.TipoPartecipazioneType partecipazioneType = StringUtils.isNotEmpty(xml)
+					? parseTipoPartecipazione(xml).getTipoPartecipazione()
+					: null;
+			result = partecipazioneType != null && partecipazioneType.getRti() ? partecipazioneType.getDenominazioneRti() : null;
+		}
+
+		return result;
+	}
+
+	/**
+	 * La libreria xmlbean e' buggata, non si puo' referenziare il Factoru all'interno di: TipoPartecipazioneType; perche'
+	 * la classe base ha un field chiamato Factory...
+	 * @param xml
+	 * @return
+	 * @throws XmlException
+	 */
+	private TipoPartecipazioneDocument parseTipoPartecipazione(String xml) throws XmlException {
+		return (TipoPartecipazioneDocument) XmlBeans.getContextTypeLoader().parse(xml, TipoPartecipazioneDocument.type, (XmlOptions)null);
+	}
+
+	public String getCodiceSecondoGrado(String codice) {
+		return bandiDao.getCodiceSecondoGrado(codice);
+	}
+	
+	public boolean canShowRankingFirstGradeCompetition(String ngara) {
+		return bandiDao.canShowRankingFirstGradeCompetition(ngara);
+	}
+	
+	/**
+	 * restituisce l'elenco delle imprese ausiliarie relative ad un avvalimento
+	 * @throws SqlComposerException 
+	 * @throws DataAccessException 
+	 */
+	public List<ImpresaAusiliariaType> getImpreseAusiliarie(String username, String codice, String progressivoOfferta) throws DataAccessException, SqlComposerException {
+		return bandiDao.getImpreseAusiliarie(username, codice, progressivoOfferta);
 	}
 	
 }

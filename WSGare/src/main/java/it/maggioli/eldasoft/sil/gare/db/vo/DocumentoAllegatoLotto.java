@@ -17,6 +17,8 @@ public class DocumentoAllegatoLotto  extends DocumentoAllegatoType {
 	protected LottoGaraType lotto;
 	protected String gruppo;	
 	protected long idComunicazione;
+	protected String bucket_ref;
+	protected String bucket_uuid;
 	
 	public DocumentoAllegatoLotto() {
 		this.lotto = new LottoGaraType();
@@ -40,5 +42,18 @@ public class DocumentoAllegatoLotto  extends DocumentoAllegatoType {
 	
 	public Integer getCostoFisso() { return lotto.getCostoFisso(); }
 	public void setCostoFisso(Integer value) { lotto.setCostoFisso(value); }
-		
+
+	public String getBucket_uuid() {
+		return bucket_uuid;
+	}
+	public void setBucket_uuid(String bucket_uuid) {
+		this.bucket_uuid = bucket_uuid;
+	}
+	public String getBucket_ref() {
+		return bucket_ref;
+	}
+	public void setBucket_ref(String bucket_ref) {
+		this.bucket_ref = bucket_ref;
+	}
+
 }

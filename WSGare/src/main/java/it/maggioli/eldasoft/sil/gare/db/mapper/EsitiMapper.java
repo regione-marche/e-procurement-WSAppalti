@@ -21,8 +21,8 @@ public interface EsitiMapper {
 			, @Param("cig") String cig
 			, @Param("dataPubblicazioneDa") Date dataPubblicazioneDa
 			, @Param("dataPubblicazioneA") Date dataPubblicazioneA
-			, @Param("proceduraTelematica") Boolean proceduraTelematica
-			, @Param("sommaUrgenza") Boolean sommaUrgenza
+			, @Param("proceduraTelematica") Integer proceduraTelematica
+			, @Param("sommaUrgenza") Integer sommaUrgenza
 			, @Param("altriSoggetti") Integer altriSoggetti
 			, @Param("isGreen") String isGreen
             , @Param("isRecycle") String isRecycle
@@ -39,8 +39,8 @@ public interface EsitiMapper {
 			, @Param("cig") String cig
 			, @Param("dataPubblicazioneDa") Date dataPubblicazioneDa
 			, @Param("dataPubblicazioneA") Date dataPubblicazioneA
-			, @Param("proceduraTelematica") Boolean proceduraTelematica
-			, @Param("sommaUrgenza") Boolean sommaUrgenza
+			, @Param("proceduraTelematica") Integer proceduraTelematica
+			, @Param("sommaUrgenza") Integer sommaUrgenza
 			, @Param("altriSoggetti") Integer altriSoggetti
 			, @Param("isGreen") String isGreen
             , @Param("isRecycle") String isRecycle
@@ -56,8 +56,8 @@ public interface EsitiMapper {
 			, @Param("cig") String cig
 			, @Param("dataPubblicazioneDa") Date dataPubblicazioneDa
 			, @Param("dataPubblicazioneA") Date dataPubblicazioneA
-			, @Param("proceduraTelematica") Boolean proceduraTelematica
-			, @Param("sommaUrgenza") Boolean sommaUrgenza
+			, @Param("proceduraTelematica") Integer proceduraTelematica
+			, @Param("sommaUrgenza") Integer sommaUrgenza
 			, @Param("altriSoggetti") Integer altriSoggetti
 			, @Param("isGreen") String isGreen
             , @Param("isRecycle") String isRecycle
@@ -74,8 +74,8 @@ public interface EsitiMapper {
 			, @Param("cig") String cig
 			, @Param("dataPubblicazioneDa") Date dataPubblicazioneDa
 			, @Param("dataPubblicazioneA") Date dataPubblicazioneA
-			, @Param("proceduraTelematica") Boolean proceduraTelematica
-			, @Param("sommaUrgenza") Boolean sommaUrgenza
+			, @Param("proceduraTelematica") Integer proceduraTelematica
+			, @Param("sommaUrgenza") Integer sommaUrgenza
 			, @Param("altriSoggetti") Integer altriSoggetti
 			, @Param("isGreen") String isGreen
             , @Param("isRecycle") String isRecycle
@@ -91,8 +91,8 @@ public interface EsitiMapper {
 			, @Param("cig") String cig
 			, @Param("dataPubblicazioneDa") Date dataPubblicazioneDa
 			, @Param("dataPubblicazioneA") Date dataPubblicazioneA
-			, @Param("proceduraTelematica") Boolean proceduraTelematica
-			, @Param("sommaUrgenza") Boolean sommaUrgenza
+			, @Param("proceduraTelematica") Integer proceduraTelematica
+			, @Param("sommaUrgenza") Integer sommaUrgenza
 			, @Param("altriSoggetti") Integer altriSoggetti
 			, @Param("isGreen") String isGreen
             , @Param("isRecycle") String isRecycle
@@ -109,8 +109,8 @@ public interface EsitiMapper {
 			, @Param("cig") String cig
 			, @Param("dataPubblicazioneDa") Date dataPubblicazioneDa
 			, @Param("dataPubblicazioneA") Date dataPubblicazioneA
-			, @Param("proceduraTelematica") Boolean proceduraTelematica
-			, @Param("sommaUrgenza") Boolean sommaUrgenza
+			, @Param("proceduraTelematica") Integer proceduraTelematica
+			, @Param("sommaUrgenza") Integer sommaUrgenza
 			, @Param("altriSoggetti") Integer altriSoggetti
 			, @Param("isGreen") String isGreen
             , @Param("isRecycle") String isRecycle
@@ -123,6 +123,10 @@ public interface EsitiMapper {
 
     public EsitoType getEsito(
 			  @Param("codice") String codice
+	);
+    
+    public EsitoType getEsitoByCig(
+			  @Param("cig") String cig
 	);
 
     public List<LottoGaraType> getLottiGaraConEsito(

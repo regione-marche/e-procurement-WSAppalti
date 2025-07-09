@@ -52,7 +52,9 @@ import java.util.Date;
 	"dataUltimoAggiornamento",
     "isGreen",
     "isRecycle",
-    "isPnrr"
+    "isPnrr",
+    "tipoAvvisoGenerale",
+    "stato"
 })
 public class AvvisoType implements Serializable 
 {
@@ -84,6 +86,8 @@ public class AvvisoType implements Serializable
     protected String isGreen;
     protected String isRecycle;
     protected String isPnrr;
+    protected String tipoAvvisoGenerale;
+    protected Integer stato;
 
     public String getStazioneAppaltante() {
         return stazioneAppaltante;
@@ -179,6 +183,22 @@ public class AvvisoType implements Serializable
 
 	public void setIsPnrr(String isPnrr) {
 		this.isPnrr = isPnrr;
+	}
+
+	public String getTipoAvvisoGenerale() {
+		return tipoAvvisoGenerale;
+	}
+
+	public void setTipoAvvisoGenerale(String tipoAvvisoGenerale) {
+		this.tipoAvvisoGenerale = tipoAvvisoGenerale;
+	}
+
+	public Integer getStato() {
+		return stato;
+	}
+
+	public void setStato(Integer stato) {
+		this.stato = stato;
 	}
       
 }

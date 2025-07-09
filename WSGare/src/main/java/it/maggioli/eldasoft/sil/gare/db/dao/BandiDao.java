@@ -49,8 +49,7 @@ public interface BandiDao {
 	 */
 	List<DatoCodificatoType> getElencoStazioniAppaltanti()
 			throws DataAccessException;
-	
-	
+		
 	/**
 	 * Ritorna l'elenco delle stazioni appaltanti gestite nel backoffice 
 	 * per la legge 190
@@ -186,6 +185,16 @@ public interface BandiDao {
 	 * @throws DataAccessException
 	 */
 	GaraType getBando(String codiceGara) throws DataAccessException;
+	
+	/**
+	 * Ritorna il dettaglio dei dati di un bando di gara individuato dal cig.
+	 * 
+	 * @param cig
+	 *            cig relativo al bando di gara
+	 * @return dettaglio della gara
+	 * @throws DataAccessException
+	 */
+	GaraType getBandoByCig(String cig) throws DataAccessException;
 
 	/**
 	 * Ritorna l'elenco dei documenti in allegato al bando o al lotto
@@ -455,7 +464,9 @@ public interface BandiDao {
 			boolean soccorsoIstruttorio,
 			String entita,
 			int indicePrimoRecord, int maxNumRecord,
-			String stazioneAppaltante);
+			String stazioneAppaltante,
+			String cryptedUsername
+	);
 
 	/**
 	 * Ottimizzazione gestione lotti in getDettaglioGara(...)
@@ -548,7 +559,19 @@ public interface BandiDao {
 			boolean soccorsoIstruttorio,
 			String entita,
 			boolean soloDaLeggere,
-			String stazioneAppaltante);
+			String stazioneAppaltante,
+			String cryptedUsername
+	);
+	
+	// versione ottimizzata di "countComunicazioniRicevute"
+	public List<StatisticheComunicazioni> countComunicazioniRicevuteFull(
+			String username, 
+			String codice,
+			String codice2,
+			Date dataInvioDa,
+			String entita,
+			String stazioneAppaltante,
+			String cryptedUsername);
 
 	/**
 	 * Conta il numero di comunicazioni totali ricevute sui lotti di una gara, filtrate per i dati in
@@ -631,7 +654,7 @@ public interface BandiDao {
 	 * 			  progressivo destinatario relativo alla comunicazione
 	 * @return dettaglio comunicazione
 	 */
-	ComunicazioneType getComunicazioneRicevuta(String username, Long id, Long idDestinatario, String idprg);
+	ComunicazioneType getComunicazioneRicevuta(String username, String cryptedUsername, Long id, Long idDestinatario, String idprg);
 
 	/**
 	 * Ritorna la comunicazione inviata a partire dalla sua chiave.
@@ -878,7 +901,7 @@ public interface BandiDao {
 	 * @return true se abilitata, false altrimenti
 	 * @throws DataAccessException
 	 */
-	boolean getAbilitazionePresentazioneOfferta(String username, String codice)
+	boolean getAbilitazionePresentazioneOfferta(String username, String codice, String cryptedUsername)
 			throws DataAccessException;
 
 	/**
@@ -1236,7 +1259,7 @@ public interface BandiDao {
 	 * Estrae l'elenco degli operatori con relativi soccorsi istruttori per una data gara 
 	 */
 	public List<EspletGaraOperatoreType> getEspletamentoGaraSoccorsiElencoOperatori(
-			String codiceGara, String codiceLotto, String fase, String tokenRichiedente) throws DataAccessException;
+			String codiceGara, String codiceLotto, String fase, String tokenRichiedente, String cryptedUsername) throws DataAccessException;
 	
 	/**
 	 * Estrae l'elenco degli operatori che hanno presentato busta ammistrativa 
@@ -1278,6 +1301,24 @@ public interface BandiDao {
 	 * per una data gara 
 	 */
 	public List<EspletGaraOperatoreType> getEspletamentoGaraGraduatoriaElencoOperatori(
+			String codiceGara, String tokenRichiedente) throws DataAccessException;
+	
+	/**
+	 * Estrae l'elenco dei primi cinque classificati per l'accesso ai documenti art. 36 
+	 */
+	public List<EspletGaraOperatoreType> getEspletamentoGaraAccessoDocumentiElencoOperatori(
+			String codiceGara, String tokenRichiedente, boolean aggiudicataria) throws DataAccessException;
+		
+	/**
+	 * Estrae i documenti relatifi ad uno dei primi cinque classificati per l'accesso ai documenti art. 36 
+	 */
+	public List<EspletGaraAccessoDocumentiDocumentoType> getEspletamentoGaraAccessoDocumentiAtti(
+			String codiceGara, String tokenRichiedente) throws DataAccessException;
+	
+	/**
+	 * Estrae l'elenco dei lotti relativi all'accesso ai documenti art. 36
+	 */
+	public List<EspletGaraLottoType> getEspletamentoGaraAccessoDocumentiLotti(
 			String codiceGara, String tokenRichiedente) throws DataAccessException;
 	
 	/**
@@ -1367,7 +1408,11 @@ public interface BandiDao {
 	 * @throws DataAccessException
 	 */
 	public List<RettificaGaraType> getRettifichePresentazioneDomandaOfferta(
-			String codiceGara, Integer tipter) throws DataAccessException;
+			String codiceGara
+			, Integer tipter
+			, Date dataScadenza
+			, String oraScadenza
+	) throws DataAccessException;
 	
 	/**
 	 * Ritorna la lista dei criteri di valutazione di un'offerta (1=tecnica, 2=economica)
@@ -1398,6 +1443,9 @@ public interface BandiDao {
 	public List<DocumentoAllegatoLotto> checkDocumentiNulli(
 			String codiceGara, String username, String tipoBusta) throws DataAccessException, SqlComposerException;
 
+	public List<DocumentoAllegatoLotto> checkDocumentiLotto(
+			String codiceGara, String username, String tipoBusta
+	) throws DataAccessException, SqlComposerException;
 	/**
 	 * Ritorna la lista dei documenti per i quali ci sono differenze 
 	 * tra la dimensione del file originario e la dimensione sul db 
@@ -1435,7 +1483,8 @@ public interface BandiDao {
 			String tipoAppalto, 
 			String cig, 
 			Date dataPubblicazioneDa, 			
-			Date dataPubblicazioneA,			
+			Date dataPubblicazioneA,
+			String codgara,
 			Boolean sommaUrgenza,
 			int indicePrimoRecord, 
 			int maxNumRecord) throws DataAccessException, SqlComposerException;
@@ -1463,8 +1512,26 @@ public interface BandiDao {
 			String tipoAppalto, 
 			String cig, 
 			Date dataPubblicazioneDa, 			
-			Date dataPubblicazioneA, 
-			Boolean sommaUrgenza) throws DataAccessException, SqlComposerException;
+			Date dataPubblicazioneA,
+			String codgara,
+			Boolean sommaUrgenza
+	) throws DataAccessException, SqlComposerException;
+	
+	/**
+	 * Restituisce il dettaglio di una delibera a contrarre 
+	 */	
+	public DeliberaType getDettaglioDelibera(
+			String codgara
+	) throws DataAccessException, SqlComposerException;
+	
+	/**
+	 * Restituisce i documenti associati al dettaglio di una delibera a contrarre 
+	 */	
+	public List<DocumentoDeliberaType> getDocumentiDelibera(
+			String codgara,
+			String codgaraDa,
+			String codgaraA
+	) throws DataAccessException, SqlComposerException;
 	
 	/**
 	 * Ritorna la lista delle gare di somma urgenza 
@@ -1488,7 +1555,8 @@ public interface BandiDao {
 			Date dataPubblicazioneDa, 
 			Date dataPubblicazioneA,
 			int indicePrimoRecord, 
-			int maxNumRecord) throws DataAccessException, SqlComposerException;
+			int maxNumRecord
+	) throws DataAccessException, SqlComposerException;
 
 	/**
 	 * Restituisce il totale delle gare di somma urgenza
@@ -1546,5 +1614,26 @@ public interface BandiDao {
 	 * recupera i parametri del questionario
 	 */
 	public List<ParametroQuestionarioType> getParametriQuestionario() throws DataAccessException, SqlComposerException;
+
+	String getRagioneSocialeAnonima(String cryptedUsername, String ngara);
+
+	boolean isConcorsoCrypted(String cryptedUsername, String ngara);
+	String getIdAnonimo(String cryptedUsername, String ngara);
+
+	String getCodiceSecondoGrado(String ngara);
+	boolean canShowRankingFirstGradeCompetition(String ngara);
+	
+	/**
+	 * restituisce l'elenco delle imprese ausiliarie relative ad un avvalimento
+	 */
+	public List<ImpresaAusiliariaType> getImpreseAusiliarie(
+			String username, 
+			String codice,
+			String progressivoOfferta) throws DataAccessException, SqlComposerException;
+
+	/**
+	 * recupera un parametro di configurazione da W_CONFIG 
+	 */
+	public String getWConfig(String applicativo, String chiave);
 	
 }

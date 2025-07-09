@@ -7,15 +7,17 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 
+import it.maggioli.eldasoft.sil.gare.db.vo.EspletGaraOperatoreLotto;
+
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "EspletGaraLottoType", propOrder = { 
     "lotto",
     "codiceInterno",
     "oggetto",
-    "ammissione"
+    "ammissione",
+    "faseGara"
 })
 public class EspletGaraLottoType implements Serializable {
-	
 	/**
 	 * UID
 	 */
@@ -26,54 +28,60 @@ public class EspletGaraLottoType implements Serializable {
     protected String codiceInterno;
     protected String oggetto;
     protected String ammissione;
+    protected Long faseGara;
     
-	/**
-	 * @return the lotto
-	 */
+    /**
+     * costruttore
+     */
+    public EspletGaraLottoType() {
+    }
+    	
+    public EspletGaraLottoType(EspletGaraOperatoreLotto source) {
+    	lotto = source.getCodiceLotto();
+    	codiceInterno = source.getCodiceLotto();
+		//oggetto = source.???
+		ammissione = source.getAmmissione();
+		faseGara = source.getFaseGara();
+    }
+    
 	public String getLotto() {
 		return lotto;
 	}
-	/**
-	 * @param lotto the lotto to set
-	 */
+	
 	public void setLotto(String lotto) {
 		this.lotto = lotto;
 	}
-	/**
-	 * @return the codiceInterno
-	 */
+	
 	public String getCodiceInterno() {
 		return codiceInterno;
 	}
-	/**
-	 * @param codiceInterno the codiceInterno to set
-	 */
+	
 	public void setCodiceInterno(String codiceInterno) {
 		this.codiceInterno = codiceInterno;
 	}
-	/**
-	 * @return the oggetto
-	 */
+	
 	public String getOggetto() {
 		return oggetto;
 	}
-	/**
-	 * @param oggetto the oggetto to set
-	 */
+	
 	public void setOggetto(String oggetto) {
 		this.oggetto = oggetto;
 	}
-	/**
-	 * @return the ammissione
-	 */
+	
 	public String getAmmissione() {
 		return ammissione;
 	}
-	/**
-	 * @param ammissione the ammissione to set
-	 */
+	
 	public void setAmmissione(String ammissione) {
 		this.ammissione = ammissione;
+	}
+	
+	public Long getFaseGara() {
+		return faseGara;
+	}
+	
+	public void setFaseGara(Long faseGara) {
+		this.faseGara = faseGara;
 	}
     
 }

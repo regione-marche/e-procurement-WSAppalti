@@ -21,6 +21,7 @@
 		<result property="isGreen" column="ISGREEN"/>
 		<result property="isRecycle" column="ISRECYCLE"/>
 		<result property="isPnrr" column="ISPNRR"/>
+		<result property="BDNCPAnac" column="VERNPA" />
 	</resultMap>
 	
 	<resultMap id="resultLottoEsito" type="it.maggioli.eldasoft.sil.gare.ws.LottoEsitoType">
@@ -50,109 +51,90 @@
 	</resultMap>
 	
   <sql id="selectListaEsiti">
-  SELECT descsa as sa, codice, oggetto, codcig, codcupprg, tipologia, desctipoapp as tipoapp, descstatogara as stato, dataesito, datpub, descstatoesito as esito, gartel, isaccordoquadro, 
-  		dultagg, sommaur, ISGREEN, ISRECYCLE, ISPNRR
-    FROM v_ws_esiti
+  SELECT e.descsa as sa, e.codice, e.oggetto, e.codcig, e.codcupprg, e.tipologia, e.desctipoapp as tipoapp, e.descstatogara as stato, 
+  		 e.dataesito, e.datpub, e.descstatoesito as esito, e.gartel, e.isaccordoquadro, 
+  		 e.dultagg, e.sommaur, e.ISGREEN, e.ISRECYCLE, e.ISPNRR, e.VERNPA    
   </sql>
-
+  
+  <sql id="fromListaEsiti">
+    FROM v_ws_esiti e
+         LEFT JOIN v_ws_aderente_lotto al ON e.codice = al.codice
+  </sql>
+  
+  <sql id="whereEsitiFilters">
+  	 <if test="stazioneAppaltante != null and stazioneAppaltante != ''">AND (e.codsa = #{stazioneAppaltante} OR (al.cenint = #{stazioneAppaltante}))</if> 
+     <if test="oggetto != null and oggetto != ''">AND ${operatoreUpper}(e.oggetto) like #{oggetto}</if> 
+     <if test="tipoAppalto != null and tipoAppalto != ''">AND e.codtipoapp = #{tipoAppalto}</if> 
+     <if test="cig != null and cig != ''">AND EXISTS (SELECT codgar FROM v_ws_gare_lotti l WHERE e.codgar = l.codgar AND ${operatoreUpper}(l.codciglotto) like #{cig})</if>  
+     <if test="dataPubblicazioneDa != null">AND e.dataesito &gt;= #{dataPubblicazioneDa}</if> 
+     <if test="dataPubblicazioneA != null">AND e.dataesito &lt;= #{dataPubblicazioneA}</if> 
+     <if test="proceduraTelematica != null and proceduraTelematica != ''">AND e.gartel = #{proceduraTelematica}</if> 
+     <if test="sommaUrgenza != null and sommaUrgenza != ''">AND (case when e.sommaur='1' then 1 else 0 end) = #{sommaUrgenza} </if>
+     <if test="altriSoggetti != null and altriSoggetti != ''">AND e.altrisog = #{altriSoggetti}</if>
+     <if test="isGreen != null and isGreen != ''">AND (e.ISGREEN = #{isGreen} OR (e.ISGREEN IS NULL AND #{isGreen} = '0'))</if>
+     <if test="isRecycle != null and isRecycle != ''">AND (e.ISRECYCLE = #{isRecycle} OR (e.ISRECYCLE IS NULL AND #{isRecycle} = '0'))</if>
+     <if test="isPnrr != null and isPnrr != ''">AND (e.ISPNRR = #{isPnrr} OR (e.ISPNRR IS NULL AND #{isPnrr} = '0'))</if>
+  </sql>
+  
   <sql id="whereEsiti">
-  WHERE #{annoMinimoPubblicazione} &lt;= annoinizioperscadenza
-  	 AND garpriv IS NULL
-     <if test="stazioneAppaltante != null and stazioneAppaltante != ''">AND 
-     (codsa = #{stazioneAppaltante}
-      OR EXISTS (SELECT cenint FROM v_ws_aderente_lotto al WHERE v_ws_esiti.codice = al.codice AND al.cenint = #{stazioneAppaltante})) 
-     </if> 
-     <if test="oggetto != null and oggetto != ''">AND ${operatoreUpper}(oggetto) like #{oggetto}</if> 
-     <if test="tipoAppalto != null and tipoAppalto != ''">AND codtipoapp = #{tipoAppalto}</if> 
-     <if test="cig != null and cig != ''">AND EXISTS (SELECT codgar FROM v_ws_gare_lotti l WHERE v_ws_esiti.codgar = l.codgar AND ${operatoreUpper}(l.codciglotto) like #{cig})</if>  
-     <if test="dataPubblicazioneDa != null">AND dataesito &gt;= #{dataPubblicazioneDa}</if> 
-     <if test="dataPubblicazioneA != null">AND dataesito &lt;= #{dataPubblicazioneA}</if> 
-     <if test="proceduraTelematica != null and proceduraTelematica != ''">AND gartel = #{proceduraTelematica}</if> 
-     <if test="sommaUrgenza != null and sommaUrgenza != ''">AND (case when sommaur='1' then 1 else 0 end) = #{sommaUrgenza} </if>
-     <if test="altriSoggetti != null and altriSoggetti != ''">AND altrisog = #{altriSoggetti}</if>
-     <if test="isGreen != null and isGreen != ''">AND (ISGREEN = #{isGreen} OR (ISGREEN IS NULL AND #{isGreen} = '0'))</if>
-     <if test="isRecycle != null and isRecycle != ''">AND (ISRECYCLE = #{isRecycle} OR (ISRECYCLE IS NULL AND #{isRecycle} = '0'))</if>
-     <if test="isPnrr != null and isPnrr != ''">AND (ISPNRR = #{isPnrr} OR (ISPNRR IS NULL AND #{isPnrr} = '0'))</if>
+  WHERE #{annoMinimoPubblicazione} &lt;= e.annoinizioperscadenza
+  	 AND e.garpriv IS NULL
+  	 <include refid="whereEsitiFilters"/>
   </sql>
   
   <select id="searchEsiti" parameterType="java.util.HashMap" resultMap="resultEsito">
    <include refid="selectListaEsiti"/>
+   <include refid="fromListaEsiti"/>
    <include refid="whereEsiti"/>
    ORDER BY dataesito DESC
   </select>
 
   <select id="countEsiti" parameterType="java.util.HashMap" resultType="java.lang.Integer">
  SELECT count(1)
-   FROM v_ws_esiti
+   <include refid="fromListaEsiti"/>
    <include refid="whereEsiti"/>
   </select>
   
   <sql id="whereElencoEsiti">
-  WHERE #{annoMinimoPubblicazione} &lt;= annoinizioperscadenza
-  	 AND garpriv IS NULL
-     <if test="stazioneAppaltante != null and stazioneAppaltante != ''">AND 
-     (codsa = #{stazioneAppaltante}
-      OR EXISTS (SELECT cenint FROM v_ws_aderente_lotto al WHERE v_ws_esiti.codice = al.codice AND al.cenint = #{stazioneAppaltante})) 
-     </if> 
-     <if test="oggetto != null and oggetto != ''">AND ${operatoreUpper}(oggetto) like #{oggetto}</if> 
-     <if test="tipoAppalto != null and tipoAppalto != ''">AND codtipoapp = #{tipoAppalto}</if> 
-     <if test="cig != null and cig != ''">AND EXISTS (SELECT codgar FROM v_ws_gare_lotti l WHERE v_ws_esiti.codgar = l.codgar AND ${operatoreUpper}(l.codciglotto) like #{cig})</if>  
-     <if test="dataPubblicazioneDa != null">AND dataesito &gt;= #{dataPubblicazioneDa}</if> 
-     <if test="dataPubblicazioneA != null">AND dataesito &lt;= #{dataPubblicazioneA}</if> 
-     <if test="proceduraTelematica != null and proceduraTelematica != ''">AND gartel = #{proceduraTelematica}</if> 
-     <if test="sommaUrgenza != null and sommaUrgenza != ''">AND (case when sommaur='1' then 1 else 0 end) = #{sommaUrgenza} </if>
-     <if test="altriSoggetti != null and altriSoggetti != ''">AND altrisog = #{altriSoggetti}</if>
-     <if test="isGreen != null and isGreen != ''">AND (ISGREEN = #{isGreen} OR (ISGREEN IS NULL AND #{isGreen} = '0'))</if>
-     <if test="isRecycle != null and isRecycle != ''">AND (ISRECYCLE = #{isRecycle} OR (ISRECYCLE IS NULL AND #{isRecycle} = '0'))</if>
-     <if test="isPnrr != null and isPnrr != ''">AND (ISPNRR = #{isPnrr} OR (ISPNRR IS NULL AND #{isPnrr} = '0'))</if>
+  WHERE #{annoMinimoPubblicazione} &lt;= e.annoinizioperscadenza
+  	 AND e.garpriv IS NULL
+  	 <include refid="whereEsitiFilters"/>
   </sql>
   
   <select id="getElencoEsiti" resultMap="resultEsito">
    <include refid="selectListaEsiti"/>
+   <include refid="fromListaEsiti"/>
    <include refid="whereElencoEsiti"/>
    ORDER BY dataesito DESC
   </select>
 
   <select id="countElencoEsiti" parameterType="java.util.HashMap" resultType="java.lang.Integer">
  SELECT count(1)
-   FROM v_ws_esiti
+   <include refid="fromListaEsiti"/>
    <include refid="whereElencoEsiti"/>
   </select>
   
   <sql id="whereElencoEsitiAffidamenti">
-   WHERE #{annoMinimoPubblicazione} &lt;= annoinizioperscadenza AND ISELENCO = 1
-     AND garpriv IS NULL
-     <if test="stazioneAppaltante != null and stazioneAppaltante != ''">AND 
-     (codsa = #{stazioneAppaltante}
-      OR EXISTS (SELECT cenint FROM v_ws_aderente_lotto al WHERE v_ws_esiti.codice = al.codice AND al.cenint = #{stazioneAppaltante})) 
-     </if> 
-     <if test="oggetto != null and oggetto != ''">AND ${operatoreUpper}(oggetto) like #{oggetto}</if> 
-     <if test="tipoAppalto != null and tipoAppalto != ''">AND codtipoapp = #{tipoAppalto}</if> 
-     <if test="cig != null and cig != ''">AND EXISTS (SELECT codgar FROM v_ws_gare_lotti l WHERE v_ws_esiti.codgar = l.codgar AND ${operatoreUpper}(l.codciglotto) like #{cig})</if>  
-     <if test="dataPubblicazioneDa != null">AND dataesito &gt;= #{dataPubblicazioneDa}</if> 
-     <if test="dataPubblicazioneA != null">AND dataesito &lt;= #{dataPubblicazioneA}</if> 
-     <if test="proceduraTelematica != null and proceduraTelematica != ''">AND gartel = #{proceduraTelematica}</if> 
-     <if test="sommaUrgenza != null and sommaUrgenza != ''">AND (case when sommaur='1' then 1 else 0 end) = #{sommaUrgenza} </if>
-     <if test="altriSoggetti != null and altriSoggetti != ''">AND altrisog = #{altriSoggetti}</if>
-     <if test="isGreen != null and isGreen != ''">AND (ISGREEN = #{isGreen} OR (ISGREEN IS NULL AND #{isGreen} = '0'))</if>
-     <if test="isRecycle != null and isRecycle != ''">AND (ISRECYCLE = #{isRecycle} OR (ISRECYCLE IS NULL AND #{isRecycle} = '0'))</if>
-     <if test="isPnrr != null and isPnrr != ''">AND (ISPNRR = #{isPnrr} OR (ISPNRR IS NULL AND #{isPnrr} = '0'))</if>
+   WHERE #{annoMinimoPubblicazione} &lt;= e.annoinizioperscadenza AND e.ISELENCO = 1
+     AND e.garpriv IS NULL
+     <include refid="whereEsitiFilters"/>
   </sql>
   
   <select id="getElencoEsitiAffidamenti" resultMap="resultEsito">
    <include refid="selectListaEsiti"/>
+   <include refid="fromListaEsiti"/>
    <include refid="whereElencoEsitiAffidamenti"/>
    ORDER BY dataesito DESC
   </select>
 
   <select id="countElencoEsitiAffidamenti" parameterType="java.util.HashMap" resultType="java.lang.Integer">
  SELECT count(1)
-   FROM v_ws_esiti
+   <include refid="fromListaEsiti"/>
    <include refid="whereElencoEsitiAffidamenti"/>
   </select>
   
   <select id="getStazioneAppaltanteEsito" parameterType="java.lang.String" resultMap="it.maggioli.eldasoft.sil.gare.db.mapper.BandiMapper.resultStazioneAppaltanteBando">
-  SELECT codsa as codstazione, descsa as descstazione, descrup
+  SELECT codsa as codstazione, descsa as descstazione, descrup, descrpaff
     FROM v_ws_esiti
    WHERE codice = #{codice} 
      AND garpriv IS NULL
@@ -160,9 +142,17 @@
 
   <select id="getEsito" parameterType="java.lang.String" resultMap="resultEsito">
   SELECT codsa as sa, codice, oggetto, codcig, codcupprg, tipologia, codtipoapp as tipoapp, codstatogara as stato, dataesito, datpub, descstatoesito as esito, gartel, isaccordoquadro,
-  		dultagg
+  		dultagg, vernpa
     FROM v_ws_esiti
    WHERE codice = #{codice}
+     AND garpriv IS NULL
+  </select>
+  
+  <select id="getEsitoByCig" parameterType="java.lang.String" resultMap="resultEsito">
+  SELECT codsa as sa, codice, oggetto, codcig, codcupprg, tipologia, codtipoapp as tipoapp, codstatogara as stato, dataesito, datpub, descstatoesito as esito, gartel, isaccordoquadro,
+  		dultagg, vernpa
+    FROM v_ws_esiti
+   WHERE codcig = #{cig}
      AND garpriv IS NULL
   </select>
   

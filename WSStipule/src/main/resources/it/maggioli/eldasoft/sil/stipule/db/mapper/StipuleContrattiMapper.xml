@@ -65,9 +65,8 @@
 	FROM v_ws_gare_stipula s 
    WHERE s.usernome = #{usernome}
        <if test="codiceStipula != null and codiceStipula != ''">AND s.codstipula = #{codiceStipula}</if>
-       <if test="idstipula != null and idstipula != ''">AND s.id = #{idstipula}</if>
-   
-   <if test="pubblicata != null and pubblicata">AND datpub is not null</if>
+       <if test="idStipula != null and idStipula != ''">AND s.id = #{idStipula}</if>
+   	   <if test="pubblicata != null and pubblicata">AND datpub is not null</if>
    </select>
 	
     <select id="getDocumentiRichiestiStipulaContratto" parameterType="java.util.HashMap" resultMap="resultDocumentoRichiestoStipula">
@@ -81,7 +80,7 @@
   		 d.firmacheck,
   		 d.firmacheckts
     FROM g1docstipula g
-    	 LEFT OUTER JOIN w_docdig d ON g.id = d.digkey1 and d.digent = 'G1DOCSTIPULA' and idprg = 'PG'
+    	 LEFT OUTER JOIN w_docdig d ON cast(g.id as varchar(30)) = d.digkey1 and d.digent = 'G1DOCSTIPULA' and idprg = 'PG'
    WHERE g.idStipula = #{idStipula} 
      AND g.visibilita != 1
    	 AND g.statodoc != 1

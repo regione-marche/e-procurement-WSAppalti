@@ -38,7 +38,7 @@ public class PagoPaManager {
 
 	@Transactional(propagation = Propagation.NOT_SUPPORTED)
 	public StatisticaPagamentiOutType getStatisticaPagamenti(String codiceImpresa) {
-		logger.info("Calling PagoPaManager.getStatisticaPagamenti with "+codiceImpresa);
+		logger.debug("Calling PagoPaManager.getStatisticaPagamenti with "+codiceImpresa);
 		StatisticaPagamentiOutType res = new StatisticaPagamentiOutType();
 		res.setStatistica(pagoPaDao.getCountPagamentiGroupByStato(codiceImpresa));
 		return res;
@@ -100,9 +100,9 @@ public class PagoPaManager {
 	@Transactional(propagation = Propagation.NOT_SUPPORTED)
 	public PagamentiPaginationType getItemsByFilter(PagamentiFilterInType filtro) throws PagoPaValidationException {
 		this.validaFiltro(filtro);
-		logger.info("Calling with "+filtro);
+		logger.debug("Calling with "+filtro);
 		List<PagopaPagamento> lista = this.pagoPaDao.getPagamentiByFiltro(filtro);
-		logger.info("Found "+lista.size() +" elements");
+		logger.debug("Found "+lista.size() +" elements");
 		List<PagamentiOutType> listaOut = new ArrayList<>(lista.size());
 		for(PagopaPagamento el : lista) {
 			listaOut.add(convertPagopaPagamentoToPagamentiOutType(el));
@@ -145,7 +145,7 @@ public class PagoPaManager {
 	public ElencoTipiCausalePagamentoOutType getElencoTipiCausalePagamento() {
 		ElencoTipiCausalePagamentoOutType out = new ElencoTipiCausalePagamentoOutType();
 		out.setTipologia(this.pagoPaDao.getElencoTipiCausalePagamento());
-		logger.info("getElencoTipiCausalePagamento: "+out.getTipologia().size());
+		logger.debug("getElencoTipiCausalePagamento: "+out.getTipologia().size());
 		return out;
 	}
 
@@ -164,9 +164,9 @@ public class PagoPaManager {
 	@Transactional(propagation = Propagation.NOT_SUPPORTED)
 	public PagopaRicevutaOutType getRicevutaById(Long id) throws PagoPaException {
 		try {
-			logger.info("Richiesta ricevuta con id "+id);
+			logger.debug("Richiesta ricevuta con id "+id);
 			PagopaRicevuta pr = this.pagoPaDao.getRicevutaById(id);
-			logger.info("Trovata ricevuta? "+(pr!=null));
+			logger.debug("Trovata ricevuta? "+(pr!=null));
 			if(pr==null) throw new PagoPaException("Missing rivevuta con id "+id);
 			return new PagopaRicevutaOutType().id(pr.getPagopapagamentiid()).ricevuta(pr.getRicevuta());
 		} catch (Exception e) {
@@ -192,7 +192,7 @@ public class PagoPaManager {
 		if(filtro == null || filtro.getUsernome()==null)
 			throw new PagoPaValidationException("RiferimentoResponseOutType missing");
 		try {
-			logger.info("Filtro: " + filtro);
+			logger.debug("Filtro: " + filtro);
 			List<PagopaRiferimentoProcedura> lista = this.pagoPaDao.getRiferimentoProceduraByFiltro(filtro);
 			List<RiferimentoOutType> out = new ArrayList<>(lista.size());
 			for(PagopaRiferimentoProcedura p : lista) {

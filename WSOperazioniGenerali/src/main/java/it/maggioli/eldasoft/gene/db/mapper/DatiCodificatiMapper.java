@@ -32,4 +32,8 @@ public interface DatiCodificatiMapper {
             @Param("nazione") String nazione
     );
 
+    List<DatoCodificatoType> getTipiAvvalimento();
+    
+    List<DatoCodificatoType> getTipiImpresaNaturaGiuridica();
+    
 }

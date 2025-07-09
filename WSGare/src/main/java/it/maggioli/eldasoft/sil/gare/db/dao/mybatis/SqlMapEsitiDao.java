@@ -61,8 +61,8 @@ public class SqlMapEsitiDao implements EsitiDao {
 				, toWithPercentAndUpper(filtri.getCig())
 				, filtri.getDataPubblicazioneDa()
 				, filtri.getDataPubblicazioneA()
-				, filtri.getProceduraTelematica()
-				, filtri.getSommaUrgenza()
+				, BandiManager.boolToInt(filtri.getProceduraTelematica()) 
+				, BandiManager.boolToInt(filtri.getSommaUrgenza())
 				, BandiManager.toInt(filtri.getAltriSoggetti(), "Formato non valido per altri soggetti")
 				, filtri.getIsGreen()
 				, filtri.getIsRecycle()
@@ -84,8 +84,8 @@ public class SqlMapEsitiDao implements EsitiDao {
 				, toWithPercentAndUpper(filtri.getCig())
 				, filtri.getDataPubblicazioneDa()
 				, filtri.getDataPubblicazioneA()
-				, filtri.getProceduraTelematica()
-				, filtri.getSommaUrgenza()
+				, BandiManager.boolToInt(filtri.getProceduraTelematica())
+				, BandiManager.boolToInt(filtri.getSommaUrgenza())
 				, BandiManager.toInt(filtri.getAltriSoggetti(), "Formato non valido per altri soggetti")
 				, filtri.getIsGreen()
 				, filtri.getIsRecycle()
@@ -106,8 +106,8 @@ public class SqlMapEsitiDao implements EsitiDao {
 				, toWithPercentAndUpper(filtri.getCig())
 				, filtri.getDataPubblicazioneDa()
 				, filtri.getDataPubblicazioneA()
-				, filtri.getProceduraTelematica()
-				, filtri.getSommaUrgenza()
+				, BandiManager.boolToInt(filtri.getProceduraTelematica()) 
+				, BandiManager.boolToInt(filtri.getSommaUrgenza())  
 				, BandiManager.toInt(filtri.getAltriSoggetti(), "Formato non valido per altri soggetti")
 				, filtri.getIsGreen()
 				, filtri.getIsRecycle()
@@ -129,8 +129,8 @@ public class SqlMapEsitiDao implements EsitiDao {
 				, toWithPercentAndUpper(filtri.getCig())
 				, filtri.getDataPubblicazioneDa()
 				, filtri.getDataPubblicazioneA()
-				, filtri.getProceduraTelematica()
-				, filtri.getSommaUrgenza()
+				, BandiManager.boolToInt(filtri.getProceduraTelematica())
+				, BandiManager.boolToInt(filtri.getSommaUrgenza())
 				, BandiManager.toInt(filtri.getAltriSoggetti(), "Formato non valido per altri soggetti")
 				, filtri.getIsGreen()
 				, filtri.getIsRecycle()
@@ -151,8 +151,8 @@ public class SqlMapEsitiDao implements EsitiDao {
 				, toWithPercentAndUpper(filtri.getCig())
 				, filtri.getDataPubblicazioneDa()
 				, filtri.getDataPubblicazioneA()
-				, filtri.getProceduraTelematica()
-				, filtri.getSommaUrgenza()
+				, BandiManager.boolToInt(filtri.getProceduraTelematica())
+				, BandiManager.boolToInt(filtri.getSommaUrgenza())
 				, BandiManager.toInt(filtri.getAltriSoggetti(), "Formato non valido per altri soggetti")
 				, filtri.getIsGreen()
 				, filtri.getIsRecycle()
@@ -174,8 +174,8 @@ public class SqlMapEsitiDao implements EsitiDao {
 				, toWithPercentAndUpper(filtri.getCig())
 				, filtri.getDataPubblicazioneDa()
 				, filtri.getDataPubblicazioneA()
-				, filtri.getProceduraTelematica()
-				, filtri.getSommaUrgenza()
+				, BandiManager.boolToInt(filtri.getProceduraTelematica())
+				, BandiManager.boolToInt(filtri.getSommaUrgenza())
 				, BandiManager.toInt(filtri.getAltriSoggetti(), "Formato non valido per altri soggetti")
 				, filtri.getIsGreen()
 				, filtri.getIsRecycle()
@@ -192,6 +192,11 @@ public class SqlMapEsitiDao implements EsitiDao {
 	@Override
 	public EsitoType getEsito(String codiceGara) throws DataAccessException {
 		return esitiMapper.getEsito(codiceGara);
+	}
+	
+	@Override
+	public EsitoType getEsitoByCig(String cig) throws DataAccessException {
+		return esitiMapper.getEsitoByCig(cig);
 	}
 	
 	@Override

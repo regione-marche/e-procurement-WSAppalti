@@ -23,13 +23,13 @@ public interface StipuleContrattiMapper {
     
     public StipulaContrattoType getDettaglioStipulaContratto(
 			  @Param("codiceStipula") String codiceStipula
-			, @Param("idstipula") String idStipula
+			, @Param("idStipula") Long idStipula
 			, @Param("usernome") String usernome
 			, @Param("pubblicata") Boolean pubblicata
 	);
 
     public List<DocumentazioneStipulaContrattiType> getDocumentiRichiestiStipulaContratto(
-			  @Param("idStipula") String idStipula
+			  @Param("idStipula") Long idStipula
 	);
 
     public Integer countStipuleContratti(
@@ -47,12 +47,12 @@ public interface StipuleContrattiMapper {
 	);
 
     public Integer updateStipula(
-			  @Param("codiceStipula") String codStipula
+			  @Param("codiceStipula") Long codStipula
 			, @Param("stato") Long stato
     );
 
 	public Integer updateDocStipula(
-			  @Param("codiceStipula") String codStipula
+			  @Param("codiceStipula") Long codStipula
 			, @Param("stato") Long stato
 	);
 

@@ -56,8 +56,17 @@ public interface WSOperazioniGeneraliSoap {
         it.maggioli.eldasoft.gene.ws.DettaglioComunicazioneType testata
     );
 
+    @WebMethod(operationName = "SearchElencoComunicazioni", action = "http://www.eldasoft.it/WSOperazioniGenerali/SearchElencoComunicazioni")    
+    public it.maggioli.eldasoft.gene.ws.GetElencoComunicazioniOutType searchElencoComunicazioni(
+        @WebParam(name = "testata", targetNamespace = "")
+        it.maggioli.eldasoft.gene.ws.DettaglioComunicazioneType testata
+    );
+
     @WebMethod(operationName = "GetElencoTipiComunicazione", action = "http://www.eldasoft.it/sil/WSOperazioniGenerali/GetElencoTipiComunicazione")    
     public java.lang.String getElencoTipiComunicazione();
+    
+    @WebMethod(operationName = "GetElencoTipiComunicazioneUlteriori", action = "http://www.eldasoft.it/sil/WSOperazioniGenerali/GetElencoTipiComunicazioneUlteriori")    
+    public java.lang.String getElencoTipiComunicazioneUlteriori();
 
     @WebMethod(operationName = "GetElencoAliquoteIVA", action = "http://www.eldasoft.it/WSOperazioniGenerali/GetElencoAliquoteIVA")    
     public java.lang.String getElencoAliquoteIVA();
@@ -227,11 +236,19 @@ public interface WSOperazioniGeneraliSoap {
         long id
     );
 
-
     @WSDLDocumentation("Nome nazione a codifica DGUE")
     public java.lang.String getNazioniCodificateDGUE(
             @WebParam(name = "nazione", targetNamespace = "")
             String nazione
     );
 
+    @WSDLDocumentation("Lista di rating disponibili")
+    public String getListaRating();
+
+    @WSDLDocumentation("Lista di tipi di concorsi di progettazione di primo grado")
+    public String getListaTipoProceduraConcorso();
+
+    @WSDLDocumentation("Lista dei tipi di avviso di carattere generale")
+    public String getListaTipiAvvisoGenerali();
+    
 }

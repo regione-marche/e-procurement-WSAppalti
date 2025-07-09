@@ -35,7 +35,7 @@ public interface DocumentiDao {
 	 * @return documento costituito dal suo contenuto e dal nome del file
 	 * @throws DataAccessException
 	 */
-	FileType getDocumentoDigitale(String idProgramma, long idDocumento, String username)
+	FileType getDocumentoDigitale(String idProgramma, long idDocumento, String username, String cryptedUseranme)
 			throws DataAccessException;
 
 	/**

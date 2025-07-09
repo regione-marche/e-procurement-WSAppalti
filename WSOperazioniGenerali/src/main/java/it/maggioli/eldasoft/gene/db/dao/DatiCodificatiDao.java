@@ -65,7 +65,26 @@ public interface DatiCodificatiDao {
 	   */
 	  List<DatoCodificatoType> getNazioniCodificate() throws DataAccessException;
 
+	  /**
+	   * ... 
+	   */
 	  List<DatoCodificatoType> getFormeGiuridicheCooperative() throws DataAccessException;
+	  
+	  /**
+	   * ... 
+	   */
 	  String getNazioniCodificateDGUE(String nazione);
+	  
+	  /**
+	   * Restituisce la lista dei tipi di avvalimento
+	   * @return lista delle codifiche
+	   * @throws DataAccessException
+	   */
+	  List<DatoCodificatoType> getTipiAvvalimento() throws DataAccessException;
+	  
+	  /**
+	   *  Restituisce la lista dei tipi impresa e natura giuridica
+	   */
+	  List<DatoCodificatoType> getTipiImpresaNaturaGiuridica() throws DataAccessException;
 	  
 }

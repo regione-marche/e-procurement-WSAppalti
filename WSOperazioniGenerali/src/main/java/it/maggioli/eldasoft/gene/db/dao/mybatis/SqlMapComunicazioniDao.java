@@ -10,16 +10,16 @@
  */
 package it.maggioli.eldasoft.gene.db.dao.mybatis;
 
+import it.maggioli.eldasoft.gene.bean.ObjectStorageConfiguration;
 import it.maggioli.eldasoft.gene.db.dao.ComunicazioniDao;
 import it.maggioli.eldasoft.gene.db.mapper.ComunicazioniMapper;
-import it.maggioli.eldasoft.gene.ws.AllegatoComunicazioneType;
-import it.maggioli.eldasoft.gene.ws.DettaglioComunicazioneType;
-import it.maggioli.eldasoft.gene.ws.WSAllegatoType;
-import it.maggioli.eldasoft.gene.ws.WSDocumentoType;
+import it.maggioli.eldasoft.gene.model.UploadInfo;
+import it.maggioli.eldasoft.gene.ws.*;
+import lombok.RequiredArgsConstructor;
+import lombok.val;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Component;
 
@@ -31,14 +31,15 @@ import java.util.List;
  * 
  * @author Stefano.Sabbadin
  */
+@RequiredArgsConstructor
 @Component
 public class SqlMapComunicazioniDao implements ComunicazioniDao {
 
 	private static final Logger LOG = LoggerFactory.getLogger(SqlMapComunicazioniDao.class);
 
-	@Autowired
-	private ComunicazioniMapper comunicazioniMapper;
-	
+	private final ComunicazioniMapper comunicazioniMapper;
+	private final ObjectStorageConfiguration obs_conf;
+
 	/**
 	 * converti il valore di comunicazione.ComunicazionePubblica prima di un insertComunicazione o updatecomunicazione 
 	 */
@@ -48,13 +49,6 @@ public class SqlMapComunicazioniDao implements ComunicazioniDao {
 			comPub = new Integer( value.booleanValue() ? 1 : 2 );
 		}
 		return comPub;
-	}
-	
-	@Override
-	public Long getMaxIdComunicazione(String applicativo)
-			throws DataAccessException {
-		Long id = comunicazioniMapper.getMaxIdComunicazione(applicativo);
-		return id == null ? 0l : id;
 	}
 	
 	@Override
@@ -88,6 +82,7 @@ public class SqlMapComunicazioniDao implements ComunicazioniDao {
 				, comunicazione.getIdRisposta()
 				, comunicazione.getModello()
 				, comunicazione.getTipoBusta()
+				, comunicazione.getStazioneAppaltante()
 		);
 	}
 	
@@ -120,23 +115,23 @@ public class SqlMapComunicazioniDao implements ComunicazioniDao {
 				, comunicazione.getTipoBusta()
 				, comunicazione.getApplicativo()
 				, comunicazione.getId()
+				, comunicazione.getStazioneAppaltante()
 		);
 	}
 
 	@Override
-	public Long getMaxIdAllegato(String applicativo) throws DataAccessException {
-		Long id = comunicazioniMapper.getMaxIdAllegato(applicativo);
-		return id == null ? 0L : id;
-	}
-	
-	@Override
-	public void insertAllegato(String applicativo, Long idAllegato,
-			Long idComunicazione, int progressivoAllegato,
-			AllegatoComunicazioneType allegato) throws DataAccessException {
+	public void insertAllegato(
+			String applicativo
+			, Long idAllegato
+			, Long idComunicazione
+			, int progressivoAllegato
+			, AllegatoComunicazioneType allegato
+			, UploadInfo bucket_info
+	) throws DataAccessException {
 		boolean isEmptyStream = (allegato.getFile() == null ||
    			    			     (allegato.getFile() != null && allegato.getFile().length <= 0));
 
-		if(isEmptyStream) {
+		if(!obs_conf.enabled() && isEmptyStream) {
 			// 21/01/2019 (bug rilevato a "Chieti")
 			// Warning per insert di un allegato senza contenuto!!!
 			LOG.warn(
@@ -147,32 +142,37 @@ public class SqlMapComunicazioniDao implements ComunicazioniDao {
 				"nomeFile={}" +
 				")", applicativo, idComunicazione, idAllegato, allegato.getNomeFile());
 		} else {
-			String entita = "W_INVCOM";
 			comunicazioniMapper.insertAllegato(
 					applicativo
 					, idAllegato
-					, entita
+					, "W_INVCOM"
 					, idComunicazione
 					, progressivoAllegato
 					, (!StringUtils.isEmpty(allegato.getUuid()) ? allegato.getUuid() : null)
+					, allegato.getCifrato()
 					, allegato.getTipo()
 					, allegato.getNomeFile()
 					, allegato.getDescrizione()
 					, allegato.getFile()
 					, StringUtils.trimToNull(allegato.getFirmacheck())
 					, allegato.getFirmacheckts()
+					, bucket_info
 			);
 		}
 	}
 	
 	@Override
 	public void updateAllegato(
-			String applicativo, Long idAllegato, Long idComunicazione, 
-			int progressivoAllegato, AllegatoComunicazioneType allegato) 
-	{
-		String uuid = (!StringUtils.isEmpty(allegato.getUuid())	? allegato.getUuid() : null);
+			String applicativo
+			, Long idAllegato
+			, Long idComunicazione
+			, int progressivoAllegato
+			, AllegatoComunicazioneType allegato
+			, final UploadInfo info
+	) {
+		val uuid = (!StringUtils.isEmpty(allegato.getUuid())	? allegato.getUuid() : null);
 		byte[] file = null;
-		if(uuid != null) {
+		if(uuid != null && StringUtils.isEmpty(info.uuid())) {
 			// 2.0.0
 			// in caso di gestione degli allegati fuori dalla busta xml 
 			// gestisci l'allegato solo se e' stato modificato
@@ -206,7 +206,7 @@ public class SqlMapComunicazioniDao implements ComunicazioniDao {
 			file = allegato.getFile();
 		}
 
-		String entita = "W_INVCOM";
+		val entita = "W_INVCOM";
 
 		comunicazioniMapper.updateAllegato(
 				progressivoAllegato
@@ -215,12 +215,15 @@ public class SqlMapComunicazioniDao implements ComunicazioniDao {
 				, allegato.getDescrizione()
 				, file
 				, uuid
+				, allegato.getCifrato()
 				, StringUtils.trimToNull(allegato.getFirmacheck())
 				, allegato.getFirmacheckts()
 				, applicativo
 				, idAllegato
 				, entita
 				, idComunicazione
+				, info
+				, StringUtils.isNotEmpty(info.uuid())
 		);
 	}
 	
@@ -279,9 +282,10 @@ public class SqlMapComunicazioniDao implements ComunicazioniDao {
 	
 	@Override
 	public List<AllegatoComunicazioneType> getAllegatiComunicazione(
-			String applicativo, 
-			long id, 
-			String idDocumento) throws DataAccessException {
+			String applicativo
+			, long id
+			, String idDocumento
+	) throws DataAccessException {
 		String entita = "W_INVCOM";
 
 		List<AllegatoComunicazioneType> allegati =
@@ -313,20 +317,72 @@ public class SqlMapComunicazioniDao implements ComunicazioniDao {
 		
 		return allegati;
 	}
+
+	@Override
+	public List<AllegatoComunicazioneType> getAllegatiComunicazioneNoFile(
+			String applicativo,
+			long id,
+			String idDocumento) throws DataAccessException {
+		String entita = "W_INVCOM";
+
+		return comunicazioniMapper.getAllegatiComunicazioneNoFile(
+				applicativo
+				, entita
+				, Long.toString(id)
+				, idDocumento
+		);
+	}
 	
 	@Override
 	public List<DettaglioComunicazioneType> getElencoComunicazioni(
 			DettaglioComunicazioneType criteriRicerca)
 			throws DataAccessException {
-		String oggetto = criteriRicerca.getOggetto();
-		String testo = criteriRicerca.getTesto();
-		if (oggetto != null && oggetto.length() > 0)
-			criteriRicerca.setOggetto("%" + oggetto + "%");
-		if (testo != null && testo.length() > 0)
-			criteriRicerca.setTesto("%" + testo + "%");
-		return comunicazioniMapper.getElencoComunicazioni(criteriRicerca);
+		return comunicazioniMapper.getElencoComunicazioni(
+				criteriRicerca.getApplicativo()
+	    		, criteriRicerca.getId()
+	            , criteriRicerca.getEntita()
+	            , criteriRicerca.getChiave1()
+	            , criteriRicerca.getChiave2()
+	            , criteriRicerca.getChiave3()
+	            , criteriRicerca.getChiave4()
+	            , criteriRicerca.getChiave5()
+	            , criteriRicerca.getIdOperatore()
+	            , criteriRicerca.getMittente()
+	            , criteriRicerca.getStato()
+	            , (StringUtils.isNotEmpty(criteriRicerca.getOggetto()) ? "%" + criteriRicerca.getOggetto() + "%" : null)
+	            , (StringUtils.isNotEmpty(criteriRicerca.getTesto()) ? "%" + criteriRicerca.getTesto() + "%" : null)
+	            , null 		// comunicazionePubblica ??? ==> non esiste in DettaglioComunicazioneType
+	            , criteriRicerca.getTipoComunicazione()
+	            , criteriRicerca.getDataPubblicazione()
+	            , criteriRicerca.getModello()
+		);
 	}
 	
+	@Override
+	public List<DettaglioComunicazioneType> searchElencoComunicazioni(
+			DettaglioComunicazioneType criteriRicerca)
+			throws DataAccessException {
+		return comunicazioniMapper.searchElencoComunicazioni(
+				criteriRicerca.getApplicativo()
+	    		, criteriRicerca.getId()
+	            , criteriRicerca.getEntita()
+	            , (StringUtils.isNotEmpty(criteriRicerca.getChiave1()) ? criteriRicerca.getChiave1() + "%" : null)
+	            , (StringUtils.isNotEmpty(criteriRicerca.getChiave2()) ? criteriRicerca.getChiave2() + "%" : null)
+	            , (StringUtils.isNotEmpty(criteriRicerca.getChiave3()) ? criteriRicerca.getChiave3() + "%" : null)
+	            , (StringUtils.isNotEmpty(criteriRicerca.getChiave4()) ? criteriRicerca.getChiave4() + "%" : null)
+	            , (StringUtils.isNotEmpty(criteriRicerca.getChiave5()) ? criteriRicerca.getChiave5() + "%" : null)
+	            , criteriRicerca.getIdOperatore()
+	            , criteriRicerca.getMittente()
+	            , criteriRicerca.getStato()
+	            , (StringUtils.isNotEmpty(criteriRicerca.getOggetto()) ? "%" + criteriRicerca.getOggetto() + "%" : null)
+	            , (StringUtils.isNotEmpty(criteriRicerca.getTesto()) ? "%" + criteriRicerca.getTesto() + "%" : null)
+	            , null 		// comunicazionePubblica ??? ==> non esiste in DettaglioComunicazioneType
+	            , criteriRicerca.getTipoComunicazione()
+	            , criteriRicerca.getDataPubblicazione()
+	            , criteriRicerca.getModello()
+		);
+	}
+
 	@Override
 	public Boolean isComunicazioneProcessata(String applicativo, long id)
 			throws DataAccessException {
@@ -389,6 +445,19 @@ public class SqlMapComunicazioniDao implements ComunicazioniDao {
 				, applicativo
 				, id
 		);
+	}
+
+	@Override
+	public String getStatoComunicazione(String usernome, String numGara, String bustaType) {
+		return comunicazioniMapper.getStatoComunicazione(usernome, numGara, bustaType);
+	}
+	@Override
+	public String getRichiestaPartecipazione(String username, String ngara) {
+		DigoggType richiesta = comunicazioniMapper.getRichiestaPartecipazione(username, ngara);
+
+		return richiesta != null
+				? richiesta.getDigogg()
+				: null;
 	}
 
 }

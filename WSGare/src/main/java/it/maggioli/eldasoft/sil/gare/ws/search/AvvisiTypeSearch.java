@@ -20,11 +20,13 @@ import java.util.Date;
         "dataPubblicazioneA",
         "dataScadenzaDa",
         "dataScadenzaA",
+        "stato",
         "altriSoggetti",
         "numAnniPubblicazione",
         "isGreen",
         "isRecycle",
         "isPnrr",
+        "tipoAvvisoGenerale",
         "indicePrimoRecord",
         "maxNumRecord"
 })
@@ -49,11 +51,13 @@ public class AvvisiTypeSearch implements Serializable {
     @XmlJavaTypeAdapter(DateAdapter.class)
     @XmlSchemaType(name = "date")
     private Date dataScadenzaA;
+    private String stato;
     private String altriSoggetti;
     private int numAnniPubblicazione;
     private String isGreen;
     private String isRecycle;
     private String isPnrr;
+    private String tipoAvvisoGenerale;
 
     private int indicePrimoRecord;
     private int maxNumRecord;
@@ -113,8 +117,16 @@ public class AvvisiTypeSearch implements Serializable {
     public void setDataScadenzaA(Date dataScadenzaA) {
         this.dataScadenzaA = dataScadenzaA;
     }
+    
+    public String getStato() {
+		return stato;
+	}
 
-    public String getAltriSoggetti() {
+	public void setStato(String stato) {
+		this.stato = stato;
+	}
+
+	public String getAltriSoggetti() {
         return altriSoggetti;
     }
 
@@ -154,7 +166,15 @@ public class AvvisiTypeSearch implements Serializable {
 		this.isPnrr = isPnrr;
 	}
 
-    public int getIndicePrimoRecord() {
+	public String getTipoAvvisoGenerale() {
+		return tipoAvvisoGenerale;
+	}
+
+	public void setTipoAvvisoGenerale(String tipoAvvisoGenerale) {
+		this.tipoAvvisoGenerale = tipoAvvisoGenerale;
+	}
+
+	public int getIndicePrimoRecord() {
         return indicePrimoRecord;
     }
 

@@ -6,15 +6,18 @@
 	<resultMap id="resultGetDocumentoDigitale" type="it.maggioli.eldasoft.gene.ws.FileType">
 		<result property="file" column="contfile" jdbcType="BINARY"/>
 		<result property="nome" column="nome"/>
+		<result property="url" column="urldoc"/>
+		<result property="bucket_ref" column="bucket_ref"/>
+		<result property="bucket_uuid" column="bucket_uuid"/>
 	</resultMap>
 	
 	<select id="getDocumentoDigitale" parameterType="java.util.HashMap" resultMap="resultGetDocumentoDigitale">
-	SELECT digogg as contfile, dignomdoc as nome 
+	SELECT digogg contfile, dignomdoc nome, urldoc, idstampa, bucket_uuid, bucket_ref
 	FROM v_ws_documenti_digitali
 	WHERE iddocdig = #{id}
 	AND idprg = #{prg}
 	<if test="username == null or username == ''">and usernome IS NULL</if>
-	<if test="username != null and username != ''">and usernome = #{username}</if>
+	<if test="username != null and username != ''">and usernome in(#{username}, #{cryptedUsername})</if>
 	</select>
 
 	<select id="getUsernameDocumentoRiservato" parameterType="java.util.HashMap" resultType="java.lang.String">
@@ -22,8 +25,9 @@
 	FROM v_ws_documenti_digitali dd 
 	     INNER JOIN documgara dg ON (dd.digkey1=dg.codgar and dd.iddocdig=dg.iddocdg)
 	WHERE dg.gruppo = 6
+	AND dd.usernome IS NOT NULL
  	AND dd.iddocdig = #{id}
-	ANd dd.idprg = #{prg}
+	AND dd.idprg = #{prg}
 	</select>
 
 </mapper>

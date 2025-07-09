@@ -140,6 +140,10 @@ public class EsitiManager {
 	public EsitoType getEsito(String codiceGara) {
 		return this.esitiDao.getEsito(codiceGara);
 	}
+	
+	public EsitoType getEsitoByCig(String cig) {
+		return this.esitiDao.getEsitoByCig(cig);
+	}
 
 	public List<LottoGaraType> getLottiGaraConEsito(String codiceGara) {
 		return this.esitiDao.getLottiGaraConEsito(codiceGara);

@@ -68,7 +68,8 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
     "dataUltimoAggiornamento",
     "isGreen",
     "isRecycle",
-    "isPnrr"
+    "isPnrr",
+    "BDNCPAnac"
 })
 public class EsitoType implements Serializable
 {
@@ -104,6 +105,7 @@ public class EsitoType implements Serializable
     protected String isGreen;
     protected String isRecycle;
     protected String isPnrr;
+    protected String BDNCPAnac;
 
     public String getStazioneAppaltante() {
         return stazioneAppaltante;
@@ -247,6 +249,14 @@ public class EsitoType implements Serializable
 
 	public void setIsPnrr(String isPnrr) {
 		this.isPnrr = isPnrr;
+	}
+
+	public String getBDNCPAnac() {
+		return BDNCPAnac;
+	}
+
+	public void setBDNCPAnac(String bDNCPAnac) {
+		BDNCPAnac = bDNCPAnac;
 	}
 	
 }

@@ -1,6 +1,7 @@
 package it.maggioli.eldasoft.sil.aste.db.dao.mybatis;
 
 import it.eldasoft.utils.sql.comp.SqlComposerException;
+import it.maggioli.eldasoft.sil.aste.bl.AsteManager;
 import it.maggioli.eldasoft.sil.aste.db.dao.AsteDao;
 import it.maggioli.eldasoft.sil.aste.db.mapper.AsteMapper;
 import it.maggioli.eldasoft.sil.aste.ws.*;
@@ -95,7 +96,7 @@ public class SqlMapAsteDao implements AsteDao {
 		return asteMapper.getElencoRilanci(
 				  (codiceLotto != null && !codiceLotto.isEmpty() ? codiceLotto : codice)
 				, username
-				, numeroFase
+				, AsteManager.toInt(numeroFase, "Formato non valido per il numero fase")
 		);
 	}
 	
@@ -103,7 +104,7 @@ public class SqlMapAsteDao implements AsteDao {
 	public void insertRilancioAsta(
 			String codice, 
 			String codiceLotto, 
-			DettaglioRilancioType rilancio) {	  	
+			DettaglioRilancioType rilancio) {
 		asteMapper.insertRilancioAsta(
 				  (codiceLotto != null && !codiceLotto.isEmpty() ? codiceLotto : codice)
 				, rilancio.getId()

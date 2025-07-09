@@ -3,7 +3,6 @@ package it.maggioli.eldasoft.sil.stipule.ws;
 
 import it.eldasoft.utils.sql.comp.SqlComposerException;
 import it.maggioli.eldasoft.gene.ws.AllegatoComunicazioneType;
-import it.maggioli.eldasoft.gene.xml.DatetimeAdapter;
 import it.maggioli.eldasoft.sil.stipule.bl.StipuleContrattiManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,8 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import java.util.Date;
 import java.util.List;
 
 @Service
@@ -37,20 +34,17 @@ public class WSStipuleSoapImpl implements WSStipuleSoap {
 			String stazioneAppaltante,
 			String usernome,
 			int indicePrimoRecord,
-	        int maxNumRecord)  
-	{
-		if (LOG.isDebugEnabled())
-			LOG.debug("searchStipuleContratti(" + codiceStipula + "," + oggetto	+ "," + stato
-					+ "): inizio metodo");
+	        int maxNumRecord) {
+		LOG.debug("searchStipuleContratti({}, {}, {}): inizio metodo", codiceStipula, oggetto, stato);
 
 		ElencoStipuleContrattiOutType risultato = new ElencoStipuleContrattiOutType();
 
 		try {
 			int count = this.stipuleContrattiManager.countStipuleContratti(
-					codiceStipula, 
-					oggetto, 
-					stato,
-					stazioneAppaltante
+					codiceStipula
+					, oggetto
+					, stato
+					, stazioneAppaltante
 					, usernome
 			);
 			risultato.setNum(count);
@@ -65,9 +59,7 @@ public class WSStipuleSoapImpl implements WSStipuleSoap {
 			        maxNumRecord);
 			risultato.setElenco(lista);
 		} catch (DataAccessException e) {
-			LOG.error(
-					"Errore inaspettato durante l'interazione con la base dati",
-					e);
+			LOG.error("Errore inaspettato durante l'interazione con la base dati", e);
 			risultato.setErrore(e.getMessage());
 		} catch (SqlComposerException e) {
 			LOG.error("DBMS non supportato o non valido", e);
@@ -81,8 +73,7 @@ public class WSStipuleSoapImpl implements WSStipuleSoap {
 	
 	@Override
 	public GetDettaglioStipulaContrattoOutType getDettaglioStipulaContratto(String codiceStipula, String usernome, boolean pubblicata) {
-		if (LOG.isDebugEnabled())
-			LOG.debug("getDettaglioStipulaContratto(" + codiceStipula + "): inizio metodo");
+		LOG.debug("getDettaglioStipulaContratto({}): inizio metodo", codiceStipula);
 
 		GetDettaglioStipulaContrattoOutType risultato = new GetDettaglioStipulaContrattoOutType();
 
@@ -90,9 +81,7 @@ public class WSStipuleSoapImpl implements WSStipuleSoap {
 			StipulaContrattoType dettaglio = this.stipuleContrattiManager.getDettaglioStipulaContratto(codiceStipula, usernome, pubblicata);
 			risultato.setStipulaContratto(dettaglio);
 		} catch (DataAccessException e) {
-			LOG.error(
-					"Errore inaspettato durante l'interazione con la base dati",
-					e);
+			LOG.error("Errore inaspettato durante l'interazione con la base dati", e);
 			risultato.setErrore(e.getMessage());
 		}
 		LOG.debug("getDettaglioStipulaContratto: fine metodo");
@@ -102,14 +91,9 @@ public class WSStipuleSoapImpl implements WSStipuleSoap {
 	
 		
 	@Override
-	public GetDocumentiRichiestiStipulaContrattoOutType getDocumentiRichiestiStipulaContratto(
-			String idStipula)
-	{
-		if (LOG.isDebugEnabled()) {
-			LOG.debug("getDocumentiRichiestiStipulaContratto(" + idStipula 
-					+ "): inizio metodo");
-		}
-		
+	public GetDocumentiRichiestiStipulaContrattoOutType getDocumentiRichiestiStipulaContratto(String idStipula)	{
+		LOG.debug("getDocumentiRichiestiStipulaContratto({}): inizio metodo", idStipula);
+
 		GetDocumentiRichiestiStipulaContrattoOutType risultato = new GetDocumentiRichiestiStipulaContrattoOutType();
 
 		try {
@@ -117,26 +101,19 @@ public class WSStipuleSoapImpl implements WSStipuleSoap {
 					.getDocumentiRichiestiStipulaContratto(idStipula);
 			risultato.setDocumento(requisiti);
 		} catch (DataAccessException e) {
-			LOG.error(
-					"Errore inaspettato durante l'interazione con la base dati",
-					e);
+			LOG.error("Errore inaspettato durante l'interazione con la base dati", e);
 			risultato.setErrore(e.getMessage());
 		}
 
-		if (LOG.isDebugEnabled())
-			LOG.debug("getDocumentiRichiestiStipulaContratto: fine metodo");
+		LOG.debug("getDocumentiRichiestiStipulaContratto: fine metodo");
 
 		return risultato;
 	}
 
 
 	@Override
-	public GetAllegatoStipulaContrattoOutType getDocumentoStipula(String idDocumento)
-	{
-		if (LOG.isDebugEnabled()) {
-			LOG.debug("getDocumentoStipula(" + idDocumento
-					+ "): inizio metodo");
-		}
+	public GetAllegatoStipulaContrattoOutType getDocumentoStipula(String idDocumento) {
+		LOG.debug("getDocumentoStipula({}): inizio metodo",idDocumento);
 
 		GetAllegatoStipulaContrattoOutType risultato = new GetAllegatoStipulaContrattoOutType();
 
@@ -145,90 +122,65 @@ public class WSStipuleSoapImpl implements WSStipuleSoap {
 					.getDocumentoStipula(idDocumento);
 			risultato.setDocumento(allegato);
 		} catch (DataAccessException e) {
-			LOG.error(
-					"Errore inaspettato durante l'interazione con la base dati",
-					e);
+			LOG.error("Errore inaspettato durante l'interazione con la base dati", e);
 			risultato.setErrore(e.getMessage());
 		}
 
-		if (LOG.isDebugEnabled())
-			LOG.debug("getDocumentiRichiestiStipulaContratto: fine metodo");
+		LOG.debug("getDocumentiRichiestiStipulaContratto: fine metodo");
 
 		return risultato;
 	}
 
 	@Override
-	public String deleteDocumentoStipula(String idDocumento)
-	{
-		if (LOG.isDebugEnabled()) {
-			LOG.debug("deleteDocumentoStipula(" + idDocumento 
-					+ "): inizio metodo");
-		}
-		
+	public String deleteDocumentoStipula(String idDocumento) {
+		LOG.debug("deleteDocumentoStipula({}): inizio metodo", idDocumento);
+
 		try {
 			this.stipuleContrattiManager
 					.deleteDocumentoStipula(idDocumento);
 		} catch (DataAccessException e) {
-			LOG.error(
-					"Errore inaspettato durante l'interazione con la base dati",
-					e);
+			LOG.error("Errore inaspettato durante l'interazione con la base dati", e);
 			return e.getMessage();
 		}
 
-		if (LOG.isDebugEnabled())
-			LOG.debug("deleteDocumentoStipula: fine metodo");
+		LOG.debug("deleteDocumentoStipula: fine metodo");
 		return null;
 
 	}
 	
 	@Override
-	public String insertAllegato(String nomeFile, Long idDocStipula, byte[] allegato, String note,String firmacheck, 
-			@XmlJavaTypeAdapter(DatetimeAdapter.class)
-			Date firmacheckts) {
-		if (LOG.isDebugEnabled()) {
-			LOG.debug("insertAllegato(" + nomeFile + "," + idDocStipula 
-					+ "): inizio metodo");
-		}
-		
+	public String insertAllegato(
+			Long idDocStipula
+			, AllegatoComunicazioneType allegato
+			, String note
+	) {
+		LOG.debug("insertAllegato({}, {}, {}): inizio metodo", idDocStipula, allegato.getNomeFile(), note);
+
 		try {
-			
-			LOG.info("firmacheck: "+firmacheck);
-			LOG.info("firmacheckts: "+firmacheckts);
-			
-			this.stipuleContrattiManager
-					.insertAllegato(nomeFile, idDocStipula, allegato, note, firmacheck, firmacheckts);
+			LOG.debug("firmacheck: {}; firmacheckts: {};", allegato.getFirmacheckts(), allegato.getFirmacheckts());
+
+			stipuleContrattiManager.insertAllegato(idDocStipula, allegato, note);
 		} catch (DataAccessException e) {
-			LOG.error(
-					"Errore inaspettato durante l'interazione con la base dati",
-					e);
+			LOG.error("Errore inaspettato durante l'interazione con la base dati", e);
 			return e.getMessage();
 		}
 
-		if (LOG.isDebugEnabled())
-			LOG.debug("insertAllegato: fine metodo");
+		LOG.debug("insertAllegato: fine metodo");
 		return null;
-
 	}
 	
 	@Override
 	public String updateStipula(String idStipula, String username) throws DataAccessException {
-		if (LOG.isDebugEnabled()) {
-			LOG.debug("updateStipula(" + idStipula + "," + username 
-					+ "): inizio metodo");
-		}
-		
+		LOG.debug("updateStipula({}, {}): inizio metodo", idStipula, username);
+
 		try {
-			this.stipuleContrattiManager
-					.updateStipula(idStipula, username);
+			this.stipuleContrattiManager.updateStipula(idStipula, username);
 		} catch (DataAccessException e) {
-			LOG.error(
-					"Errore inaspettato durante l'interazione con la base dati",
-					e);
+			LOG.error("Errore inaspettato durante l'interazione con la base dati", e);
 			return e.getMessage();
 		}
 
-		if (LOG.isDebugEnabled())
-			LOG.debug("updateStipula: fine metodo");
+		LOG.debug("updateStipula: fine metodo");
 		return null;
 	}
 	

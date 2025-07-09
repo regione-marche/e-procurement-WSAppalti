@@ -85,10 +85,10 @@
 			   #{item}
 			 </foreach>
   		</if>
-  		<if test="dataScadenzaDa != null and dataScadenzaDa != ''">AND
+  		<if test="dataScadenzaDa != null">AND
   			 ppa.DATASCADENZA &gt;= #{dataScadenzaDa} 
   		</if>
-  		<if test="dataScadenzaA != null and dataScadenzaA != ''">AND
+  		<if test="dataScadenzaA != null">AND
   			 ppa.DATASCADENZA &lt; #{dataScadenzaA}  
   		</if>
   	</select>
@@ -128,10 +128,10 @@
 			   #{item}
 			 </foreach>
   		</if>
-  		<if test="dataScadenzaDa != null and dataScadenzaDa != ''">AND
+  		<if test="dataScadenzaDa != null">AND
   			 ppa.DATASCADENZA &gt;= #{dataScadenzaDa} 
   		</if>
-  		<if test="dataScadenzaA != null and dataScadenzaA != ''">AND
+  		<if test="dataScadenzaA != null">AND
   			 ppa.DATASCADENZA &lt; #{dataScadenzaA}  
   		</if>
   	</select>
@@ -169,12 +169,10 @@
   		SELECT prp.codice,prp.oggetto,prp.sa,prp.cig,prp.usernome
   		FROM v_ws_pagopa_rif_proc prp
   		WHERE (prp.usernome is null or prp.usernome = #{usernome})
-		<trim prefix=" " suffixOverrides=" AND ">
-			<if test="codice != null and codice != ''">prp.codice = #{codice} AND</if>
-			<if test="oggetto != null and oggetto != ''">prp.oggetto = #{oggetto} AND</if>
-			<if test="sa != null and sa != ''">prp.sa = #{sa} AND</if>
-			<if test="cig != null and cig != ''">prp.cig = #{cig} AND</if>
-		</trim>
+		<if test="codice != null and codice != ''">AND prp.codice = #{codice} </if>
+		<if test="oggetto != null and oggetto != ''">AND prp.oggetto = #{oggetto} </if>
+		<if test="sa != null and sa != ''">AND prp.sa = #{sa} </if>
+		<if test="cig != null and cig != ''">AND prp.cig = #{cig} </if>
 	</select>
   	<select id="getRiferimentoProcedura" parameterType="it.maggioli.eldasoft.sil.pagopa.ws.RiferimentoFilterInType" resultType="it.maggioli.eldasoft.sil.pagopa.entities.PagopaRiferimentoProcedura">
   		SELECT prp.codice,prp.oggetto,prp.sa,prp.cig,prp.usernome
@@ -211,7 +209,7 @@
 		SET
 		<trim prefix=" " suffixOverrides=",">
 			<!-- Il trim server per rendere dinamico il settaggio dei valori  -->
-			<if test="codigara != null and codicegara != ''">codicegara = #{codicegara},</if>
+			<if test="codicegara != null and codicegara != ''">codicegara = #{codicegara},</if>
 			<if test="codimp != null and codimp != ''">codimp = #{codimp},</if>
 			<if test="username != null and username != ''">username = #{username},</if>
 			<if test="dcreazione != null and dcreazione != ''">dcreazione = #{dcreazione},</if>

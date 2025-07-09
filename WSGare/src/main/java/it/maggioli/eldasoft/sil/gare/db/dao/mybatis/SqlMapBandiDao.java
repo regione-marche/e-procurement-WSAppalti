@@ -1,5 +1,4 @@
 /*
- * Created on 06/lug/10
  *
  * Copyright (c) EldaSoft S.p.A.
  * Tutti i diritti sono riservati.
@@ -10,20 +9,15 @@
  */
 package it.maggioli.eldasoft.sil.gare.db.dao.mybatis;
 
+import it.eldasoft.utils.sicurezza.FactoryCriptazioneByte;
+import it.eldasoft.utils.sicurezza.ICriptazioneByte;
 import it.eldasoft.utils.sql.comp.SqlComposer;
 import it.eldasoft.utils.sql.comp.SqlComposerException;
 import it.eldasoft.utils.sql.comp.SqlManager;
 import it.maggioli.eldasoft.sil.gare.bl.BandiManager;
 import it.maggioli.eldasoft.sil.gare.db.dao.BandiDao;
 import it.maggioli.eldasoft.sil.gare.db.mapper.BandiMapper;
-import it.maggioli.eldasoft.sil.gare.db.vo.AttributoAggiuntivoOfferta;
-import it.maggioli.eldasoft.sil.gare.db.vo.ComunicazioneLotto;
-import it.maggioli.eldasoft.sil.gare.db.vo.CriterioValutazioneOffertaLotto;
-import it.maggioli.eldasoft.sil.gare.db.vo.DocumentazioneRichiestaLotto;
-import it.maggioli.eldasoft.sil.gare.db.vo.DocumentoAllegatoLotto;
-import it.maggioli.eldasoft.sil.gare.db.vo.EspletGaraOperatoreLotto;
-import it.maggioli.eldasoft.sil.gare.db.vo.RequisitoRichiestoLotto;
-import it.maggioli.eldasoft.sil.gare.db.vo.SoggettoAderenteLotto;
+import it.maggioli.eldasoft.sil.gare.db.vo.*;
 import it.maggioli.eldasoft.sil.gare.ws.*;
 import it.maggioli.eldasoft.sil.gare.ws.search.GaraTypeSearch;
 import it.maggioli.eldasoft.wsOperazioniGenerali.daticomuni.DatoCodificatoType;
@@ -33,14 +27,17 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.List;
+import javax.crypto.Cipher;
+import javax.crypto.spec.SecretKeySpec;
 
-import static it.maggioli.eldasoft.sil.gare.util.DAOUtils.*;
+import java.net.URI;
+import java.net.URLEncoder;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import static it.maggioli.eldasoft.sil.gare.util.DAOUtils.getBounds;
+import static it.maggioli.eldasoft.sil.gare.util.DAOUtils.toWithPercentAndUpper;
 
 
 /**
@@ -58,6 +55,18 @@ public class SqlMapBandiDao implements BandiDao {
 	@Autowired
 	private BandiMapper bandiMapper;
 
+	// BIC NAMIRIAL
+	public static final int DURATA_TOKEN_DEFAULT 						= 3;  // gg
+	public static final String INTEGRAZIONE_BIC_CHIAVE_TOKEN 			= "integrazionebic.chiavetoken";
+	public static final String INTEGRAZIONE_BIC_DURATA_TOKEN 			= "integrazionebic.duratatoken";
+	public static final String PROP_TIPOLOGIA_CIFRATURA_DATI			= "it.eldasoft.cifraturaPassword.algoritmo";
+	
+	private static SimpleDateFormat YYYYMMDD = new SimpleDateFormat("YYYYMMDD");
+
+	private static String formatYYYYMMDDHHMM(Date data, String ora) {
+		return (data != null ? YYYYMMDD.format(data) : "") + " " + (StringUtils.isNotEmpty(ora) ? ora : "");
+	}
+
     @Override
 	public String getAppaltiVersion()
 		throws DataAccessException {
@@ -70,20 +79,17 @@ public class SqlMapBandiDao implements BandiDao {
 		return bandiMapper.getElencoStazioniAppaltanti();
     }
     
-    
 	@Override
 	public List<DatoCodificatoType> getElencoStazioniAppaltantiL190()
 		throws DataAccessException {
 		return bandiMapper.getElencoStazioniAppaltantiL190();
     }
-
     
     @Override
 	public List<DatoCodificatoType> getStatiGara() throws DataAccessException {
 		return bandiMapper.getStatiGara();
     }
 
-    
     @Override
 	public List<DatoCodificatoType> getEsitiGara() throws DataAccessException {
 		return bandiMapper.getEsitiGara();
@@ -104,15 +110,18 @@ public class SqlMapBandiDao implements BandiDao {
 				, filtri.getDataPubblicazioneA()
 				, filtri.getDataScadenzaDa()
 				, filtri.getDataScadenzaA()
-				, filtri.getProceduraTelematica()
+				, BandiManager.boolToInt(filtri.getProceduraTelematica())
 				, BandiManager.toInt(filtri.getStato(), "Formato non valido per lo stato")
+				, filtri.getEsito()
 				, BandiManager.toInt(filtri.getAltriSoggetti(), "Formato non valido per altri soggetti")
-				, filtri.getSommaUrgenza()
+				, BandiManager.boolToInt(filtri.getSommaUrgenza())
+				, filtri.getVisualizzaNegoziate()
+				, filtri.getGaraPrivatistica()
 				, filtri.getIsGreen()
 				, filtri.getIsRecycle()
 				, filtri.getIsPnrr()
 				, toWithPercentAndUpper(filtri.getCodice())
-				, filtri.getOrderCriteria().getSqlCriteriaValue()
+				, (filtri.getOrderCriteria() != null ? filtri.getOrderCriteria().getSqlCriteriaValue() : null)
 				, getBounds(filtri.getIndicePrimoRecord(), filtri.getMaxNumRecord())
 		);
 	}
@@ -132,10 +141,13 @@ public class SqlMapBandiDao implements BandiDao {
 				, filtri.getDataPubblicazioneA()
 				, filtri.getDataScadenzaDa()
 				, filtri.getDataScadenzaA()
-				, filtri.getProceduraTelematica()
+				, BandiManager.boolToInt(filtri.getProceduraTelematica())
 				, BandiManager.toInt(filtri.getStato(), "Formato non valido per lo stato")
+				, filtri.getEsito()
 				, BandiManager.toInt(filtri.getAltriSoggetti(), "Formato non valido per altri soggetti")
-				, filtri.getSommaUrgenza()
+				, BandiManager.boolToInt(filtri.getSommaUrgenza())
+				, filtri.getVisualizzaNegoziate()
+				, filtri.getGaraPrivatistica()
 				, filtri.getIsGreen()
 				, filtri.getIsRecycle()
 				, filtri.getIsPnrr()
@@ -157,16 +169,16 @@ public class SqlMapBandiDao implements BandiDao {
 				, filtri.getDataPubblicazioneA()
 				, filtri.getDataScadenzaDa()
 				, filtri.getDataScadenzaA()
-				, filtri.getProceduraTelematica()
+				, BandiManager.boolToInt(filtri.getProceduraTelematica())
 				, BandiManager.toInt(filtri.getStato(), "Formato non valido per il tipo appalto")
 				, BandiManager.toInt(filtri.getAltriSoggetti(), "Formato non valido per lo stato")
-				, filtri.getSommaUrgenza()
+				, BandiManager.boolToInt(filtri.getSommaUrgenza())
 				, filtri.getGaraPrivatistica()
 				, filtri.getIsGreen()
 				, filtri.getIsRecycle()
 				, filtri.getIsPnrr()
 				, toWithPercentAndUpper(filtri.getCodice())
-				, filtri.getOrderCriteria().getSqlCriteriaValue()
+				, (filtri.getOrderCriteria() != null ? filtri.getOrderCriteria().getSqlCriteriaValue() : null)
 				, getBounds(filtri.getIndicePrimoRecord(), filtri.getMaxNumRecord())
 		);
 	}
@@ -185,10 +197,10 @@ public class SqlMapBandiDao implements BandiDao {
 				, filtri.getDataPubblicazioneA()
 				, filtri.getDataScadenzaDa()
 				, filtri.getDataScadenzaA()
-				, filtri.getProceduraTelematica()
+				, BandiManager.boolToInt(filtri.getProceduraTelematica())
 				, BandiManager.toInt(filtri.getStato(), "Formato non valido per il tipo appalto")
 				, BandiManager.toInt(filtri.getAltriSoggetti(), "Formato non valido per lo stato")
-				, filtri.getSommaUrgenza()
+				, BandiManager.boolToInt(filtri.getSommaUrgenza())
 				, filtri.getGaraPrivatistica()
 				, filtri.getIsGreen()
 				, filtri.getIsRecycle()
@@ -212,18 +224,18 @@ public class SqlMapBandiDao implements BandiDao {
 				, filtri.getDataPubblicazioneA()
 				, filtri.getDataScadenzaDa()
 				, filtri.getDataScadenzaA()
-				, filtri.getProceduraTelematica()
+				, BandiManager.boolToInt(filtri.getProceduraTelematica())
 				, BandiManager.toInt(filtri.getStato(), "Formato non valido per il tipo appalto")
 				, filtri.getEsito()
 				, BandiManager.toInt(filtri.getAltriSoggetti(), "Formato non valido per lo stato")
-				, filtri.getSommaUrgenza()
+				, BandiManager.boolToInt(filtri.getSommaUrgenza())
 				, filtri.getVisualizzaNegoziate()
 				, filtri.getGaraPrivatistica()
 				, filtri.getIsGreen()
 				, filtri.getIsRecycle()
 				, filtri.getIsPnrr()
 				, toWithPercentAndUpper(filtri.getCodice())
-				, filtri.getOrderCriteria().getSqlCriteriaValue()
+				, (filtri.getOrderCriteria() != null ? filtri.getOrderCriteria().getSqlCriteriaValue() : null)
 				, getBounds(filtri.getIndicePrimoRecord(), filtri.getMaxNumRecord())
 		);
 	}
@@ -243,11 +255,11 @@ public class SqlMapBandiDao implements BandiDao {
 				, filtri.getDataPubblicazioneA()
 				, filtri.getDataScadenzaDa()
 				, filtri.getDataScadenzaA()
-				, filtri.getProceduraTelematica()
+				, BandiManager.boolToInt(filtri.getProceduraTelematica())
 				, BandiManager.toInt(filtri.getStato(), "Formato non valido per il tipo appalto")
 				, filtri.getEsito()
 				, BandiManager.toInt(filtri.getAltriSoggetti(), "Formato non valido per lo stato")
-				, filtri.getSommaUrgenza()
+				, BandiManager.boolToInt(filtri.getSommaUrgenza())
 				, filtri.getVisualizzaNegoziate()
 				, filtri.getGaraPrivatistica()
 				, filtri.getIsGreen()
@@ -304,36 +316,45 @@ public class SqlMapBandiDao implements BandiDao {
 		);
     }
 
+    @Override
+	public GaraType getBandoByCig(String cig) throws DataAccessException {
+		return bandiMapper.getBandoByCig(
+				  cig
+		);
+    }
     
     @Override
 	public List<DocumentoAllegatoType> getDocumentiBandoLotto(
 	    String codiceGara, String codiceLotto) throws DataAccessException {
-		return bandiMapper.getDocumentiBandoLotto(
-				  codiceGara
-				, codiceLotto
-		);
-    }
-    
+    	return toDocumentiAllegati(
+    			bandiMapper.getDocumentiBandoLotto(
+    					codiceGara
+    					, codiceLotto
+    			) 
+    	);
+    }    
     
     @Override
 	public List<DocumentoAllegatoType> getDocumentiInvitoLotto(
 	    String codiceGara, String codiceLotto) throws DataAccessException {
-		return bandiMapper.getDocumentiInvitoLotto(
-				  codiceGara
-				, codiceLotto
-		);
+    	return toDocumentiAllegati(
+    			bandiMapper.getDocumentiInvitoLotto(
+    					codiceGara
+    					, codiceLotto
+				)
+    	);
 	}
-
     
     @Override
 	public List<DocumentoAllegatoType> getDocumentiInvitoAstaLotto(
 	    String codiceGara, String codiceLotto) throws DataAccessException {
-		return bandiMapper.getDocumentiInvitoAstaLotto(
-				  codiceGara
-				, codiceLotto
-		);
+    	return toDocumentiAllegati(
+    			bandiMapper.getDocumentiInvitoAstaLotto(
+    					codiceGara
+    					, codiceLotto
+    			)
+    	);
     }
-
     
     @Override
 	public List<RequisitoRichiestoType> getRequisitiRichiestiBandoLotto(
@@ -344,8 +365,7 @@ public class SqlMapBandiDao implements BandiDao {
 		);
     }
     
-    /** Ottimizzazione vedi getDettaglioGara */
-    
+    /** Ottimizzazione vedi getDettaglioGara */    
     @Override
 	public List<RequisitoRichiestoLotto> getRequisitiRichiestiBando(
 	    String codiceGara) throws DataAccessException {
@@ -353,7 +373,6 @@ public class SqlMapBandiDao implements BandiDao {
 				  codiceGara
 		);
     }
-
     
     @Override
 	public List<LottoGaraType> getLottiGara(String codiceGara)
@@ -361,14 +380,13 @@ public class SqlMapBandiDao implements BandiDao {
 		return bandiMapper.getLottiGara(codiceGara);
     }
 
-    /** Ottimizzazione vedi getDettaglioGara */
-    
+    /** Ottimizzazione vedi getDettaglioGara */    
     @Override
-	public List<DocumentoAllegatoLotto> getDocumentiGara(String codiceGara)
-	    throws DataAccessException {
-		return bandiMapper.getDocumentiGara(codiceGara);
+	public List<DocumentoAllegatoLotto> getDocumentiGara(String codiceGara) throws DataAccessException {
+    	return toDocumentiAllegatiLotto(
+    			bandiMapper.getDocumentiGara(codiceGara)
+    	);
     }
-
 	
 	@Override
 	public List<LottoGaraType> getLottiGaraPerDomandePartecipazione(
@@ -378,7 +396,6 @@ public class SqlMapBandiDao implements BandiDao {
 				, progressivoOfferta
 		);
 	}
-
 	
 	@Override
 	public List<LottoGaraType> getLottiGaraPerRichiesteOfferta(String username,
@@ -389,7 +406,6 @@ public class SqlMapBandiDao implements BandiDao {
 				, progressivoOfferta
 		);
 	}
-
 	
 	@Override
 	public List<LottoGaraType> getLottiGaraPlicoUnicoPerRichiesteOfferta(String username,
@@ -400,7 +416,6 @@ public class SqlMapBandiDao implements BandiDao {
 				, progressivoOfferta
 		);
 	}
-
 	
 	@Override
 	public List<LottoGaraType> getLottiGaraPerRichiesteCheckDocumentazione(
@@ -410,14 +425,12 @@ public class SqlMapBandiDao implements BandiDao {
 				, username
 		);
 	}
-
     
     @Override
 	public List<CategoriaGaraType> getCategorieLotto(String codiceLotto)
 	    throws DataAccessException {
 		return bandiMapper.getCategorieLotto(codiceLotto);
     }
-
     
     @Override
 	public List<BandoIscrizioneType> getElencoBandiIscrizione(int genere, String stazioneAppaltante, Boolean isAttivo)
@@ -444,16 +457,13 @@ public class SqlMapBandiDao implements BandiDao {
 				codice
 		);
     }
-
     
     @Override
-	public List<DocumentoAllegatoType> getDocumentiBandoIscrizione(
-	    String codice) throws DataAccessException {
-		return bandiMapper.getDocumentiBandoIscrizione(
-				  codice
-		);
+	public List<DocumentoAllegatoType> getDocumentiBandoIscrizione(String codice) throws DataAccessException {
+    	return toDocumentiAllegati(
+    			bandiMapper.getDocumentiBandoIscrizione(codice)
+    	);
     }
-
 	
 	@Override
 	public List<RequisitoRichiestoType> getRequisitiRichiestiBandoIscrizione(
@@ -484,22 +494,24 @@ public class SqlMapBandiDao implements BandiDao {
 			boolean soccorsoIstruttorio,
 			String entita,
 			int indicePrimoRecord, int maxNumRecord,
-			String stazioneAppaltante) {
+			String stazioneAppaltante,
+			String cryptedUsername
+	) {
 		return bandiMapper.getComunicazioniRicevute(
 				  username
 				, codice
 				, dataInvioDa
 				, dataInvioA
 				, stazioneAppaltante
-				, soccorsoIstruttorio ? "1" : ""
+				, (soccorsoIstruttorio ? 1 : null)
 				, entita
 				, "GARE".equalsIgnoreCase(entita) ? "TORN" : ""
+				, cryptedUsername
 				, getBounds(indicePrimoRecord, maxNumRecord)
 		);
 	}
 	
-	/** Ottimizzazione vedi getDettaglioGara */
-	
+	/** Ottimizzazione vedi getDettaglioGara */	
 	@Override
 	public List<ComunicazioneLotto> getComunicazioniPubblicheRicevute(
 			String applicativo, 
@@ -531,7 +543,7 @@ public class SqlMapBandiDao implements BandiDao {
 				, dataInvioA
 				, entita
 				, stazioneAppaltante
-				, soccorsoIstruttorio ? "1" : ""
+				, (soccorsoIstruttorio ? 1 : null)
 				, getBounds(indicePrimoRecord, maxNumRecord)
 		);
 	}
@@ -561,7 +573,9 @@ public class SqlMapBandiDao implements BandiDao {
 			boolean soccorsoIstruttorio,
 			String entita,
 			boolean soloDaLeggere,
-			String stazioneAppaltante) {
+			String stazioneAppaltante,
+			String cryptedUsername
+	) {
 		return bandiMapper.countComunicazioniRicevute(
 				  username
 				, codice
@@ -570,9 +584,32 @@ public class SqlMapBandiDao implements BandiDao {
 				, dataInvioA
 				, soloDaLeggere
 				, stazioneAppaltante
-				, soccorsoIstruttorio ? "1" : ""
+				, (soccorsoIstruttorio ? 1 : null)
 				, entita
 				, "GARE".equalsIgnoreCase(entita) ? "TORN" : ""
+				, cryptedUsername
+		);
+	}
+	
+	// versione ottimizzata
+	@Override
+	public List<StatisticheComunicazioni> countComunicazioniRicevuteFull(
+			String username, 
+			String codice,
+			String codice2,
+			Date dataInvioDa, 
+			String entita,
+			String stazioneAppaltante,
+			String cryptedUsername) {
+		return bandiMapper.countComunicazioniRicevuteFull(
+				  username
+				, codice
+				, codice2
+				, dataInvioDa 
+				, stazioneAppaltante
+				, entita
+				, "GARE".equalsIgnoreCase(entita) ? "TORN" : ""
+				, cryptedUsername
 		);
 	}
 
@@ -592,7 +629,7 @@ public class SqlMapBandiDao implements BandiDao {
 				, dataInvioA
 				, soloDaLeggere
 				, stazioneAppaltante
-				, soccorsoIstruttorio ? "1" : ""
+				, (soccorsoIstruttorio ? 1 : null)
 				, entita
 		);
 	}
@@ -614,11 +651,12 @@ public class SqlMapBandiDao implements BandiDao {
 	}
 	
 	@Override
-	public List<DocumentoAllegatoType> getDocumentiComunicazione(
-			String applicativo, Long id) throws DataAccessException {
-		return bandiMapper.getDocumentiComunicazione(
-				  applicativo
-				, id
+	public List<DocumentoAllegatoType> getDocumentiComunicazione(String applicativo, Long id) throws DataAccessException {
+		return toDocumentiAllegati(
+				bandiMapper.getDocumentiComunicazione(
+						applicativo
+						, id
+				)
 		);
 	}
 	
@@ -628,18 +666,28 @@ public class SqlMapBandiDao implements BandiDao {
 	public List<DocumentoAllegatoLotto> getDocumentiComunicazioniPubblicheRicevute(
 			String applicativo, 
 			String codice
-			/*,String entita ???*/) throws DataAccessException {
-		return bandiMapper.getDocumentiComunicazioniPubblicheRicevute(
-				  applicativo
-				, codice
-				, "$" + codice
+			/*,String entita ???*/) throws DataAccessException 
+	{
+		return toDocumentiAllegatiLotto(
+				bandiMapper.getDocumentiComunicazioniPubblicheRicevute(
+						applicativo
+						, codice
+						, "$" + codice
+				)
 		);
 	}
 
 	@Override
-	public ComunicazioneType getComunicazioneRicevuta(String username, Long id, Long idDestinatario, String idprg) {
+	public ComunicazioneType getComunicazioneRicevuta(
+			String username
+			, String cryptedUsername
+			, Long id
+			, Long idDestinatario
+			, String idprg
+	) {
 		return bandiMapper.getComunicazioneRicevuta(
 				  username
+				, cryptedUsername
 				, id, idDestinatario
 				, idprg
 		);
@@ -653,7 +701,6 @@ public class SqlMapBandiDao implements BandiDao {
 				, idprg
 		);
 	}
-
 	
 	@Override
 	public List<InvioType> getElencoInvii(String username, String codice,
@@ -688,7 +735,6 @@ public class SqlMapBandiDao implements BandiDao {
 	}	
 	
 	/** Ottimizzazione vedi getDettaglioGara */
-	
 	@Override
 	public List<DocumentazioneRichiestaLotto> getDocumentiRichiestiBando(
 			String codiceGara, Integer tipoImpresa, boolean rti) 
@@ -708,7 +754,6 @@ public class SqlMapBandiDao implements BandiDao {
 				, SqlMapBandiDao.getTipoImpresaPartecipazione(tipoImpresa, rti)
 		);
 	}
-
 	
 	@Override
 	public List<DocumentazioneRichiestaType> getDocumentiRichiestiRinnovoIscrizione(
@@ -743,6 +788,7 @@ public class SqlMapBandiDao implements BandiDao {
 		Date now = new Date();
 		return bandiMapper.getElencoBandiPerRichiesteOfferta(
 				filtri.getTokenRichiedente()
+				, filtri.getCryptedUsername()
 				, now
 				, filtri.getStazioneAppaltante()
 				, composer.getFunzioneUpperCase()
@@ -753,16 +799,16 @@ public class SqlMapBandiDao implements BandiDao {
 				, filtri.getDataPubblicazioneA()
 				, filtri.getDataScadenzaDa()
 				, filtri.getDataScadenzaA()
-				, filtri.getProceduraTelematica()
+				, BandiManager.boolToInt(filtri.getProceduraTelematica())
 				, BandiManager.toInt(filtri.getStato(), "Formato non valido per il tipo appalto")
 				, BandiManager.toInt(filtri.getAltriSoggetti(), "Formato non valido per lo stato")
-				, filtri.getSommaUrgenza()
+				, BandiManager.boolToInt(filtri.getSommaUrgenza())
 				, filtri.getGaraPrivatistica()
 				, filtri.getIsGreen()
 				, filtri.getIsRecycle()
 				, filtri.getIsPnrr()
 				, toWithPercentAndUpper(filtri.getCodice())
-				, filtri.getOrderCriteria().getSqlCriteriaValue()
+				, (filtri.getOrderCriteria() != null ? filtri.getOrderCriteria().getSqlCriteriaValue() : null)
 				, getBounds(filtri.getIndicePrimoRecord(), filtri.getMaxNumRecord())
 		);
     }
@@ -774,6 +820,7 @@ public class SqlMapBandiDao implements BandiDao {
 		Date now = new Date();
 		return bandiMapper.countElencoBandiPerRichiesteOfferta(
 				filtri.getTokenRichiedente()
+				, filtri.getCryptedUsername()
 				, now
 				, filtri.getStazioneAppaltante()
 				, composer.getFunzioneUpperCase()
@@ -784,10 +831,10 @@ public class SqlMapBandiDao implements BandiDao {
 				, filtri.getDataPubblicazioneA()
 				, filtri.getDataScadenzaDa()
 				, filtri.getDataScadenzaA()
-				, filtri.getProceduraTelematica()
+				, BandiManager.boolToInt(filtri.getProceduraTelematica())
 				, BandiManager.toInt(filtri.getStato(), "Formato non valido per il tipo appalto")
 				, BandiManager.toInt(filtri.getAltriSoggetti(), "Formato non valido per lo stato")
-				, filtri.getSommaUrgenza()
+				, BandiManager.boolToInt(filtri.getSommaUrgenza())
 				, filtri.getGaraPrivatistica()
 				, filtri.getIsGreen()
 				, filtri.getIsRecycle()
@@ -811,16 +858,16 @@ public class SqlMapBandiDao implements BandiDao {
 				, filtri.getDataPubblicazioneA()
 				, filtri.getDataScadenzaDa()
 				, filtri.getDataScadenzaA()
-				, filtri.getProceduraTelematica()
+				, BandiManager.boolToInt(filtri.getProceduraTelematica())
 				, BandiManager.toInt(filtri.getStato(), "Formato non valido per il tipo appalto")
 				, BandiManager.toInt(filtri.getAltriSoggetti(), "Formato non valido per lo stato")
-				, filtri.getSommaUrgenza()
+				, BandiManager.boolToInt(filtri.getSommaUrgenza())
 				, filtri.getIsGreen()
 				, filtri.getIsRecycle()
 				, filtri.getIsPnrr()
 				, toWithPercentAndUpper(filtri.getCodice())
 			  	, filtri.getGaraPrivatistica()
-				, filtri.getOrderCriteria().getSqlCriteriaValue()
+				, (filtri.getOrderCriteria() != null ? filtri.getOrderCriteria().getSqlCriteriaValue() : null)
 				, getBounds(filtri.getIndicePrimoRecord(), filtri.getMaxNumRecord())
 		);
     }
@@ -840,10 +887,10 @@ public class SqlMapBandiDao implements BandiDao {
 				, filtri.getDataPubblicazioneA()
 				, filtri.getDataScadenzaDa()
 				, filtri.getDataScadenzaA()
-				, filtri.getProceduraTelematica()
+				, BandiManager.boolToInt(filtri.getProceduraTelematica())
 				, BandiManager.toInt(filtri.getStato(), "Formato non valido per il tipo appalto")
 				, BandiManager.toInt(filtri.getAltriSoggetti(), "Formato non valido per lo stato")
-				, filtri.getSommaUrgenza()
+				, BandiManager.boolToInt(filtri.getSommaUrgenza())
 				, filtri.getIsGreen()
 				, filtri.getIsRecycle()
 				, filtri.getIsPnrr()
@@ -869,16 +916,16 @@ public class SqlMapBandiDao implements BandiDao {
 				, filtri.getDataPubblicazioneA()
 				, filtri.getDataScadenzaDa()
 				, filtri.getDataScadenzaA()
-				, filtri.getProceduraTelematica()
+				, BandiManager.boolToInt(filtri.getProceduraTelematica())
 				, BandiManager.toInt(filtri.getStato(), "Formato non valido per lo stato")
 				, BandiManager.toInt(filtri.getAltriSoggetti(), "Formato non valido per altri soggetti")
-				, filtri.getSommaUrgenza()
+				, BandiManager.boolToInt(filtri.getSommaUrgenza())
 				, null
 				, filtri.getIsGreen()
 				, filtri.getIsRecycle()
 				, filtri.getIsPnrr()
 				, toWithPercentAndUpper(filtri.getCodice())
-				, filtri.getOrderCriteria().getSqlCriteriaValue()
+				, (filtri.getOrderCriteria() != null ? filtri.getOrderCriteria().getSqlCriteriaValue() : null)
 				, getBounds(filtri.getIndicePrimoRecord(), filtri.getMaxNumRecord())
 		);
     }
@@ -900,10 +947,10 @@ public class SqlMapBandiDao implements BandiDao {
 				, filtri.getDataPubblicazioneA()
 				, filtri.getDataScadenzaDa()
 				, filtri.getDataScadenzaA()
-				, filtri.getProceduraTelematica()
+				, BandiManager.boolToInt(filtri.getProceduraTelematica())
 				, BandiManager.toInt(filtri.getStato(), "Formato non valido per lo stato")
 				, BandiManager.toInt(filtri.getAltriSoggetti(), "Formato non valido per altri soggetti")
-				, filtri.getSommaUrgenza()
+				, BandiManager.boolToInt(filtri.getSommaUrgenza())
 				, null
 				, filtri.getIsGreen()
 				, filtri.getIsRecycle()
@@ -923,11 +970,12 @@ public class SqlMapBandiDao implements BandiDao {
 
 	@Override
 	public boolean getAbilitazionePresentazioneOfferta(String username,
-			String codice) throws DataAccessException {
+			String codice, String cryptedUsername) throws DataAccessException {
 		return bandiMapper.getAbilitazionePresentazioneOfferta(
 				  username
 				, codice
-		) == 1;
+				, cryptedUsername
+		) >= 1;
 	}
 
 	@Override
@@ -954,7 +1002,6 @@ public class SqlMapBandiDao implements BandiDao {
 		return tipoPartecipazione;
     }
     
-    
     @Override
 	public List<DatoCodificatoType> getElencoStazioniAppaltantiPerIscrizione(
 	    String codice) throws DataAccessException {
@@ -962,7 +1009,6 @@ public class SqlMapBandiDao implements BandiDao {
 				  codice
 		);
     }
-
     
     @Override
 	public List<CategoriaImpresaType> getCategorieImpresaPerIscrizione(
@@ -972,7 +1018,6 @@ public class SqlMapBandiDao implements BandiDao {
 				, codice
 		);
     }
-
 	
 	@Override
 	public List<DatoCodificatoType> getElencoClassificazioniLavoriPerIscrizione()
@@ -995,17 +1040,18 @@ public class SqlMapBandiDao implements BandiDao {
 				, filtri.getDataPubblicazioneA()
 				, filtri.getDataScadenzaDa()
 				, filtri.getDataScadenzaA()
-				, filtri.getProceduraTelematica()
+				, BandiManager.boolToInt(filtri.getProceduraTelematica())
 				, BandiManager.toInt(filtri.getStato(), "Formato non valido per il tipo appalto")
 				, filtri.getEsito()
 				, BandiManager.toInt(filtri.getAltriSoggetti(), "Formato non valido per lo stato")
-				, filtri.getSommaUrgenza()
+				, BandiManager.boolToInt(filtri.getSommaUrgenza())
 				, filtri.getGaraPrivatistica()
 				, filtri.getIsGreen()
 				, filtri.getIsRecycle()
 				, filtri.getIsPnrr()
 				, toWithPercentAndUpper(filtri.getCodice())
-				, filtri.getOrderCriteria().getSqlCriteriaValue()
+				, (filtri.getOrderCriteria() != null ? filtri.getOrderCriteria().getSqlCriteriaValue() : null)
+				, filtri.getCryptedUsername()
 				, getBounds(filtri.getIndicePrimoRecord(), filtri.getMaxNumRecord())
 		);
 	}
@@ -1025,16 +1071,17 @@ public class SqlMapBandiDao implements BandiDao {
 				, filtri.getDataPubblicazioneA()
 				, filtri.getDataScadenzaDa()
 				, filtri.getDataScadenzaA()
-				, filtri.getProceduraTelematica()
+				, BandiManager.boolToInt(filtri.getProceduraTelematica())
 				, BandiManager.toInt(filtri.getStato(), "Formato non valido per il tipo appalto")
 				, filtri.getEsito()
 				, BandiManager.toInt(filtri.getAltriSoggetti(), "Formato non valido per lo stato")
-				, filtri.getSommaUrgenza()
+				, BandiManager.boolToInt(filtri.getSommaUrgenza())
 				, filtri.getGaraPrivatistica()
 				, filtri.getIsGreen()
 				, filtri.getIsRecycle()
 				, filtri.getIsPnrr()
 				, toWithPercentAndUpper(filtri.getCodice())
+				, filtri.getCryptedUsername()
 		);
 	}
 
@@ -1053,16 +1100,16 @@ public class SqlMapBandiDao implements BandiDao {
 				, filtri.getDataPubblicazioneA()
 				, filtri.getDataScadenzaDa()
 				, filtri.getDataScadenzaA()
-				, filtri.getProceduraTelematica()
+				, BandiManager.boolToInt(filtri.getProceduraTelematica())
 				, BandiManager.toInt(filtri.getStato(), "Formato non valido per il tipo appalto")
 				, filtri.getEsito()
 				, BandiManager.toInt(filtri.getAltriSoggetti(), "Formato non valido per lo stato")
-				, filtri.getSommaUrgenza()
+				, BandiManager.boolToInt(filtri.getSommaUrgenza())
 				, filtri.getIsGreen()
 				, filtri.getIsRecycle()
 				, filtri.getIsPnrr()
 				, toWithPercentAndUpper(filtri.getCodice())
-				, filtri.getOrderCriteria().getSqlCriteriaValue()
+				, (filtri.getOrderCriteria() != null ? filtri.getOrderCriteria().getSqlCriteriaValue() : null)
 				, getBounds(filtri.getIndicePrimoRecord(), filtri.getMaxNumRecord())
 		);
 	}
@@ -1082,11 +1129,11 @@ public class SqlMapBandiDao implements BandiDao {
 				, filtri.getDataPubblicazioneA()
 				, filtri.getDataScadenzaDa()
 				, filtri.getDataScadenzaA()
-				, filtri.getProceduraTelematica()
+				, BandiManager.boolToInt(filtri.getProceduraTelematica())
 				, BandiManager.toInt(filtri.getStato(), "Formato non valido per il tipo appalto")
 				, filtri.getEsito()
 				, BandiManager.toInt(filtri.getAltriSoggetti(), "Formato non valido per lo stato")
-				, filtri.getSommaUrgenza()
+				, BandiManager.boolToInt(filtri.getSommaUrgenza())
 				, filtri.getIsGreen()
 				, filtri.getIsRecycle()
 				, filtri.getIsPnrr()
@@ -1151,7 +1198,6 @@ public class SqlMapBandiDao implements BandiDao {
 				  codice
 		);
 	}
-
 	
 	@Override
 	public List<DettaglioStazioneAppaltanteType> getStazioniAppaltanti() {
@@ -1165,7 +1211,6 @@ public class SqlMapBandiDao implements BandiDao {
 				  codice
 		);
 	}
-
 	
 	@Override
 	public List<String> getPuntiIstruttori(String codice) {
@@ -1225,8 +1270,8 @@ public class SqlMapBandiDao implements BandiDao {
 
 	@Override
 	public List<DocumentoAllegatoType> getAttiDocumentiBandoGara(String codiceGara) {
-		return bandiMapper.getAttiDocumentiBandoGara(
-				  codiceGara
+		return toDocumentiAllegati(
+				bandiMapper.getAttiDocumentiBandoGara(codiceGara)
 		);
 	}
 	
@@ -1289,31 +1334,37 @@ public class SqlMapBandiDao implements BandiDao {
 	
 	@Override
 	public List<EspletGaraOperatoreType> getEspletamentoGaraSoccorsiElencoOperatori(
-			String codiceGara, 
-			String codiceLotto,
-			String fase,
-			String tokenRichiedente) throws DataAccessException {
+			String codiceGara
+			, String codiceLotto
+			, String fase
+			, String tokenRichiedente
+			, String cryptedUsername
+	) throws DataAccessException {
 		return bandiMapper.getEspletamentoGaraSoccorsiElencoOperatori(
-				  fase
+				  BandiManager.toInt(fase,  "Formato non valido per la fase")
 				, codiceGara
 				, codiceLotto
 				, tokenRichiedente
+				, cryptedUsername
 		);
 	}
 
 	@Override
 	public List<EspletGaraOperatoreType> getEspletamentoGaraDocAmmElencoOperatori(
-			String codiceGara, String tokenRichiedente) throws DataAccessException {
+			String codiceGara
+			, String tokenRichiedente
+	) throws DataAccessException {
 		return bandiMapper.getEspletamentoGaraDocAmmElencoOperatori(
 				  codiceGara
 				, tokenRichiedente
 		);
 	}
 	
-	
 	@Override
 	public List<EspletGaraOperatoreType> getEspletamentoGaraValTecElencoOperatori(
-			String codiceGara, String tokenRichiedente) throws DataAccessException {
+			String codiceGara
+			, String tokenRichiedente
+	) throws DataAccessException {
 		return bandiMapper.getEspletamentoGaraValTecElencoOperatori(
 				  codiceGara
 				, tokenRichiedente
@@ -1322,7 +1373,9 @@ public class SqlMapBandiDao implements BandiDao {
 
 	@Override
 	public List<EspletGaraOperatoreLotto> getEspletamentoGaraValTecElencoOperatoriLotto(
-			String codiceGara, String tokenRichiedente) throws DataAccessException {
+			String codiceGara
+			, String tokenRichiedente
+	) throws DataAccessException {
 		return bandiMapper.getEspletamentoGaraValTecElencoOperatoriLotto(
 				  codiceGara + "%"
 				, tokenRichiedente
@@ -1331,7 +1384,9 @@ public class SqlMapBandiDao implements BandiDao {
 
 	@Override
 	public List<EspletGaraOperatoreType> getEspletamentoGaraOffEcoElencoOperatori(
-			String codiceGara, String tokenRichiedente) throws DataAccessException {
+			String codiceGara
+			, String tokenRichiedente
+	) throws DataAccessException {
 		return bandiMapper.getEspletamentoGaraOffEcoElencoOperatori(
 				  codiceGara
 				, tokenRichiedente
@@ -1340,17 +1395,20 @@ public class SqlMapBandiDao implements BandiDao {
 
 	@Override
 	public List<EspletGaraOperatoreLotto> getEspletamentoGaraOffEcoElencoOperatoriLotto(
-			String codiceGara, String tokenRichiedente) throws DataAccessException {
+			String codiceGara
+			, String tokenRichiedente
+	) throws DataAccessException {
 		return bandiMapper.getEspletamentoGaraOffEcoElencoOperatoriLotto(
 				  codiceGara + "%"
 				, tokenRichiedente
 		);
 	}
-
 	
 	@Override
 	public List<EspletGaraOperatoreType> getEspletamentoGaraGraduatoriaElencoOperatori(
-			String codiceGara, String tokenRichiedente) throws DataAccessException {
+			String codiceGara
+			, String tokenRichiedente
+	) throws DataAccessException {
 		List<EspletGaraOperatoreType> elenco = bandiMapper.getEspletamentoGaraGraduatoriaElencoOperatori(
 				  codiceGara
 				, tokenRichiedente
@@ -1358,17 +1416,17 @@ public class SqlMapBandiDao implements BandiDao {
 		);
 
 		// prepara l'ordinamento da applicare all'elenco...
-		if(elenco != null && elenco.size() > 0) {
+		if (elenco != null && elenco.size() > 0) {
 			String rical = elenco.get(0).getTipoRibasso();
 			String codmodagg = elenco.get(0).getCodiceModAgg();
 			String orderBy = null;
-			if("17".equalsIgnoreCase(codmodagg)) {
+			if ("17".equalsIgnoreCase(codmodagg)) {
 				// "prezzo piu' basso
 				orderBy = "1";
-			} else if(!"6".equalsIgnoreCase(codmodagg) && 
+			} else if (!"6".equalsIgnoreCase(codmodagg) &&
 				("5".equalsIgnoreCase(codmodagg) || "14".equalsIgnoreCase(codmodagg) || "2".equalsIgnoreCase(rical))) {
 				orderBy = "2";
-			} else if(!"6".equalsIgnoreCase(codmodagg) &&  "1".equalsIgnoreCase(rical)) {
+			} else if (!"6".equalsIgnoreCase(codmodagg) &&  "1".equalsIgnoreCase(rical)) {
 				orderBy = "3";
 			} else {
 				// default
@@ -1384,6 +1442,35 @@ public class SqlMapBandiDao implements BandiDao {
 		return elenco;
 	}
 	
+	@Override
+	public List<EspletGaraOperatoreType> getEspletamentoGaraAccessoDocumentiElencoOperatori(
+			String codiceGara, String tokenRichiedente, boolean aggiudicataria) throws DataAccessException {
+		List<EspletGaraOperatoreType> elenco = bandiMapper.getEspletamentoGaraAccessoDocumentiElencoOperatori(
+				  codiceGara
+				, tokenRichiedente
+				, aggiudicataria ? "1" : "2"
+		);
+		return elenco; 
+	}
+	
+	@Override
+	public List<EspletGaraAccessoDocumentiDocumentoType> getEspletamentoGaraAccessoDocumentiAtti(
+			String codiceGara, String tokenRichiedente) throws DataAccessException {
+		List<EspletGaraAccessoDocumentiDocumentoType> documenti = bandiMapper.getEspletamentoGaraAccessoDocumentiAtti(
+				  codiceGara
+				, tokenRichiedente
+		);
+		return documenti;
+	}
+	
+	@Override
+	public List<EspletGaraLottoType> getEspletamentoGaraAccessoDocumentiLotti(
+			String codiceGara, String tokenRichiedente) throws DataAccessException {
+		return bandiMapper.getEspletamentoGaraAccessoDocumentiLotti(
+				  codiceGara
+				, tokenRichiedente
+		);
+	}
 	
 	@Override
 	public List<EspletGaraLottoType> getEspletamentoGaraLotti(
@@ -1393,7 +1480,6 @@ public class SqlMapBandiDao implements BandiDao {
 				, tokenRichiedente
 		);
 	}
-	
 	
 	@Override
 	public List<EspletGaraDocumentoType> getEspletamentoGaraDocumenti(
@@ -1456,7 +1542,6 @@ public class SqlMapBandiDao implements BandiDao {
 	}
 	
 	/** Ottimizzazione vedi getDettaglioGara */
-	
 	@Override
 	public List<SoggettoAderenteLotto> getSoggettiAderentiLotti(
 			String codiceGara) throws DataAccessException {		
@@ -1483,11 +1568,33 @@ public class SqlMapBandiDao implements BandiDao {
 
 	@Override
 	public List<RettificaGaraType> getRettifichePresentazioneDomandaOfferta(
-			String codiceGara, Integer tipter)throws DataAccessException {	
-		return bandiMapper.getRettifichePresentazioneDomandaOfferta(
+			String codiceGara
+			, Integer tipter
+			, Date dataScadenza
+			, String oraScadenza 
+	)throws DataAccessException {
+		List<RettificaGaraType> rettifiche = bandiMapper.getRettifichePresentazioneDomandaOfferta(
 				  codiceGara
 				, tipter
 		);
+		
+		// rimuovi le righe che non corrispondono ad effettive variazioni dei termini di scadenza...
+		if(rettifiche != null) {
+			rettifiche = rettifiche.stream()
+					// filtra le righe uguali alla data termine di partecipazione/offerta
+					.filter(r -> !formatYYYYMMDDHHMM(dataScadenza, oraScadenza)
+									.equals(formatYYYYMMDDHHMM(r.getDataTermine(), r.getOraTermine())))
+					// rimuovi i duplicati per data termine + ora termine
+	                .collect(Collectors.toMap(
+	                        	r -> formatYYYYMMDDHHMM(r.getDataTermine(), r.getOraTermine()), 
+	                        	r -> r,
+	                        	(existing, replacement) -> existing
+	                ))
+	                .values().stream()
+	                .collect(Collectors.toList());
+		}
+		
+		return rettifiche;
 	}
 	
 	@Override
@@ -1506,7 +1613,6 @@ public class SqlMapBandiDao implements BandiDao {
 	}	
 
 	/** Ottimizzazione vedi getDettaglioGara */
-	
 	@Override
 	public List<CriterioValutazioneOffertaLotto> getCriteriValutazioneLotti(
 			String codiceGara, String tipoBusta) throws DataAccessException {		
@@ -1546,6 +1652,22 @@ public class SqlMapBandiDao implements BandiDao {
 	}
 
 	@Override
+	public List<DocumentoAllegatoLotto> checkDocumentiLotto(
+			String codiceGara, String username, String tipoBusta
+	) throws DataAccessException, SqlComposerException {
+		SqlComposer composer = SqlManager.getComposer(this.dbms);
+
+		return bandiMapper.checkDocumentiNulli(
+				operatoreWinvcomIdCom("i.IDCOM")
+				, composer.getFunzioneUpperCase()
+				, StringUtils.upperCase(codiceGara)
+				, "$" + StringUtils.upperCase(codiceGara)
+				, username
+				, tipoBusta
+		);
+	}
+
+	@Override
 	public List<DocumentoAllegatoLotto> checkDimensioneDocumenti(
 			String codiceGara, String username, String tipoBusta) throws DataAccessException, SqlComposerException {
 		SqlComposer composer = SqlManager.getComposer(this.dbms);
@@ -1570,23 +1692,68 @@ public class SqlMapBandiDao implements BandiDao {
 			String cig, 
 			Date dataPubblicazioneDa, 
 			Date dataPubblicazioneA,
+			String codgara,
 			Boolean sommaUrgenza,
 			int indicePrimoRecord, 
-			int maxNumRecord) throws SqlComposerException, SqlComposerException {
+			int maxNumRecord
+	) throws SqlComposerException, SqlComposerException {
 		SqlComposer composer = SqlManager.getComposer(this.dbms);
-
-		return bandiMapper.getDelibere(
+		
+		List<DeliberaType> delibere = new ArrayList<DeliberaType>();
+				
+		// estrai l'elenco delle delibere ordinato per data pubblicazione
+		List<DeliberaInfo> elenco = bandiMapper.getDelibere(
 				annoInizio
 				, stazioneAppaltante
-				, tipoAppalto
+				, BandiManager.toInt(tipoAppalto, "Formato non valido per il tipo appalto")
 				, composer.getFunzioneUpperCase()
 				, toWithPercentAndUpper(oggetto)
 				, toWithPercentAndUpper(cig)
 				, dataPubblicazioneDa
 				, dataPubblicazioneA
+				, toWithPercentAndUpper(codgara)
 				, Boolean.TRUE.equals(sommaUrgenza) ? 1 : 0
 				, getBounds(indicePrimoRecord, maxNumRecord)
-		);	}
+		);	
+		
+		// prepara l'elenco delle delibere (DelibereType)
+		if(elenco != null && elenco.size() > 0) {
+			elenco.forEach(d -> delibere.add(d.toDeliberaType()));
+		
+			// trova codgar min e max nell'elenco delle gare estratte
+			String codgarDa = delibere.get(0).getCodice();
+			String codgarA = delibere.get(0).getCodice();
+			for(DeliberaType d : delibere) {
+				if(codgarDa.compareToIgnoreCase(d.getCodice()) >= 0)
+					codgarDa = d.getCodice();
+				if(codgarA.compareToIgnoreCase(d.getCodice()) <= 0)
+					codgarA = d.getCodice();
+			};
+			
+			// recupera SOLO i documenti delle delibere estratte 
+			// NB: l'elenco e' in ordine di data pubblicazione discendente!!!
+			elenco.get(0).getDataPubblicazione();
+			List<DocumentoDeliberaType> documenti = bandiMapper.getDocumentiDelibera(null, codgarDa, codgarA);
+			if(documenti != null) {
+				// aggiungi i documenti alle relative delibere
+				documenti.forEach(doc -> {
+					// trova la delibera associata al codice gara
+					// e aggiungi il documento 
+					DeliberaType delibera = delibere.stream()
+							.filter(d -> doc.getCodice().equalsIgnoreCase(d.getCodice()))
+							.findFirst()
+							.orElse(null);
+					if(delibera != null) {
+						if(delibera.getDocumenti() == null)
+							delibera.setDocumenti( new ArrayList<DocumentoDeliberaType>() );
+						delibera.getDocumenti().add(doc);
+					}
+				});
+			}
+		}
+		
+		return delibere;
+	}
 	
 	@Override
 	public int countDelibere(
@@ -1597,22 +1764,43 @@ public class SqlMapBandiDao implements BandiDao {
 			String cig, 
 			Date dataPubblicazioneDa, 
 			Date dataPubblicazioneA,
-			Boolean sommaUrgenza) throws SqlComposerException, SqlComposerException {
+			String codgara,
+			Boolean sommaUrgenza
+	) throws SqlComposerException, SqlComposerException {
 		SqlComposer composer = SqlManager.getComposer(this.dbms);
 
 		return bandiMapper.countDelibere(
 				  annoInizio
 				, stazioneAppaltante
-				, tipoAppalto
+				, BandiManager.toInt(tipoAppalto, "Formato non valido per il tipo appalto")
 				, composer.getFunzioneUpperCase()
 				, toWithPercentAndUpper(oggetto)
 				, toWithPercentAndUpper(cig)
 				, dataPubblicazioneDa
 				, dataPubblicazioneA
-				, Boolean.TRUE.equals(sommaUrgenza) ? 1 : 0
+				, toWithPercentAndUpper(codgara)
+				, (sommaUrgenza != null && sommaUrgenza ? 1 : 0)
 		);
 	}
 
+	@Override
+	public DeliberaType getDettaglioDelibera(String codgara) throws SqlComposerException, SqlComposerException {
+		return bandiMapper.getDettaglioDelibera(codgara);
+	}
+	
+	@Override
+	public List<DocumentoDeliberaType> getDocumentiDelibera(
+			String codgara
+			, String codgaraDa 
+			, String codgaraA
+	) throws SqlComposerException, SqlComposerException {
+		return bandiMapper.getDocumentiDelibera(
+				codgara
+				, codgaraDa 
+				, codgaraA
+		);
+	}
+	
 	@Override
 	public List<SommaUrgenzaType> getElencoSommaUrgenza(
 			String stazioneAppaltante,
@@ -1651,7 +1839,6 @@ public class SqlMapBandiDao implements BandiDao {
 //				, dataPubblicazioneA
 		);
 	}
-
 	
 	@Override
 	public List<WSDMConfigType> getWSDMConfig(
@@ -1660,7 +1847,6 @@ public class SqlMapBandiDao implements BandiDao {
 				stazioneAppaltante
 		);
 	}
-	
 	
 	@Override
 	public List<InvitoGaraType> getElencoInvitiGara(
@@ -1687,8 +1873,8 @@ public class SqlMapBandiDao implements BandiDao {
 			String busta) throws DataAccessException, SqlComposerException {
 		return bandiMapper.getQuestionari(
 				  toWithPercentAndUpper(codice)
-				, tipologia
-				, busta
+				, BandiManager.toInt(tipologia, "Formato non valido per tipologia") 
+				, BandiManager.toInt(busta, "Formato non valido per busta")
 		);
 	}
 
@@ -1733,8 +1919,10 @@ public class SqlMapBandiDao implements BandiDao {
 	 *         riguarda un soggetto individuale che partecipa in un
 	 *         raggruppamento di soggetti, 3 altrimenti
 	 */
-	private static Integer getTipoImpresaPartecipazione(Integer tipoImpresa,
-														boolean rti) {
+	private static Integer getTipoImpresaPartecipazione(
+			Integer tipoImpresa
+			, boolean rti
+	) {
 		Integer risultato = tipoImpresa;
 		if (rti) {
 			if (tipoImpresa <= 5) {
@@ -1747,8 +1935,12 @@ public class SqlMapBandiDao implements BandiDao {
 	}
 
 	private List<CategoriaBandoIscrizioneType> getCategorieBandoIscrizione(
-			HashMap<String, String> hash, String livello1, String livello2,
-			String livello3, String livello4) {
+			HashMap<String, String> hash
+			, String livello1
+			, String livello2
+			,String livello3
+			, String livello4
+	) {
 		List<CategoriaBandoIscrizioneType> risultato = new ArrayList<CategoriaBandoIscrizioneType>();
 		List<CategoriaBandoIscrizioneType> lista = bandiMapper.getCategorieBandoIscrizione(
 				  hash.get("codice")
@@ -1783,6 +1975,128 @@ public class SqlMapBandiDao implements BandiDao {
 			}
 		}
 		return risultato;
+	}
+	
+	@Override
+	public boolean isConcorsoCrypted(String cryptedUsername, String ngara) {
+		return Boolean.TRUE.equals(bandiMapper.isConcorsoCrypted(cryptedUsername, ngara));
+	}
+
+	@Override
+	public String getIdAnonimo(String cryptedUsername, String ngara) {
+		return bandiMapper.getIdAnonimo(cryptedUsername, ngara);
+	}
+
+	@Override
+	public String getRagioneSocialeAnonima(String cryptedUsername, String ngara) {
+		return bandiMapper.getRagioneSocialeAnonima(cryptedUsername, ngara);
+	}
+
+	@Override
+	public String getCodiceSecondoGrado(String ngara) {
+		return bandiMapper.getCodiceSecondoGrado(ngara);
+	}
+	
+	@Override
+	public boolean canShowRankingFirstGradeCompetition(String ngara) {
+		Boolean returned = bandiMapper.canShowRankingFirstGradeCompetition(ngara);
+		return returned != null && returned;
+	}
+
+	@Override
+	public List<ImpresaAusiliariaType> getImpreseAusiliarie(String username, String codice, String progressivoOfferta) 
+			throws DataAccessException, SqlComposerException 
+	{
+		return bandiMapper.getImpreseAusiliarie(username, codice, progressivoOfferta);
+	}
+
+	@Override
+	public String getWConfig(String applicativo, String chiave) {
+		WConfigType config = bandiMapper.getWConfig(applicativo, chiave);
+		// NB: il flag "criptato" non viene utilizato qui 
+		//     e si restituisce sempre il valore letto dal DB
+		//if(config != null && "1".equals(config.getCriptato())) {
+		//}
+		return (config != null ? config.getValore() : null);
+	}	
+	
+	/**
+	 * calcola il token per l'url link bic namirial 
+	 */
+	private DocumentoAllegatoType setTokenBicNamirial(DocumentoAllegatoType doc) {
+		if(doc != null && StringUtils.isNotBlank(doc.getUrl()) && StringUtils.isNotBlank(doc.getUltbic())) {
+			try {
+				String urldoc = doc.getUrl();
+				
+				// decifra "integrazionebic.chiavetoken"
+				String chiaveToken = getWConfig(BandiManager.CODICE_APPLICATIVO_APPALTI, INTEGRAZIONE_BIC_CHIAVE_TOKEN);
+				if (StringUtils.isNotBlank(chiaveToken)) {
+					// recupera il tipo di "cifratura dati" ed eventualmente imposta il default "LEG"
+					String tipoCifratura = getWConfig(BandiManager.CODICE_APPLICATIVO_APPALTI, PROP_TIPOLOGIA_CIFRATURA_DATI);
+					tipoCifratura = (StringUtils.isNotEmpty(tipoCifratura) ? tipoCifratura : "LEG");
+					ICriptazioneByte valore = FactoryCriptazioneByte.getInstance(
+							tipoCifratura
+							, chiaveToken.getBytes()
+							, ICriptazioneByte.FORMATO_DATO_CIFRATO
+					);
+					chiaveToken = new String(valore.getDatoNonCifrato());
+				}
+
+				boolean controlliOk = true;
+				if (StringUtils.isEmpty(chiaveToken)) {
+					BandiManager.logger.error("setBicNamirial", "Per effettuare l'inoltro della chiamata a BIC  necessario impostare la chiave di criptazione del token nel pannello di amministrazione alla sezione 'Integrazione BIC'");
+					controlliOk = false;
+				}
+				
+				if (controlliOk && chiaveToken.length() != 16 && chiaveToken.length() != 24 && chiaveToken.length() != 36) {
+					BandiManager.logger.error("setBicNamirial", "La chiave di criptazione del token deve essere lunga 16, 24 o 36 caratteri");
+					controlliOk = false;
+				}
+				
+				if (controlliOk) {
+					// recupera la durata del token (default 3gg)
+					int durataToken;
+					try {
+						durataToken = Integer.parseInt(
+								getWConfig(BandiManager.CODICE_APPLICATIVO_APPALTI, INTEGRAZIONE_BIC_DURATA_TOKEN));
+					} catch (Exception e) {
+						durataToken = DURATA_TOKEN_DEFAULT;
+					}
+
+					// componi il token, cifralo e codificalo in base64...
+					Cipher cipher = Cipher.getInstance("AES");
+					SecretKeySpec secretKey = new SecretKeySpec(chiaveToken.getBytes(), "AES");
+					cipher.init(Cipher.ENCRYPT_MODE, secretKey);
+					String token = doc.getUltbic() + "|" + durataToken;
+					token = Base64.getEncoder().encodeToString( cipher.doFinal(token.getBytes()) );
+					
+					// codifica SAFE URL....
+					token = URLEncoder.encode(token, "UTF-8");
+					URI uri = new URI(urldoc);
+					urldoc += (uri.getQuery() == null
+							? "?token=" + token
+							: "&token=" + token
+					);
+					
+					doc.setUrl(urldoc);
+				}
+			} catch (Throwable t) {
+				BandiManager.logger.error("setBicNamirial", t);
+			}
+		}
+		return doc;
+	}
+
+	private List<DocumentoAllegatoType> toDocumentiAllegati(List<DocumentoAllegatoType> source) {
+		if(source != null)
+			source.forEach(d -> setTokenBicNamirial(d));
+		return source;
+	}
+	
+	private List<DocumentoAllegatoLotto> toDocumentiAllegatiLotto(List<DocumentoAllegatoLotto> source) {
+		if(source != null)
+			source.forEach(d -> setTokenBicNamirial(d));
+		return source;
 	}
 
 }

@@ -1,13 +1,12 @@
 
 package it.maggioli.eldasoft.sil.gare.ws;
 
-import java.io.Serializable;
-import java.util.List;
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
+import java.io.Serializable;
+import java.util.List;
 
 
 /**
@@ -39,7 +38,8 @@ import javax.xml.bind.annotation.XmlType;
     "denominazione",
     "rup",
     "puntoOrdinante",
-    "puntoIstruttore"
+    "puntoIstruttore",
+    "responsabileFaseAffidamento"
 })
 public class StazioneAppaltanteBandoType
     implements Serializable
@@ -54,6 +54,7 @@ public class StazioneAppaltanteBandoType
     protected String rup;
     protected List<String> puntoOrdinante;
     protected List<String> puntoIstruttore;
+    protected String responsabileFaseAffidamento;
 
     /**
      * Recupera il valore della proprietà codice.
@@ -155,4 +156,11 @@ public class StazioneAppaltanteBandoType
 		this.puntoIstruttore = puntoIstruttore;
 	}
 
+    public String getResponsabileFaseAffidamento() {
+        return responsabileFaseAffidamento;
+    }
+
+    public void setResponsabileFaseAffidamento(String responsabileFaseAffidamento) {
+        this.responsabileFaseAffidamento = responsabileFaseAffidamento;
+    }
 }

@@ -16,19 +16,26 @@
         <result property="isGreen" column="ISGREEN"/>
         <result property="isRecycle" column="ISRECYCLE"/>
 		<result property="isPnrr" column="ISPNRR"/>
+ 		<result property="tipoAvvisoGenerale" column="tipogen"/>
+ 		<result property="stato" column="stato"/>
     </resultMap>
 
   <sql id="selectListaAvvisi">
   SELECT descsa as sa, codice, oggetto, desctipoapp as tipoapp, desctipoavv as tipoavv, datpub, datascadenza, orascadenza, 
-  		dultagg, ISGREEN, ISRECYCLE, ISPNRR
+  		dultagg, ISGREEN, ISRECYCLE, ISPNRR, tipogen, 
+  		CASE WHEN #{dataOdierna} &lt;= dataorascadenza THEN 1 
+  		     WHEN #{dataOdierna} &gt; dataorascadenza AND #{annoMinimoPubblicazione} &lt;= annoinizioperscadenza THEN 2
+  		     ELSE 0 END stato
     FROM v_ws_avvisi
   </sql>
 
   <sql id="whereAvvisi">
-   WHERE #{annoMinimoPubblicazione} &lt;= annoinizioperscadenza
-     <if test="stazioneAppaltante != null and stazioneAppaltante != ''">AND codsa = #{stazioneAppaltante}</if> 
+   WHERE 1=1 
+     <if test="stato != null and stato == 1">AND #{dataOdierna} &lt;= dataorascadenza</if>
+     <if test="stato != null and stato == 2">AND #{dataOdierna} &gt; dataorascadenza AND #{annoMinimoPubblicazione} &lt;= annoinizioperscadenza</if>
+     <if test="stazioneAppaltante != null and stazioneAppaltante != ''">AND codsa = #{stazioneAppaltante}</if>
      <if test="oggetto != null and oggetto != ''">AND ${operatoreUpper}(oggetto) like #{oggetto}</if> 
-     <if test="tipoAvviso != null and tipoAvviso != ''">AND codtipoavv = #{tipoAvviso}</if> 
+     <if test="tipoAvviso != null">AND codtipoavv = #{tipoAvviso}</if>
      <if test="dataPubblicazioneDa != null">AND datpub &gt;= #{dataPubblicazioneDa}</if> 
      <if test="dataPubblicazioneA != null">AND datpub &lt;= #{dataPubblicazioneA}</if> 
      <if test="dataScadenzaDa != null">AND datascadenza &gt;= #{dataScadenzaDa}</if> 
@@ -37,25 +44,43 @@
      <if test="isGreen != null and isGreen != ''">AND (ISGREEN = #{isGreen} OR (ISGREEN IS NULL AND #{isGreen} = '0'))</if>
      <if test="isRecycle != null and isRecycle != ''">AND (ISRECYCLE = #{isRecycle} OR (ISRECYCLE IS NULL AND #{isRecycle} = '0'))</if>
      <if test="isPnrr != null and isPnrr != ''">AND (ISPNRR = #{isPnrr} OR (ISPNRR IS NULL AND #{isPnrr} = '0'))</if>
+     <if test="tipoAvvisoGenerale != null">AND tipogen = #{tipoAvvisoGenerale}</if>
   </sql>
-    
+
+  <select id="searchAvvisiGenerali" parameterType="java.util.HashMap" resultMap="resultAvviso">
+   <include refid="selectListaAvvisi"/>
+   <include refid="whereAvvisi"/>
+   AND tipogen IS NOT NULL
+   ORDER BY dataorascadenza ASC, datpub DESC
+  </select>
+  
+  <select id="countAvvisiGenerali" parameterType="java.util.HashMap" resultType="java.lang.Integer">
+ SELECT count(1)
+   FROM v_ws_avvisi
+   <include refid="whereAvvisi"/>
+   AND tipogen IS NOT NULL
+  </select>
+      
   <select id="searchAvvisi" parameterType="java.util.HashMap" resultMap="resultAvviso">
    <include refid="selectListaAvvisi"/>
    <include refid="whereAvvisi"/>
-   ORDER BY dataorascadenza DESC, datpub DESC
+   AND tipogen IS NULL
+   <if test="stato != null and stato == 1">ORDER BY dataorascadenza ASC, datpub DESC</if>
+   <if test="stato != null and stato == 2">ORDER BY dataorascadenza DESC</if>
   </select>
 
   <select id="countAvvisi" parameterType="java.util.HashMap" resultType="java.lang.Integer">
  SELECT count(1)
    FROM v_ws_avvisi
    <include refid="whereAvvisi"/>
+   AND tipogen IS NULL
   </select>
 
   <sql id="whereElencoAvvisi">
   WHERE #{dataOdierna} &lt;= dataorascadenza
      <if test="stazioneAppaltante != null and stazioneAppaltante != ''">AND codsa = #{stazioneAppaltante}</if> 
      <if test="oggetto != null and oggetto != ''">AND ${operatoreUpper}(oggetto) like #{oggetto}</if> 
-     <if test="tipoAvviso != null and tipoAvviso != ''">AND codtipoavv = #{tipoAvviso}</if> 
+     <if test="tipoAvviso != null">AND codtipoavv = #{tipoAvviso}</if>
      <if test="dataPubblicazioneDa != null">AND datpub &gt;= #{dataPubblicazioneDa}</if> 
      <if test="dataPubblicazioneA != null">AND datpub &lt;= #{dataPubblicazioneA}</if> 
      <if test="dataScadenzaDa != null">AND datascadenza &gt;= #{dataScadenzaDa}</if> 
@@ -63,12 +88,14 @@
      <if test="altriSoggetti != null and altriSoggetti != ''">AND altrisog = #{altriSoggetti}</if>
      <if test="isGreen != null and isGreen != ''">AND (ISGREEN = #{isGreen} OR (ISGREEN IS NULL AND #{isGreen} = '0'))</if>
      <if test="isRecycle != null and isRecycle != ''">AND (ISRECYCLE = #{isRecycle} OR (ISRECYCLE IS NULL AND #{isRecycle} = '0'))</if>
-     <if test="isPnrr != null and isPnrr != ''">AND (ISPNRR = #{isPnrr} OR (ISPNRR IS NULL AND #{isPnrr} = '0'))</if>
+     <if test="isPnrr != null and isPnrr != ''">AND (ISPNRR = #{isPnrr} OR (ISPNRR IS NULL AND #{isPnrr} = '0'))</if>     
+     <if test="tipoAvvisoGenerale != null">AND tipogen = #{tipoAvvisoGenerale}</if>
   </sql>
   
   <select id="getElencoAvvisi" resultMap="resultAvviso">
    <include refid="selectListaAvvisi"/>
    <include refid="whereElencoAvvisi"/>
+   AND tipogen IS NULL
    ORDER BY dataorascadenza ASC, datpub DESC
   </select>
   
@@ -83,7 +110,7 @@
      AND #{annoMinimoPubblicazione} &lt;= annoinizioperscadenza
      <if test="stazioneAppaltante != null and stazioneAppaltante != ''">AND codsa = #{stazioneAppaltante}</if> 
      <if test="oggetto != null and oggetto != ''">AND ${operatoreUpper}(oggetto) like #{oggetto}</if> 
-     <if test="tipoAvviso != null and tipoAvviso != ''">AND codtipoavv = #{tipoAvviso}</if> 
+     <if test="tipoAvviso != null">AND codtipoavv = #{tipoAvviso}</if>
      <if test="dataPubblicazioneDa != null">AND datpub &gt;= #{dataPubblicazioneDa}</if> 
      <if test="dataPubblicazioneA != null">AND datpub &lt;= #{dataPubblicazioneA}</if> 
      <if test="dataScadenzaDa != null">AND datascadenza &gt;= #{dataScadenzaDa}</if> 
@@ -92,11 +119,13 @@
      <if test="isGreen != null and isGreen != ''">AND (ISGREEN = #{isGreen} OR (ISGREEN IS NULL AND #{isGreen} = '0'))</if>
      <if test="isRecycle != null and isRecycle != ''">AND (ISRECYCLE = #{isRecycle} OR (ISRECYCLE IS NULL AND #{isRecycle} = '0'))</if>
      <if test="isPnrr != null and isPnrr != ''">AND (ISPNRR = #{isPnrr} OR (ISPNRR IS NULL AND #{isPnrr} = '0'))</if>
+     <if test="tipoAvvisoGenerale != null">AND tipogen = #{tipoAvvisoGenerale}</if>
   </sql>
   
   <select id="getElencoAvvisiScaduti" resultMap="resultAvviso">
    <include refid="selectListaAvvisi"/>
    <include refid="whereElencoAvvisiScaduti"/>
+   AND tipogen IS NULL
    ORDER BY dataorascadenza DESC
   </select>
   
@@ -104,19 +133,33 @@
  SELECT count(1)
    FROM v_ws_avvisi
    <include refid="whereElencoAvvisiScaduti"/>
+   AND tipogen IS NULL
   </select>
 
   <select id="getStazioneAppaltanteAvviso" parameterType="java.lang.String" resultMap="it.maggioli.eldasoft.sil.gare.db.mapper.BandiMapper.resultStazioneAppaltanteBando">
-  SELECT codsa as codstazione, descsa as descstazione, descrup
+  SELECT codsa as codstazione, descsa as descstazione, descrup, null as descrpaff
     FROM v_ws_avvisi
    WHERE codice = #{codice}
   </select>
 
-  <select id="getAvviso" parameterType="java.lang.String" resultMap="resultAvviso">
+  <select id="getAvviso" parameterType="java.util.HashMap" resultMap="resultAvviso">
   SELECT codsa as sa, codice, oggetto, codtipoapp as tipoapp, codtipoavv as tipoavv, datpub, datascadenza, orascadenza,
-  		 dultagg
+  		 dultagg, tipogen,
+  		 CASE WHEN #{dataOdierna} &lt;= dataorascadenza THEN 1 
+  		     WHEN #{dataOdierna} &gt; dataorascadenza AND #{annoMinimoPubblicazione} &lt;= annoinizioperscadenza THEN 2
+  		     ELSE 0 END stato
     FROM v_ws_avvisi
    WHERE codice = #{codice}
+  </select>
+  
+  <select id="getAvvisoByCig" parameterType="java.util.HashMap" resultMap="resultAvviso">
+  SELECT codsa as sa, codice, oggetto, codtipoapp as tipoapp, codtipoavv as tipoavv, datpub, datascadenza, orascadenza,
+  		 dultagg, tipogen,
+  		 CASE WHEN #{dataOdierna} &lt;= dataorascadenza THEN 1 
+  		     WHEN #{dataOdierna} &gt; dataorascadenza AND #{annoMinimoPubblicazione} &lt;= annoinizioperscadenza THEN 2
+  		     ELSE 0 END stato
+    FROM v_ws_avvisi
+   WHERE codcig = #{cig}
   </select>
   
 <!--   <select id="getDocumentiAvvisoLotto" parameterClass="java.util.HashMap" resultMap="Bandi.resultDocumentoBando"> -->

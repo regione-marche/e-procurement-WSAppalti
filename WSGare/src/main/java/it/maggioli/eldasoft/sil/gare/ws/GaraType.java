@@ -130,6 +130,7 @@ import java.util.List;
     "SACodice",
     "SADescrizione",
     "SARup",
+    "SAResponsabileFaseAffidamento",
     "garaPrivatistica",
     "numDecimaliRibasso",
     "noBustaAmministrativa",
@@ -142,7 +143,13 @@ import java.util.List;
     "isPnrr",
     "orderCriteria",
     "dataTermineRichiestaChiarimenti",
-    "dataTermineRispostaOperatori"
+    "dataTermineRispostaOperatori",
+    "isConcProg",
+    "valoreComplessivo",
+    "fineConc",
+    "tipoConcorso",
+    "BDNCPAnac",
+    "dataPubblicazioneAtti"
 })
 public class GaraType
     implements Serializable
@@ -232,6 +239,7 @@ public class GaraType
     protected String SACodice;				// ottimizzazione per getDettaglioGara
     protected String SADescrizione;			// ottimizzazione per getDettaglioGara
     protected String SARup;					// ottimizzazione per getDettaglioGara
+    protected String SAResponsabileFaseAffidamento;
     protected Integer garaPrivatistica;
     protected Long numDecimaliRibasso;    
     protected boolean noBustaAmministrativa;
@@ -249,7 +257,16 @@ public class GaraType
     @XmlJavaTypeAdapter(DateAdapter.class)
     @XmlSchemaType(name = "date")
     protected Date dataTermineRispostaOperatori;
+    protected Double valoreComplessivo;
 
+    protected boolean isConcProg;
+    protected boolean fineConc;
+    protected Integer tipoConcorso;
+    protected String BDNCPAnac;				// url trasparenza ANAC
+    
+    @XmlJavaTypeAdapter(DatetimeAdapter.class)
+    @XmlSchemaType(name = "dateTime")
+    protected Date dataPubblicazioneAtti;	// accesso documenti Art36
 
     public String getStazioneAppaltante() {
         return stazioneAppaltante;
@@ -780,6 +797,7 @@ public class GaraType
     public void setOrderCriteria(OrderCriteria orderCriteria) {
         this.orderCriteria = orderCriteria;
     }
+    
     public Date getDataTermineRichiestaChiarimenti() {
         return dataTermineRichiestaChiarimenti;
     }
@@ -795,7 +813,69 @@ public class GaraType
     public void setDataTermineRispostaOperatori(Date dataTermineRispostaOperatori) {
         this.dataTermineRispostaOperatori = dataTermineRispostaOperatori;
     }
+    
+    public boolean setIsConcProg() {
+        return isConcProg;
+    }
+    
+    public void setConcProg(boolean concProg) {
+        isConcProg = concProg;
+    }
+
+    public String getSAResponsabileFaseAffidamento() {
+        return SAResponsabileFaseAffidamento;
+    }
+
+    public void setSAResponsabileFaseAffidamento(String SAResponsabileFaseAffidamento) {
+        this.SAResponsabileFaseAffidamento = SAResponsabileFaseAffidamento;
+    }
+    
+    public Double getValoreComplessivo() {
+        return valoreComplessivo;
+    }
+    
+    public void setValoreComplessivo(Double valoreComplessivo) {
+        this.valoreComplessivo = valoreComplessivo;
+    }
+
+    public boolean isFineConc() {
+        return fineConc;
+    }
+    
+    public void setFineConc(boolean fineConc) {
+        this.fineConc = fineConc;
+    }
+    
+    public void setFineConc(Integer fineConc) {
+        this.fineConc = fineConc == 1;
+    }
+    
+    public void setFineConc(String fineConc) {
+        this.fineConc = "1".equals(fineConc);
+    }
+
+    public Integer getTipoConcorso() {
+        return tipoConcorso;
+    }
+
+    public void setTipoConcorso(Integer tipoConcorso) {
+        this.tipoConcorso = tipoConcorso;
+    }
+
+	public String getBDNCPAnac() {
+		return BDNCPAnac;
+	}
+
+	public void setBDNCPAnac(String BDNCPAnac) {
+		this.BDNCPAnac = BDNCPAnac;
+	}
+
+	public Date getDataPubblicazioneAtti() {
+		return dataPubblicazioneAtti;		// atti art 36
+	}
+
+	public void setDataPubblicazioneAtti(Date dataPubblicazioneAtti) {
+		this.dataPubblicazioneAtti = dataPubblicazioneAtti;
+	}
 
 }
-
-

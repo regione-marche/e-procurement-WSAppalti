@@ -636,6 +636,19 @@ public class WSOperazioniGeneraliSoapImpl implements WSOperazioniGeneraliSoap {
 	}
 
 	@Override
+	public java.lang.String getElencoTipiComunicazioneUlteriori() {
+		LOG.debug("getElencoTipiComunicazioneUlteriori: inizio metodo");
+
+		List<DatoCodificatoType> listaTipi = this.datiCodificatiManager
+				.getTipiTab1("W_008");
+		String documentoXML = WSOperazioniGeneraliSoapImpl.buildXML(listaTipi);
+
+		LOG.debug("getElencoTipiComunicazioneUlteriori: fine metodo");
+
+		return documentoXML;
+	}
+
+	@Override
 	public it.maggioli.eldasoft.gene.ws.GetElencoComunicazioniOutType getElencoComunicazioni(it.maggioli.eldasoft.gene.ws.DettaglioComunicazioneType testata) {
 		if (LOG.isDebugEnabled())
 			LOG.debug("getElencoComunicazioni: inizio metodo");
@@ -657,6 +670,31 @@ public class WSOperazioniGeneraliSoapImpl implements WSOperazioniGeneraliSoap {
 
 		if (LOG.isDebugEnabled())
 			LOG.debug("getElencoComunicazioni: fine metodo");
+
+		return risultato;
+    }
+
+	@Override
+	public it.maggioli.eldasoft.gene.ws.GetElencoComunicazioniOutType searchElencoComunicazioni(it.maggioli.eldasoft.gene.ws.DettaglioComunicazioneType testata) {
+		if (LOG.isDebugEnabled())
+			LOG.debug("searchElencoComunicazioni: inizio metodo");
+
+		GetElencoComunicazioniOutType risultato = new GetElencoComunicazioniOutType();
+
+		try {
+			List<DettaglioComunicazioneType> comunicazioni = this.comunicazioniManager
+					.searchElencoComunicazioni(testata); //criteriRicerca);
+			risultato.setComunicazione(comunicazioni);
+
+		} catch (DataAccessException e) {
+			LOG.error(
+					"Errore inaspettato durante l'interazione con la base dati",
+					e);
+			risultato.setErrore(e.getMessage());
+		}
+
+		if (LOG.isDebugEnabled())
+			LOG.debug("searchlencoComunicazioni: fine metodo");
 
 		return risultato;
     }
@@ -775,6 +813,43 @@ public class WSOperazioniGeneraliSoapImpl implements WSOperazioniGeneraliSoap {
 	@Override
 	public String getNazioniCodificateDGUE(String nazione) {
 		return datiCodificatiManager.getNazioniCodificateDGUE(nazione);
+	}
+
+	@Override
+	public String getListaRating() {
+		LOG.debug("getListaRating(): inizio metodo");
+
+		List<DatoCodificatoType> listaRating = this.datiCodificatiManager
+				.getTipiTab1("X0001");
+		String documentoXML = WSOperazioniGeneraliSoapImpl.buildXML(listaRating);
+
+		LOG.debug("getListaRating: fine metodo");
+
+		return documentoXML;
+	}
+
+	@Override
+	public String getListaTipoProceduraConcorso() {
+		try {
+			LOG.debug("getListaTipoConcorso(): inizio metodo");
+
+			return WSOperazioniGeneraliSoapImpl.buildXML(datiCodificatiManager.getTipiTab1("A1198"));
+		} finally {
+			LOG.debug("getListaTipoConcorso(): fine metodo");
+		}
+	}
+
+	@Override
+	public String getListaTipiAvvisoGenerali() {
+		LOG.debug("getListaTipiAvvisoGenerali(): inizio metodo");
+
+		List<DatoCodificatoType> listaRating = this.datiCodificatiManager
+				.getTipiTab1("A1201");
+		String documentoXML = WSOperazioniGeneraliSoapImpl.buildXML(listaRating);
+
+		LOG.debug("getListaTipiAvvisoGenerali: fine metodo");
+
+		return documentoXML;
 	}
 
 }

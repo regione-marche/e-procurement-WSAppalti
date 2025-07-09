@@ -80,7 +80,10 @@ import it.maggioli.eldasoft.gene.xml.DatetimeAdapter;
     "applicativoRisposta",
     "idRisposta",
     "modello",
-    "tipoBusta"
+    "tipoBusta",
+    "stazioneAppaltante",
+    "dataScadenza",
+	"oraScadenza"
 })
 public class DettaglioComunicazioneType
     implements Serializable
@@ -129,6 +132,10 @@ public class DettaglioComunicazioneType
     protected Long idRisposta;
     protected Long modello;				// NULL comunicazione normale, 1 indica un "soccorso istruttorio"
     protected Long tipoBusta;
+    protected String stazioneAppaltante;
+    @XmlSchemaType(name = "dateTime")
+	protected Date dataScadenza;
+	protected String oraScadenza;
 
     public String getApplicativo() {
         return applicativo;
@@ -336,6 +343,30 @@ public class DettaglioComunicazioneType
 
 	public void setTipoBusta(Long tipoBusta) {
 		this.tipoBusta = tipoBusta;
+	}
+
+	public String getStazioneAppaltante() {
+		return stazioneAppaltante;
+	}
+
+	public void setStazioneAppaltante(String stazioneAppaltante) {
+		this.stazioneAppaltante = stazioneAppaltante;
+	}
+
+	public Date getDataScadenza() {
+		return dataScadenza;
+	}
+
+	public void setDataScadenza(Date dataScadenza) {
+		this.dataScadenza = dataScadenza;
+	}
+
+	public String getOraScadenza() {
+		return oraScadenza;
+	}
+
+	public void setOraScadenza(String oraScadenza) {
+		this.oraScadenza = oraScadenza;
 	}
 	
 }

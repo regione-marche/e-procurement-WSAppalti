@@ -13,6 +13,7 @@ package it.maggioli.eldasoft.gene.db.dao.mybatis;
 import it.maggioli.eldasoft.gene.db.dao.GenChiaviDao;
 import it.maggioli.eldasoft.gene.db.mapper.GenChiaviMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Component;
 
 /**
@@ -34,13 +35,16 @@ public class SqlMapGenChiaviDao implements GenChiaviDao {
 	 * @return
 	 */
 	@Override
-	public long getNextId(String tabella, int numIdAllocati) {
+	public long getNextId(String tabella, int numIdAllocati) throws DataAccessException {
 		genChiaviMapper.updateId(
 				  numIdAllocati > 0 ? numIdAllocati : 1
 				, tabella
 		);
 		// ultimo id da usare nel ciclo di inserimenti
 		Long i = genChiaviMapper.getNextId(tabella);
+		if(i == null)
+			// genera un'eccezione se manca la [tabella] mancante
+			throw new DataAccessException("configurazione chiave non presente per " + tabella) {};
 		// primo id da usare nel ciclo di inserimenti
 		return i - numIdAllocati + 1;
 	}

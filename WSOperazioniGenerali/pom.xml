@@ -16,7 +16,35 @@
 
 	<name>WS Operazioni generali</name>
 
+	<properties>
+		<!-- Ultima versione che supporta le javax (jdk <= 8) -->
+		<jersey-version>2.45</jersey-version>
+	</properties>
+
 	<dependencies>
+
+		<dependency>
+			<groupId>org.glassfish.jersey.core</groupId>
+			<artifactId>jersey-client</artifactId>
+			<version>${jersey-version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.glassfish.jersey.media</groupId>
+			<artifactId>jersey-media-multipart</artifactId>
+			<version>${jersey-version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.glassfish.jersey.media</groupId>
+			<artifactId>jersey-media-json-jackson</artifactId>
+			<version>${jersey-version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<version>1.18.34</version>
+<!--			<scope>provided</scope>-->
+		</dependency>
+
 
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>

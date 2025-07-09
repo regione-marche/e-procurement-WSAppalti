@@ -25,6 +25,7 @@
 		<result property="regimeFiscale" column="regfisc"/>
 		<result property="gruppoIva" column="isgruppoiva"/>
 		<result property="tipoSocietaCooperativa" column="TIPOCOOP"/>
+		<result property="codiceCNEL" column="codcnel"/>
 	</resultMap>
 
 	<resultMap id="resultIndirizzo" type="it.eldasoft.sil.portgare.datatypes.IndirizzoAggiornabileType">
@@ -131,6 +132,8 @@
 		<result property="estremi" column="coorba"/>
 		<result property="soggettiAbilitati" column="sogmov"/>
 		<result property="bic" column="codbic"/>
+		<result property="numeroConto" column="numero_conto" />
+		<result property="areaIBAN" column="is_area_iban" />
 	</resultMap>
 
 	<resultMap id="resultAbilitazionePreventiva" type="it.eldasoft.sil.portgare.datatypes.AbilitazionePreventivaAggiornabileType">
@@ -202,7 +205,7 @@
 
 	<select id="getImpresa" parameterType="java.lang.String" resultMap="resultImpresa">
 	select nomest, natgiui, tipimp, cfimp, pivimp, oggsoc, indweb, flag_soggdurc, settprod, acertatt, aistprev, flag_assobbl, zoneat, flag_ismpmi,
-	       cladim, codatt, ultdic, regfisc, sociounico, isgruppoiva, TIPOCOOP
+	       cladim, codatt, ultdic, regfisc, sociounico, isgruppoiva, TIPOCOOP, codcnel
 	  from v_ws_fornitori
 	 where codimp = #{codiceImpresa}
 	</select>
@@ -280,8 +283,8 @@
 	</select>
   
 	<select id="getDatiContoCorrenteDedicatoImpresa" parameterType="java.lang.String" resultMap="resultContoCorrenteDedicato">
-	select coorba, sogmov, codbic
-	  from v_ws_fornitori
+	select coorba, sogmov, codbic, is_area_iban, numero_conto
+	from v_ws_fornitori
 	 where codimp = #{codiceImpresa}
 	</select>
 	
@@ -442,7 +445,7 @@
 		JOIN w_puser wp on i.codimp = wp.userkey1
 		WHERE  usernome = #{tokenRichiedente}
 		AND #{data} BETWEEN sospensione_data_inizio  AND sospensione_data_fine
-		AND (sospensione_revocata IS NULL OR sospensione_revocata != 1)
+		AND (sospensione_revocata IS NULL OR sospensione_revocata != '1')
 	</select>
 
 </mapper>

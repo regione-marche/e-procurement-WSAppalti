@@ -37,6 +37,14 @@ public class AvvisiManager {
 	@Autowired
 	private AvvisiDao avvisiDao;
 
+	public List<AvvisoType> searchAvvisiGenerali(AvvisiTypeSearch filtri) throws SqlComposerException {
+		return avvisiDao.searchAvvisiGenerali(filtri);
+	}
+	
+	public int countAvvisiGenerali(AvvisiTypeSearch filtri) throws SqlComposerException {
+		return avvisiDao.countAvvisiGenerali(filtri);
+	}
+	
 	public List<AvvisoType> searchAvvisi(AvvisiTypeSearch filtri) throws SqlComposerException {
 		return avvisiDao.searchAvvisi(filtri);
 	}
@@ -80,8 +88,12 @@ public class AvvisiManager {
 		return this.avvisiDao.getStazioneAppaltanteAvviso(codice);
 	}
 
-	public AvvisoType getAvviso(String codiceGara) {
-		return this.avvisiDao.getAvviso(codiceGara);
+	public AvvisoType getAvviso(String codiceGara, int numAnniPubblicazione) throws DataAccessException {
+		return this.avvisiDao.getAvviso(codiceGara, numAnniPubblicazione);
+	}
+	
+	public AvvisoType getAvvisoByCig(String cig, int numAnniPubblicazione) throws DataAccessException {
+		return this.avvisiDao.getAvvisoByCig(cig, numAnniPubblicazione);
 	}
 
 }

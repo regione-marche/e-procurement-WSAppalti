@@ -27,7 +27,7 @@ public class WSPagoPASoapImpl implements WSPagoPASoap {
 	public it.maggioli.eldasoft.sil.pagopa.ws.StatisticaPagamentiOutType getStatisticaPagamenti(String codiceImpresa)  throws PagoPaException {
 		if(StringUtils.isEmpty(codiceImpresa)) throw new PagoPaValidationException("codiceImpresa missing.");
 		try {
-			logger.info("Calling getStatisticaPagamenti with "+codiceImpresa);
+			logger.debug("Calling getStatisticaPagamenti with "+codiceImpresa);
 			return pagoPaManager.getStatisticaPagamenti(codiceImpresa);
 		} catch (Exception e) {
 			logger.error("Errore",e);

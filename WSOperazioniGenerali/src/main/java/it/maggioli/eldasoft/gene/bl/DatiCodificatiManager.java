@@ -54,8 +54,17 @@ public class DatiCodificatiManager {
 	public List<DatoCodificatoType> getFormeGiuridicheCooperative() {
 		return datiCodificatiDao.getFormeGiuridicheCooperative();
 	}
+	
 	public String getNazioniCodificateDGUE(String nazione) {
 		return datiCodificatiDao.getNazioniCodificateDGUE(nazione);
 	}
 
+	public List<DatoCodificatoType> getTipiAvvalimento() {
+		return datiCodificatiDao.getTipiAvvalimento();
+	}
+	
+	public List<DatoCodificatoType> getTipiImpresaNaturaGiuridica() {
+		return datiCodificatiDao.getTipiImpresaNaturaGiuridica();
+	}
+	
 }

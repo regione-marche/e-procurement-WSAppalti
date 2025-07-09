@@ -30,7 +30,7 @@ public interface AsteMapper {
     public List<DettaglioRilancioType> getElencoRilanci(
 			  @Param("ngara") String nGara
 			, @Param("username") String username
-			, @Param("numeroFase") String numeroFase
+			, @Param("numeroFase") Integer numeroFase
 	);
 
     public Integer insertRilancioAsta(

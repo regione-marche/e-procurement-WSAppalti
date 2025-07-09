@@ -122,7 +122,7 @@
   SELECT t.codgar, gl.codice, f.ngara, f.dataoraini, f.dataorafine, f.numfase, f.durmin, f.durmax, f.tbase, t.aemodvis, g.ribcal,
   		 t.prerib,
   		 CASE WHEN gl.codice!=f.ngara THEN f.ngara ELSE null END AS codiceLotto,
-  		 CASE WHEN t.ricastae=1 THEN 1 ELSE 0 END AS ricastae,
+  		 CASE WHEN t.ricastae='1' THEN 1 ELSE 0 END AS ricastae,
   		 CASE WHEN g.ribcal=1 THEN t.aeribmin
      		  WHEN g.ribcal=2 THEN t.aeimpmin
      		  ELSE 0
@@ -169,7 +169,7 @@
 		 LEFT JOIN v_ws_ditg d ON d.ngara5 = r.ngara AND r.dittao = d.dittao
 		 LEFT JOIN w_puser u ON (u.userent = 'IMPR' AND ((d.codati is null AND d.dittao = u.userkey1) OR d.codman = u.userkey1))
    WHERE r.ngara = #{ngara}
-   	 AND d.ammgar = 1
+   	 AND d.ammgar = '1'
    		<if test="numeroFase != null and numeroFase != ''">AND 
         (r.numfase = #{numeroFase} OR r.numril = -1) 
         </if>

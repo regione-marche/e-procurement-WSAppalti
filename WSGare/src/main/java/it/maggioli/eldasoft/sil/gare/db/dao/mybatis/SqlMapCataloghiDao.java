@@ -14,6 +14,7 @@ package it.maggioli.eldasoft.sil.gare.db.dao.mybatis;
 import it.eldasoft.utils.sql.comp.SqlComposer;
 import it.eldasoft.utils.sql.comp.SqlComposerException;
 import it.eldasoft.utils.sql.comp.SqlManager;
+import it.maggioli.eldasoft.sil.gare.bl.BandiManager;
 import it.maggioli.eldasoft.sil.gare.db.dao.CataloghiDao;
 import it.maggioli.eldasoft.sil.gare.db.mapper.CataloghiMapper;
 import it.maggioli.eldasoft.sil.gare.ws.ArticoloType;
@@ -47,11 +48,17 @@ public class SqlMapCataloghiDao implements CataloghiDao {
 	private CataloghiMapper cataloghiMapper;
 
 	@Override
-	public List<ArticoloType> searchArticoli(String codiceCatalogo,
-			String username, String codiceCategoria, String codice,
-			String tipo, String descrizione, String colore,
+	public List<ArticoloType> searchArticoli(
+			String codiceCatalogo,
+			String username, 
+			String codiceCategoria, 
+			String codice,
+			String tipo, 
+			String descrizione, 
+			String colore,
 			int indicePrimoRecord, int maxNumRecord)
-			throws DataAccessException, SqlComposerException {
+			throws DataAccessException, SqlComposerException 
+	{
 		SqlComposer composer = SqlManager.getComposer(this.dbms);
 
 		return cataloghiMapper.searchArticoli(
@@ -59,7 +66,7 @@ public class SqlMapCataloghiDao implements CataloghiDao {
 				, codiceCatalogo
 				, codiceCategoria
 				, codice
-				, tipo
+				, BandiManager.toInt(tipo, "Formato non valido per il tipo articolo")
 				, composer.getFunzioneUpperCase()
 				, toWithPercentAndUpper(descrizione)
 				, toWithPercentAndUpper(colore)
@@ -78,7 +85,7 @@ public class SqlMapCataloghiDao implements CataloghiDao {
 				, codiceCatalogo
 				, codiceCategoria
 				, codice
-				, tipo
+				, BandiManager.toInt(tipo, "Formato non valido per il tipo articolo")
 				, composer.getFunzioneUpperCase()
 				, toWithPercentAndUpper(descrizione)
 				, toWithPercentAndUpper(colore)
@@ -134,7 +141,7 @@ public class SqlMapCataloghiDao implements CataloghiDao {
 
 		return cataloghiMapper.searchProdotti(
 				  codiceCatalogo
-				, "4"
+				, new Long(4)
 				, username
 				, idArticolo
 				, getTerminiUtili(terminiRicerca)
@@ -149,7 +156,7 @@ public class SqlMapCataloghiDao implements CataloghiDao {
 		SqlComposer composer = SqlManager.getComposer(this.dbms);
 		return cataloghiMapper.countSearchProdotti(
 				codiceCatalogo
-				, "4"
+				, new Long(4)
 				, username
 				, idArticolo
 				, getTerminiUtili(terminiRicerca)

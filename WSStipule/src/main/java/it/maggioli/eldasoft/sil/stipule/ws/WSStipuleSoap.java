@@ -1,13 +1,12 @@
 package it.maggioli.eldasoft.sil.stipule.ws;
 
 
-import java.util.Date;
+import it.maggioli.eldasoft.gene.ws.AllegatoComunicazioneType;
+import org.apache.cxf.annotations.WSDLDocumentation;
+import org.springframework.dao.DataAccessException;
 
 import javax.jws.WebParam;
 import javax.jws.WebService;
-
-import org.apache.cxf.annotations.WSDLDocumentation;
-import org.springframework.dao.DataAccessException;
 
 @WebService( 		
 		targetNamespace = "http://www.eldasoft.it/sil/WSStipule/",  
@@ -58,18 +57,12 @@ public interface WSStipuleSoap {
 
 	@WSDLDocumentation("Inserisce un doc in w_docdig associato alla stipula.")
 	String insertAllegato(
-			@WebParam(name = "nomeFile", targetNamespace = "")
-			String nomeFile,
 			@WebParam(name = "idDocStipula", targetNamespace = "")
-			Long idDocStipula,
-			@WebParam(name = "allegato", targetNamespace = "")
-			byte[] allegato,
-			@WebParam(name = "note", targetNamespace = "")
-			String note	,	
-			@WebParam(name = "firmacheck", targetNamespace = "")
-			String firmacheck	,	
-			@WebParam(name = "firmacheckts", targetNamespace = "")
-			Date firmacheckts		
+			Long idDocStipula
+			, @WebParam(name = "allegato", targetNamespace = "")
+			AllegatoComunicazioneType allegato
+			, @WebParam(name = "note", targetNamespace = "")
+			String note
 	);
 
 	@WSDLDocumentation("Update di stipula e documenti richiesti in stato 4.")

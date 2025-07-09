@@ -54,6 +54,7 @@ public class SqlMapDatiCodificatiDao implements	DatiCodificatiDao {
 	public List<DatoCodificatoType> getNazioniCodificate() throws DataAccessException {
 		return datiCodificatiMapper.getNazioniCodificate();
 	}
+	
 	@Override
 	public List<DatoCodificatoType> getFormeGiuridicheCooperative() throws DataAccessException {
 		return datiCodificatiMapper.getFormeGiuridicheCooperative();
@@ -64,4 +65,14 @@ public class SqlMapDatiCodificatiDao implements	DatiCodificatiDao {
 		return datiCodificatiMapper.getNazioniCodificateDGUE(nazione);
 	}
 
+	@Override
+	public List<DatoCodificatoType> getTipiAvvalimento() throws DataAccessException {
+		return datiCodificatiMapper.getTipiAvvalimento();
+	}
+
+	@Override
+	public List<DatoCodificatoType> getTipiImpresaNaturaGiuridica() throws DataAccessException {
+		return datiCodificatiMapper.getTipiImpresaNaturaGiuridica();
+	}
+	
 }

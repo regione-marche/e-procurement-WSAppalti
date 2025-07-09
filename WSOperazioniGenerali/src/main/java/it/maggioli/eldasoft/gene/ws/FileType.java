@@ -1,11 +1,14 @@
 
 package it.maggioli.eldasoft.gene.ws;
 
-import java.io.Serializable;
+import lombok.Getter;
+import lombok.Setter;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
+import java.io.Serializable;
 
 
 /**
@@ -28,10 +31,15 @@ import javax.xml.bind.annotation.XmlType;
  * 
  * 
  */
+@Getter
+@Setter
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "FileType", propOrder = {
     "nome",
-    "file"
+    "file",
+    "url",
+    "bucket_uuid",
+    "bucket_ref"
 })
 public class FileType
     implements Serializable
@@ -40,53 +48,35 @@ public class FileType
     private final static long serialVersionUID = 2L;
     @XmlElement(required = true)
     protected String nome;
-    @XmlElement(required = true)
+    // false per questioni di bucket...
+    @XmlElement(required = false)
     protected byte[] file;
+    protected String url;
+    protected String bucket_uuid;
+    protected String bucket_ref;
 
-    /**
-     * Gets the value of the nome property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
     public String getNome() {
         return nome;
     }
 
-    /**
-     * Sets the value of the nome property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
     public void setNome(String value) {
         this.nome = value;
     }
 
-    /**
-     * Gets the value of the file property.
-     * 
-     * @return
-     *     possible object is
-     *     byte[]
-     */
     public byte[] getFile() {
         return file;
     }
 
-    /**
-     * Sets the value of the file property.
-     * 
-     * @param value
-     *     allowed object is
-     *     byte[]
-     */
     public void setFile(byte[] value) {
         this.file = value;
     }
 
+	public String getUrl() {
+		return url;
+	}
+
+	public void setUrl(String url) {
+		this.url = url;
+	}
+    
 }

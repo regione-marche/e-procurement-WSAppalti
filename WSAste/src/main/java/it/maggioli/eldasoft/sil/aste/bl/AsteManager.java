@@ -41,6 +41,16 @@ public class AsteManager {
 	@Autowired
     private GenChiaviManager genChiaviManager;
 
+	public static Integer toInt(String value, String errorMessage) {
+		Integer res = null;
+		try {
+			res = (StringUtils.isNotEmpty(value) ? Integer.valueOf(value) : null);
+		} catch (NumberFormatException e) {
+			logger.error(errorMessage + " (" + value + ")", e);
+		}	
+		return res;
+	}
+
 	/** 
 	 * modalita' di estrazione della classifica
 	 * 		True classifica dei ribassi

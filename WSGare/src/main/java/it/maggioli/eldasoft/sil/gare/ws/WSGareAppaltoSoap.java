@@ -1,8 +1,8 @@
 package it.maggioli.eldasoft.sil.gare.ws;
 
-import it.maggioli.eldasoft.sil.gare.ws.search.AvvisiTypeSearch;
-import it.maggioli.eldasoft.sil.gare.ws.search.EsitoTypeSearch;
-import it.maggioli.eldasoft.sil.gare.ws.search.GaraTypeSearch;
+import it.maggioli.eldasoft.sil.gare.ws.out_type.BooleanOutType;
+import it.maggioli.eldasoft.sil.gare.ws.out_type.StringOutType;
+import it.maggioli.eldasoft.sil.gare.ws.search.*;
 import org.apache.cxf.annotations.WSDLDocumentation;
 
 import javax.jws.WebParam;
@@ -260,14 +260,30 @@ public interface WSGareAppaltoSoap {
         @WebParam(name = "codiceGara", targetNamespace = "")
         java.lang.String codiceGara
     );
-
+	
+	@WSDLDocumentation("Restituisce il dettaglio di una gara a partire dal cig")
+    public it.maggioli.eldasoft.sil.gare.ws.DettaglioGaraOutType getDettaglioGaraByCig(
+        @WebParam(name = "cig", targetNamespace = "")
+        java.lang.String cig
+    );
+	
 	@WSDLDocumentation("Restituisce l'elenco degli stati dei prodotti.")
     public java.lang.String getElencoStatiProdotto();
 
 	@WSDLDocumentation("Restituisce il dettaglio di un avviso di gara a partire dalla sua chiave.")
     public it.maggioli.eldasoft.sil.gare.ws.DettaglioAvvisoOutType getDettaglioAvviso(
         @WebParam(name = "codiceGara", targetNamespace = "")
-        java.lang.String codiceGara
+        java.lang.String codiceGara,
+        @WebParam(name = "numAnniPubblicazione", targetNamespace = "")
+        int numAnniPubblicazione
+    );
+
+	@WSDLDocumentation("Restituisce il dettaglio di un avviso di gara a partire dal cig.")
+    public it.maggioli.eldasoft.sil.gare.ws.DettaglioAvvisoOutType getDettaglioAvvisoByCig(
+        @WebParam(name = "cig", targetNamespace = "")
+        java.lang.String cig,
+        @WebParam(name = "numAnniPubblicazione", targetNamespace = "")
+        int numAnniPubblicazione
     );
 
 	@WSDLDocumentation("Restituisce il numero di prodotti inseriti in stato 'In catalogo' o 'In " +
@@ -678,6 +694,12 @@ public interface WSGareAppaltoSoap {
         @WebParam(name = "codiceLotto", targetNamespace = "")
         java.lang.String codiceLotto
     );
+	
+	@WSDLDocumentation("Restituisce il codice di una gara a partire da un suo lotto.")
+	public String getCodiceGaraFromLotto(
+			@WebParam(name = "codiceLotto", targetNamespace = "")
+	        java.lang.String codiceLotto
+	);
 
 	@WSDLDocumentation("")	
     public java.lang.String getElencoUnitaMisura();
@@ -821,6 +843,12 @@ public interface WSGareAppaltoSoap {
         @WebParam(name = "codiceGara", targetNamespace = "")
         java.lang.String codiceGara
     );
+	
+	@WSDLDocumentation("Restituisce il dettaglio di un esito a partire dalla cig.")
+    public it.maggioli.eldasoft.sil.gare.ws.DettaglioEsitoOutType getDettaglioEsitoByCig(
+        @WebParam(name = "cig", targetNamespace = "")
+        java.lang.String cig
+    );
 
 	@WSDLDocumentation("Restituisce la configurazione del check della partita iva facoltativa per un libero professionista.")
     public it.maggioli.eldasoft.sil.gare.ws.GetCfgCheckPIFacoltativaOutType getCfgCheckPIFacoltativaLiberoProfessionista();
@@ -885,6 +913,12 @@ public interface WSGareAppaltoSoap {
 
 	@WSDLDocumentation("Restituisce la lista degli avvisi di gara filtrando per i parametri di input")
     public it.maggioli.eldasoft.sil.gare.ws.ElencoAvvisiOutType searchAvvisi(
+        @WebParam(name = "filtri", targetNamespace = "")
+        AvvisiTypeSearch filtri
+    );
+
+	@WSDLDocumentation("Restituisce la lista degli avvisi generali di gara filtrando per i parametri di input")
+    public it.maggioli.eldasoft.sil.gare.ws.ElencoAvvisiOutType searchAvvisiGenerali(
         @WebParam(name = "filtri", targetNamespace = "")
         AvvisiTypeSearch filtri
     );
@@ -976,20 +1010,22 @@ public interface WSGareAppaltoSoap {
 	
 	@WSDLDocumentation("Restituisce l'elenco degli operatori per l'espletamento di gara per la busta amministrativa.")
 	public GetEspletamentoGaraElencoOperatoriOutType getEspletamentoGaraDocAmmElencoOperatori(
-			@WebParam(name = "codiceGara", targetNamespace = "")
-			String codiceGara,
-			@WebParam(name = "tokenRichiedente")
-			String tokenRichiedente
+            @WebParam(name = "search", targetNamespace = "")
+            EspletamentoElencoOperatoriSearch search
 	);
-	
-	@WSDLDocumentation("Restituisce l'elenco degli operatori per l'espletamento di gara per la busta tecnica.")
+
+    @WSDLDocumentation("Restituisce la ragione sociale anonimo assegnato all'impresa per la gara specificata.")
+    StringOutType getRagioneSocialeAnonima(
+            @WebParam(name = "codImp", targetNamespace = "")
+            String codImp
+            , @WebParam(name = "ngara", targetNamespace = "")
+            String ngara
+    );
+
+    @WSDLDocumentation("Restituisce l'elenco degli operatori per l'espletamento di gara per la busta tecnica.")
 	public GetEspletamentoGaraElencoOperatoriOutType getEspletamentoGaraValTecElencoOperatori(
-			@WebParam(name = "codice", targetNamespace = "")
-			String codice,
-			@WebParam(name = "codiceLotto")
-			String codiceLotto,
-			@WebParam(name = "tokenRichiedente")
-			String tokenRichiedente
+			@WebParam(name = "search", targetNamespace = "")
+            EspletamentoElencoOperatoriSearch search
 	);
 
 	@WSDLDocumentation("Restituisce l'elenco degli operatori per l'espletamento di gara a lotti per la busta tecnica.")
@@ -1002,12 +1038,8 @@ public interface WSGareAppaltoSoap {
 
 	@WSDLDocumentation("Restituisce l'elenco degli operatori per l'espletamento di gara per la busta economica.")
 	public GetEspletamentoGaraElencoOperatoriOutType getEspletamentoGaraOffEcoElencoOperatori(
-			@WebParam(name = "codice", targetNamespace = "")
-			String codice,
-			@WebParam(name = "codiceLotto")
-			String codiceLotto,
-			@WebParam(name = "tokenRichiedente")
-			String tokenRichiedente
+            @WebParam(name = "search", targetNamespace = "")
+            EspletamentoElencoOperatoriSearch search
 	);
 	
 	@WSDLDocumentation("Restituisce l'elenco degli operatori per l'espletamento di gara a lotti per la busta economica.")
@@ -1020,12 +1052,22 @@ public interface WSGareAppaltoSoap {
 	
 	@WSDLDocumentation("Restituisce l'elenco degli operatori per l'espletamento di gara per la graduatoria.")
 	public GetEspletamentoGaraElencoOperatoriOutType getEspletamentoGaraGraduatoriaElencoOperatori(
-			@WebParam(name = "codiceGara", targetNamespace = "")
-			String codiceGara,
-			@WebParam(name = "tokenRichiedente")
-			String tokenRichiedente
+			@WebParam(name = "search", targetNamespace = "")
+			EspletamentoElencoOperatoriSearch search
 	);
 
+	@WSDLDocumentation("Restituisce l'elenco delle prime cinque classificate con i relativi dei documenti.")
+	public GetEspletamentoGaraElencoOperatoriOutType getEspletamentoGaraAccessoDocumentiElencoOperatori(
+			@WebParam(name = "search", targetNamespace = "")
+			EspletamentoElencoOperatoriSearch search
+	);
+	
+	@WSDLDocumentation("Restituisce i documenti di una classificata dopo l'aggiudicazione di gara.")
+	public GetEspletamentoGaraAccessoDocumentiOutType getEspletamentoGaraAccessoDocumentiAtti(
+			String codice
+			, String tokenRichiedente
+	);		 
+	
 	@WSDLDocumentation("Restituisce la fase di una gara.")
 	public RisultatoNumericoOutType getFaseGara(
 			@WebParam(name = "codice")
@@ -1109,12 +1151,20 @@ public interface WSGareAppaltoSoap {
             java.util.Date dataPubblicazioneDa,
             @WebParam(name = "dataPubblicazioneA", targetNamespace = "")
             java.util.Date dataPubblicazioneA,
+            @WebParam(name = "codgara", targetNamespace = "")
+            String codgara,
             @WebParam(name = "sommaUrgenza", targetNamespace = "")
 	        java.lang.Boolean sommaUrgenza,
 	        @WebParam(name = "indicePrimoRecord", targetNamespace = "")
 	        int indicePrimoRecord,
 	        @WebParam(name = "maxNumRecord", targetNamespace = "")
 	        int maxNumRecord
+	);
+
+	@WSDLDocumentation("Restituisce il dettaglio di una delibera a contrarre.")
+	public DettaglioDeliberaOutType getDettaglioDelibera(
+            @WebParam(name = "codgara", targetNamespace = "")
+            String codgara
 	);
 
 	@WSDLDocumentation("Restituisce l'elenco delle gare di somma urgenza.")
@@ -1195,9 +1245,65 @@ public interface WSGareAppaltoSoap {
 	public String getTipiAmmissioneProcedura();
 
     @WSDLDocumentation("Informazioni Vendor Rating")
-    public GetVendorRatingOutType getVendorRating(@WebParam(name = "tokenRichiedente", targetNamespace = "")
-                                                String tokenRichiedente,
-                                            @WebParam(name = "data", targetNamespace = "")
-                                                java.util.Date data);
+    public GetVendorRatingOutType getVendorRating(
+            @WebParam(name = "tokenRichiedente", targetNamespace = "")
+            String tokenRichiedente
+            , @WebParam(name = "data", targetNamespace = "")
+            java.util.Date data
+    );
 
+    @WSDLDocumentation("Elenco operatori abilitati agli elenchi")
+    public ElencoOperatoriAbilitatiElenchiOutType getElencoOperatoriAbilitatiElenco(
+            @WebParam(name = "search", targetNamespace = "")
+            ElencoOperatoriAbilitatiSearch search
+            , @WebParam(name = "isRer", targetNamespace = "")
+            boolean isRer
+    );
+
+    @WSDLDocumentation("In caso l'operatore stia partecipando come operatore anonimo, ritorna true")
+    BooleanOutType isConcorsoCrypted(
+            @WebParam(name = "username", targetNamespace = "")
+            String username
+            , @WebParam(name = "ngara", targetNamespace = "")
+            String ngara
+    );
+
+    @WSDLDocumentation("Ritorna la denominazione rti del record su ditg collegato al concorso di secondo grado corrente")
+    StringOutType getDenominazioneConcorsoAllegato(
+            @WebParam(name = "username", targetNamespace = "")
+            String username
+            , @WebParam(name = "ngara", targetNamespace = "")
+            String ngara
+    );
+
+    @WSDLDocumentation("Ritorna i partecipanti del raggruppamento del record su ditg collegato al concorso di secondo grado corrente")
+    StringOutType getPartecipantiRaggruppamento(
+            @WebParam(name = "username", targetNamespace = "")
+            String username
+            , @WebParam(name = "ngara", targetNamespace = "")
+            String ngara
+    );
+
+    @WSDLDocumentation("Ritorna il codice della gara di secondo grado collegata alla gara di primo grado inviata")
+    StringOutType getCodiceSecondoGrado(
+            @WebParam(name = "username", targetNamespace = "")
+            String username
+            , @WebParam(name = "codice", targetNamespace = "")
+            String codice
+    );
+
+    @WSDLDocumentation("Ritorna true se la gara di primo grado inviata ha una gara corrispondente di secondo grado con graduatoria attiva")
+    BooleanOutType canShowRankingFirstGradeCompetition(
+            @WebParam(name = "ngara", targetNamespace = "")
+            String ngara
+    );
+
+    @WSDLDocumentation("Restituisce l'elenco dei tipi di avvalimento.")
+	public String getTipiAvvalimento();
+    
+    @WSDLDocumentation("Restituisce l'elenco delle imprese ausiliarie associate ad un avvalimento di gara.")
+    public ImpreseAusiliarieOutType getImpreseAusiliarie(String username, String codice, String progressivoOfferta);
+    
+    @WSDLDocumentation("Restituisce l'elenco dei tipi impresa e natura giuridica.")
+	public String getTipiImpresaNaturaGiuridica();
 }

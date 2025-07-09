@@ -33,7 +33,7 @@ public interface ContrattiLFSMapper {
     public ContrattoLFSType getDettaglioContrattoLFS(
             @Param("username") String username
             , @Param("codice") String codice
-            , @Param("nappal") String napal
+            , @Param("nappal") Long napal
     );
     public String getListaNgaraLFS(
             @Param("clavor") String clavor

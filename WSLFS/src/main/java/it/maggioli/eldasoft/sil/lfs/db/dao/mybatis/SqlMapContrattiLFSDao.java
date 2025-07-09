@@ -7,6 +7,8 @@ import it.maggioli.eldasoft.sil.gare.ws.DocumentoAllegatoType;
 import it.maggioli.eldasoft.sil.lfs.db.dao.ContrattiLFSDao;
 import it.maggioli.eldasoft.sil.lfs.db.mapper.ContrattiLFSMapper;
 import it.maggioli.eldasoft.sil.lfs.ws.ContrattoLFSType;
+
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Component;
@@ -62,7 +64,11 @@ public class SqlMapContrattiLFSDao implements ContrattiLFSDao {
 			String tokenRichiedente,
 			String codice, 
 			String nappal) {
-		return contrattiLFSMapper.getDettaglioContrattoLFS(tokenRichiedente, codice, nappal);
+		return contrattiLFSMapper.getDettaglioContrattoLFS(
+				tokenRichiedente
+				, codice
+				, (StringUtils.isNotEmpty(nappal) ? Long.valueOf(nappal) : null)
+		);
 	}
 	
 	public List<DocumentoAllegatoType> getAllegatiContrattoLFS(String codice) {

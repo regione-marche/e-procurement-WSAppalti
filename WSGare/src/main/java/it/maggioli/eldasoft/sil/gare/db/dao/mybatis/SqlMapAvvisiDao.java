@@ -19,6 +19,8 @@ import it.maggioli.eldasoft.sil.gare.db.mapper.AvvisiMapper;
 import it.maggioli.eldasoft.sil.gare.ws.AvvisoType;
 import it.maggioli.eldasoft.sil.gare.ws.StazioneAppaltanteBandoType;
 import it.maggioli.eldasoft.sil.gare.ws.search.AvvisiTypeSearch;
+
+import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Component;
@@ -45,23 +47,78 @@ public class SqlMapAvvisiDao implements AvvisiDao {
 	private AvvisiMapper avvisiMapper;
 
 	@Override
-	public List<AvvisoType> searchAvvisi(AvvisiTypeSearch filtri) throws DataAccessException, SqlComposerException {
+	public List<AvvisoType> searchAvvisiGenerali(AvvisiTypeSearch filtri) throws DataAccessException, SqlComposerException {
 		SqlComposer composer = SqlManager.getComposer(dbms);
+		Date today = new Date();
 
-		return avvisiMapper.searchAvvisi(
-				SqlMapBandiDao.getAnnoMinimoPubblicazione(filtri.getNumAnniPubblicazione())
+		return avvisiMapper.searchAvvisiGenerali(
+				today
+				, SqlMapBandiDao.getAnnoMinimoPubblicazione(filtri.getNumAnniPubblicazione())
 				, filtri.getStazioneAppaltante()
 				, composer.getFunzioneUpperCase()
 				, toWithPercentAndUpper(filtri.getOggetto())
-				, BandiManager.toInt(filtri.getTipoAvviso(), "Formato non valido per il tipo avvis")
+				, BandiManager.toInt(filtri.getTipoAvviso(), "Formato non valido per il tipo avviso")
 				, filtri.getDataPubblicazioneDa()
 				, filtri.getDataPubblicazioneA()
 				, filtri.getDataScadenzaDa()
 				, filtri.getDataScadenzaA()
+				, BandiManager.toInt(filtri.getStato(), "Formato non valido per lo stato")
 				, BandiManager.toInt(filtri.getAltriSoggetti(), "Formato non valido per altri soggetti")
 				, filtri.getIsGreen()
 				, filtri.getIsRecycle()
 				, filtri.getIsPnrr()
+				, BandiManager.toInt(filtri.getTipoAvvisoGenerale(), "Formato non valido per il tipo avviso generale")
+				, getBounds(filtri.getIndicePrimoRecord(), filtri.getMaxNumRecord())
+		);
+	}
+
+	@Override
+	public int countAvvisiGenerali(AvvisiTypeSearch filtri) throws DataAccessException, SqlComposerException {
+		SqlComposer composer = SqlManager.getComposer(dbms);
+		Date today = new Date();
+
+		return avvisiMapper.countAvvisiGenerali(
+				today
+				, SqlMapBandiDao.getAnnoMinimoPubblicazione(filtri.getNumAnniPubblicazione())
+				, filtri.getStazioneAppaltante()
+				, composer.getFunzioneUpperCase()
+				, toWithPercentAndUpper(filtri.getOggetto())
+				, BandiManager.toInt(filtri.getTipoAvviso(), "Formato non valido per il tipo avviso")
+				, filtri.getDataPubblicazioneDa()
+				, filtri.getDataPubblicazioneA()
+				, filtri.getDataScadenzaDa()
+				, filtri.getDataScadenzaA()
+				, BandiManager.toInt(filtri.getStato(), "Formato non valido per lo stato")
+				, BandiManager.toInt(filtri.getAltriSoggetti(), "Formato non valido per altri soggetti")
+				, filtri.getIsGreen()
+				, filtri.getIsRecycle()
+				, filtri.getIsPnrr()
+				, BandiManager.toInt(filtri.getTipoAvvisoGenerale(), "Formato non valido per il tipo avviso generale")
+		);
+	}
+	
+	@Override
+	public List<AvvisoType> searchAvvisi(AvvisiTypeSearch filtri) throws DataAccessException, SqlComposerException {
+		SqlComposer composer = SqlManager.getComposer(dbms);
+		Date today = new Date();
+		
+		return avvisiMapper.searchAvvisi(
+				today
+				, SqlMapBandiDao.getAnnoMinimoPubblicazione(filtri.getNumAnniPubblicazione())
+				, filtri.getStazioneAppaltante()
+				, composer.getFunzioneUpperCase()
+				, toWithPercentAndUpper(filtri.getOggetto())
+				, BandiManager.toInt(filtri.getTipoAvviso(), "Formato non valido per il tipo avviso")
+				, filtri.getDataPubblicazioneDa()
+				, filtri.getDataPubblicazioneA()
+				, filtri.getDataScadenzaDa()
+				, filtri.getDataScadenzaA()
+				, BandiManager.toInt(filtri.getStato(), "Formato non valido per lo stato")
+				, BandiManager.toInt(filtri.getAltriSoggetti(), "Formato non valido per altri soggetti")
+				, filtri.getIsGreen()
+				, filtri.getIsRecycle()
+				, filtri.getIsPnrr()
+				, null
 				, getBounds(filtri.getIndicePrimoRecord(), filtri.getMaxNumRecord())
 		);
 	}
@@ -69,21 +126,25 @@ public class SqlMapAvvisiDao implements AvvisiDao {
 	@Override
 	public int countAvvisi(AvvisiTypeSearch filtri) throws DataAccessException, SqlComposerException {
 		SqlComposer composer = SqlManager.getComposer(dbms);
-
+		Date today = new Date();
+		
 		return avvisiMapper.countAvvisi(
-				SqlMapBandiDao.getAnnoMinimoPubblicazione(filtri.getNumAnniPubblicazione())
+				today
+				, SqlMapBandiDao.getAnnoMinimoPubblicazione(filtri.getNumAnniPubblicazione())
 				, filtri.getStazioneAppaltante()
 				, composer.getFunzioneUpperCase()
 				, toWithPercentAndUpper(filtri.getOggetto())
-				, BandiManager.toInt(filtri.getTipoAvviso(), "Formato non valido per il tipo avvis")
+				, BandiManager.toInt(filtri.getTipoAvviso(), "Formato non valido per il tipo avviso")
 				, filtri.getDataPubblicazioneDa()
 				, filtri.getDataPubblicazioneA()
 				, filtri.getDataScadenzaDa()
 				, filtri.getDataScadenzaA()
+				, BandiManager.toInt(filtri.getStato(), "Formato non valido per lo stato")
 				, BandiManager.toInt(filtri.getAltriSoggetti(), "Formato non valido per altri soggetti")
 				, filtri.getIsGreen()
 				, filtri.getIsRecycle()
 				, filtri.getIsPnrr()
+				, null
 		);
 	}
 
@@ -94,18 +155,21 @@ public class SqlMapAvvisiDao implements AvvisiDao {
 
 		return avvisiMapper.getElencoAvvisi(
 				  today
+				, SqlMapBandiDao.getAnnoMinimoPubblicazione(filtri.getNumAnniPubblicazione())
 				, filtri.getStazioneAppaltante()
 				, composer.getFunzioneUpperCase()
 				, toWithPercentAndUpper(filtri.getOggetto())
-				, BandiManager.toInt(filtri.getTipoAvviso(), "Formato non valido per il tipo avvis")
+				, BandiManager.toInt(filtri.getTipoAvviso(), "Formato non valido per il tipo avviso")
 				, filtri.getDataPubblicazioneDa()
 				, filtri.getDataPubblicazioneA()
 				, filtri.getDataScadenzaDa()
 				, filtri.getDataScadenzaA()
+				, null
 				, BandiManager.toInt(filtri.getAltriSoggetti(), "Formato non valido per altri soggetti")
 				, filtri.getIsGreen()
 				, filtri.getIsRecycle()
 				, filtri.getIsPnrr()
+				, null
 				, getBounds(filtri.getIndicePrimoRecord(), filtri.getMaxNumRecord())
 		);
 	}
@@ -117,18 +181,21 @@ public class SqlMapAvvisiDao implements AvvisiDao {
 
 		return avvisiMapper.countElencoAvvisi(
 				  today
+				  , SqlMapBandiDao.getAnnoMinimoPubblicazione(filtri.getNumAnniPubblicazione())  
 				, filtri.getStazioneAppaltante()
 				, composer.getFunzioneUpperCase()
 				, toWithPercentAndUpper(filtri.getOggetto())
-				, BandiManager.toInt(filtri.getTipoAvviso(), "Formato non valido per il tipo avvis")
+				, BandiManager.toInt(filtri.getTipoAvviso(), "Formato non valido per il tipo avviso")
 				, filtri.getDataPubblicazioneDa()
 				, filtri.getDataPubblicazioneA()
 				, filtri.getDataScadenzaDa()
 				, filtri.getDataScadenzaA()
+				, null
 				, BandiManager.toInt(filtri.getAltriSoggetti(), "Formato non valido per altri soggetti")
 				, filtri.getIsGreen()
 				, filtri.getIsRecycle()
 				, filtri.getIsPnrr()
+				, null
 		);
 	}
 	
@@ -143,15 +210,17 @@ public class SqlMapAvvisiDao implements AvvisiDao {
 				, filtri.getStazioneAppaltante()
 				, composer.getFunzioneUpperCase()
 				, toWithPercentAndUpper(filtri.getOggetto())
-				, BandiManager.toInt(filtri.getTipoAvviso(), "Formato non valido per il tipo avvis")
+				, BandiManager.toInt(filtri.getTipoAvviso(), "Formato non valido per il tipo avviso")
 				, filtri.getDataPubblicazioneDa()
 				, filtri.getDataPubblicazioneA()
 				, filtri.getDataScadenzaDa()
 				, filtri.getDataScadenzaA()
+				, null
 				, BandiManager.toInt(filtri.getAltriSoggetti(), "Formato non valido per altri soggetti")
 				, filtri.getIsGreen()
 				, filtri.getIsRecycle()
 				, filtri.getIsPnrr()
+				, null
 				, getBounds(filtri.getIndicePrimoRecord(), filtri.getMaxNumRecord())
 		);
 	}
@@ -167,27 +236,45 @@ public class SqlMapAvvisiDao implements AvvisiDao {
 				, filtri.getStazioneAppaltante()
 				, composer.getFunzioneUpperCase()
 				, toWithPercentAndUpper(filtri.getOggetto())
-				, BandiManager.toInt(filtri.getTipoAvviso(), "Formato non valido per il tipo avvis")
+				, BandiManager.toInt(filtri.getTipoAvviso(), "Formato non valido per il tipo avviso")
 				, filtri.getDataPubblicazioneDa()
 				, filtri.getDataPubblicazioneA()
 				, filtri.getDataScadenzaDa()
 				, filtri.getDataScadenzaA()
+				, null
 				, BandiManager.toInt(filtri.getAltriSoggetti(), "Formato non valido per altri soggetti")
 				, filtri.getIsGreen()
 				, filtri.getIsRecycle()
 				, filtri.getIsPnrr()
+				, null
 		);	
 	}
 	
 	@Override
-	public StazioneAppaltanteBandoType getStazioneAppaltanteAvviso(String codice)
-			throws DataAccessException {
+	public StazioneAppaltanteBandoType getStazioneAppaltanteAvviso(String codice) throws DataAccessException {
 		return avvisiMapper.getStazioneAppaltanteAvviso(codice);
 	}
 	
 	@Override
-	public AvvisoType getAvviso(String codiceGara) throws DataAccessException {
-		return avvisiMapper.getAvviso(codiceGara);
+	public AvvisoType getAvviso(String codiceGara, int numAnniPubblicazione) throws DataAccessException {
+		Date today = new Date();
+		
+		return avvisiMapper.getAvviso(
+				today
+				, SqlMapBandiDao.getAnnoMinimoPubblicazione(numAnniPubblicazione)
+				, codiceGara
+		);
+	}
+	
+	@Override
+	public AvvisoType getAvvisoByCig(String cig, int numAnniPubblicazione) throws DataAccessException {
+		Date today = new Date();
+		
+		return avvisiMapper.getAvvisoByCig(
+				today
+				, SqlMapBandiDao.getAnnoMinimoPubblicazione(numAnniPubblicazione)
+				, cig
+		);
 	}
 
 }

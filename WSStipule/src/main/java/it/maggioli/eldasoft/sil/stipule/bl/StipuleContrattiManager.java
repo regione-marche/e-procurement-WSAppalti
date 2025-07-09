@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -96,8 +95,12 @@ public class StipuleContrattiManager {
 	}
 
 	@Transactional(propagation = Propagation.REQUIRED)
-	public void insertAllegato(String nomeFile, Long idDocStipula, byte[] allegato, String note,String firmacheck, Date firmacheckts) {
-		this.stipuleContrattiDao.insertAllegato(nomeFile, idDocStipula, allegato, firmacheck, firmacheckts);
+	public void insertAllegato(
+			Long idDocStipula
+			, AllegatoComunicazioneType allegato
+			, String note
+	) {
+		this.stipuleContrattiDao.insertAllegato(idDocStipula, allegato);
 		this.stipuleContrattiDao.updateNoteDoc(idDocStipula, note);
 	}
 

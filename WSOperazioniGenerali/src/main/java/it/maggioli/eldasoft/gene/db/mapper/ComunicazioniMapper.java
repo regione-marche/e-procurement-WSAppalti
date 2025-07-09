@@ -1,12 +1,11 @@
 package it.maggioli.eldasoft.gene.db.mapper;
 
-import it.maggioli.eldasoft.gene.ws.AllegatoComunicazioneType;
-import it.maggioli.eldasoft.gene.ws.DettaglioComunicazioneType;
-import it.maggioli.eldasoft.gene.ws.WSAllegatoType;
-import it.maggioli.eldasoft.gene.ws.WSDocumentoType;
+import it.maggioli.eldasoft.gene.model.UploadInfo;
+import it.maggioli.eldasoft.gene.ws.*;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Date;
 import java.util.List;
 
 @Mapper
@@ -39,6 +38,7 @@ public interface ComunicazioniMapper {
             , @Param("idRisposta") Long idRisposta
             , @Param("modello") Long modello
             , @Param("tipoBusta") Long tipoBusta
+            , @Param("stazioneAppaltante") String stazioneAppaltante
     );
     public int updateComunicazione(
             @Param("entita") String entita
@@ -63,6 +63,7 @@ public interface ComunicazioniMapper {
             , @Param("tipoBusta") Long tipoBusta
             , @Param("applicativo") String applicativo
             , @Param("id") Long id    //Da controllare
+            , @Param("stazioneAppaltante") String stazioneAppaltante
     );
     public int deleteComunicazione(
              @Param("applicativo") String applicativo
@@ -78,12 +79,14 @@ public interface ComunicazioniMapper {
             , @Param("idComunicazione") Long idComunicazione
             , @Param("progressivo") Integer progressivo
             , @Param("uuid") String uuid
+            , @Param("cifrato") String cifrato
             , @Param("tipo") String tipo
             , @Param("nomeFile") String nomeFile
             , @Param("descrizione") String descrizione
             , @Param("file") byte[] file
             , @Param("firmacheck") String firmacheck
             , @Param("firmacheckts") java.util.Date firmacheckts
+            , @Param("bucket_info") UploadInfo bucket_info
     );
     public int updateAllegato(
             @Param("progressivo") Integer progressivo
@@ -92,13 +95,17 @@ public interface ComunicazioniMapper {
             , @Param("descrizione") String descrizione
             , @Param("file") byte[] file
             , @Param("uuid") String uuid
+            , @Param("cifrato") String cifrato
             , @Param("firmacheck") String firmacheck
-            , @Param("firmacheckts") java.util.Date firmacheckts
+            , @Param("firmacheckts") Date firmacheckts
             , @Param("applicativo") String applicativo
             , @Param("id") Long id
             , @Param("entita") String entita
             , @Param("idComunicazione") Long idComunicazione
+            , @Param("info") UploadInfo info
+            , @Param("has_to_force_null_digogg") boolean has_to_force_null_digogg
     );
+
     public int deleteAllegato(
             @Param("applicativo") String applicativo
             , @Param("id") Long id
@@ -133,8 +140,49 @@ public interface ComunicazioniMapper {
             , @Param("idComunicazione") String idComunicazione
             , @Param("idDocumento") String idDocumento
     );
+    public List<AllegatoComunicazioneType> getAllegatiComunicazioneNoFile(
+            @Param("applicativo") String applicativo
+            , @Param("entita") String entita
+            , @Param("idComunicazione") String idComunicazione
+            , @Param("idDocumento") String idDocumento
+    );
     public List<DettaglioComunicazioneType> getElencoComunicazioni(
-            DettaglioComunicazioneType criteriRicerca
+    		@Param("applicativo") String applicativo
+    		, @Param("id") Long id
+            , @Param("entita") String entita
+            , @Param("chiave1") String chiave1
+            , @Param("chiave2") String chiave2
+            , @Param("chiave3") String chiave3
+            , @Param("chiave4") String chiave4
+            , @Param("chiave5") String chiave5
+            , @Param("idOperatore") Long idOperatore
+            , @Param("mittente") String mittente
+            , @Param("stato") String stato
+            , @Param("oggetto") String oggetto
+            , @Param("testo") String testo
+            , @Param("comunicazionePubblica") Long comunicazionePubblica
+            , @Param("tipoComunicazione") String tipoComunicazione
+            , @Param("dataPubblicazione") java.util.Date dataPubblicazione
+            , @Param("modello") Long modello
+    );
+    public List<DettaglioComunicazioneType> searchElencoComunicazioni(
+    		@Param("applicativo") String applicativo
+    		, @Param("id") Long id
+            , @Param("entita") String entita
+            , @Param("chiave1") String chiave1
+            , @Param("chiave2") String chiave2
+            , @Param("chiave3") String chiave3
+            , @Param("chiave4") String chiave4
+            , @Param("chiave5") String chiave5
+            , @Param("idOperatore") Long idOperatore
+            , @Param("mittente") String mittente
+            , @Param("stato") String stato
+            , @Param("oggetto") String oggetto
+            , @Param("testo") String testo
+            , @Param("comunicazionePubblica") Long comunicazionePubblica
+            , @Param("tipoComunicazione") String tipoComunicazione
+            , @Param("dataPubblicazione") java.util.Date dataPubblicazione
+            , @Param("modello") Long modello
     );
     public Integer isComunicazioneProcessata(
              @Param("applicativo") String applicativo
@@ -167,4 +215,15 @@ public interface ComunicazioniMapper {
             , @Param("applicativo") String applicativo
             , @Param("idComunicazione") Long idComunicazione
     );
+
+    String getStatoComunicazione(
+            @Param("usernome") String codImp
+            , @Param("numGara") String numGara
+            , @Param("bustaType") String bustaType
+    );
+    DigoggType getRichiestaPartecipazione(
+            @Param("username") String username
+            , @Param("ngara") String ngara
+    );
+
 }

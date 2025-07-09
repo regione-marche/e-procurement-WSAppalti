@@ -3,7 +3,11 @@
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="it.maggioli.eldasoft.gene.db.mapper.ComunicazioniMapper">
 
-	<resultMap id="dettaglioComunicazione" type="it.maggioli.eldasoft.gene.ws.DettaglioComunicazioneType">
+    <resultMap id="digogg" type="it.maggioli.eldasoft.gene.ws.DigoggType">
+        <result property="digogg" column="digogg" jdbcType="BINARY"/>
+    </resultMap>
+
+    <resultMap id="dettaglioComunicazione" type="it.maggioli.eldasoft.gene.ws.DettaglioComunicazioneType">
 		<result property="applicativo" column="idprg"/>
 		<result property="id" column="idcom"/>
 		<result property="entita" column="coment"/>
@@ -30,6 +34,9 @@
 		<result property="idRisposta" column="idcomris"/>
 		<result property="modello" column="commodello"/>
 		<result property="tipoBusta" column="comtipma"/>
+		<result property="stazioneAppaltante" column="idcfg"/>
+		<result property="dataScadenza" column="comdatsca"/>
+		<result property="oraScadenza" column="comorasca"/>
 	</resultMap>
 	
 	<resultMap id="allegatoComunicazione" type="it.maggioli.eldasoft.gene.ws.AllegatoComunicazioneType">
@@ -38,16 +45,20 @@
 		<result property="nomeFile" column="dignomdoc"/>
 		<result property="descrizione" column="digdesdoc"/>
 		<result property="file" column="digogg" jdbcType="BINARY"/>
-<!-- 		<result property="file" column="digogg" columnIndex="5" jdbcType="BINARY" typeHandler="datahandlerHandler" /> -->
+<!-- 		<result property="file" column="digogg" columnIndex="5" jdbcType="BINARY" typeHandler="datahandlerHandler" /> -->		
 		<result property="uuid" column="digkey3"/>
 		<result property="firmacheck" column="firmacheck"/>
 		<result property="firmacheckts" column="firmacheckts"/>
+		<result property="cifrato" column="digkey4"/>
+        <result property="bucket_uuid" column="bucket_uuid"/>
+        <result property="bucket_ref" column="bucket_ref"/>
 	</resultMap>
 
   <sql id="selectComunicazione">
   select idprg, idcom, coment, comkey1, comkey2, comkey3, comkey4, comkey5, comcodope, committ, comstato, commsgogg, commsgtes, 
   CASE WHEN compub is null THEN null ELSE (CASE WHEN compub=1 THEN 1 ELSE 0 END) END AS comunicazione_pubblica, 
-  comtipo, comdatapub, comdatins, comdatlet, comdatprot, comnumprot, comkeysess, comdatastato, idprgris, idcomris, commodello, comtipma
+  comtipo, comdatapub, comdatins, comdatlet, comdatprot, comnumprot, comkeysess, comdatastato, idprgris, idcomris, commodello, comtipma,
+  comdatsca, comorasca
   </sql>
   
   <select id="getMaxIdComunicazione" parameterType="java.lang.String" resultType="java.lang.Long">
@@ -57,17 +68,19 @@
   <insert id="insertComunicazione" parameterType="java.util.HashMap">
   insert into w_invcom (idprg, idcom, coment, comkey1, comkey2, comkey3, comkey4, comkey5, comcodope, comdatins, committ, 
   					    comstato, commsgogg, commsgtes, compub, comtipo, comdatastato, comdatapub, comkeysess,
-  					    idprgris, idcomris, commodello, comtipma)
+  					    idprgris, idcomris, commodello, comtipma, idcfg)
   values (#{applicativo}, #{id}, #{entita,jdbcType=VARCHAR}, #{chiave1,jdbcType=VARCHAR}, #{chiave2,jdbcType=VARCHAR}, #{chiave3,jdbcType=VARCHAR}, #{chiave4,jdbcType=VARCHAR}, #{chiave5,jdbcType=VARCHAR}, #{idOperatore,jdbcType=NUMERIC}, #{dataInserimento,jdbcType=TIMESTAMP}, #{mittente,jdbcType=VARCHAR}, 
   		  #{stato,jdbcType=VARCHAR}, #{oggetto,jdbcType=VARCHAR}, #{testo,jdbcType=VARCHAR}, #{comunicazionePubblica,jdbcType=NUMERIC}, #{tipoComunicazione,jdbcType=VARCHAR}, #{dataAggStato,jdbcType=TIMESTAMP}, #{dataPubblicazione,jdbcType=TIMESTAMP}, #{sessionKey,jdbcType=VARCHAR},
-  		  #{applicativoRisposta,jdbcType=VARCHAR}, #{idRisposta,jdbcType=NUMERIC}, #{modello,jdbcType=NUMERIC}, #{tipoBusta,jdbcType=NUMERIC})
+  		  #{applicativoRisposta,jdbcType=VARCHAR}, #{idRisposta,jdbcType=NUMERIC}, #{modello,jdbcType=NUMERIC}, #{tipoBusta,jdbcType=NUMERIC},
+  		  #{stazioneAppaltante,jdbcType=VARCHAR})
   </insert>
   
   <update id="updateComunicazione" parameterType="java.util.HashMap">
   update w_invcom set coment = #{entita,jdbcType=VARCHAR}, comkey1 = #{chiave1,jdbcType=VARCHAR}, comkey2 = #{chiave2,jdbcType=VARCHAR}, comkey3 = #{chiave3,jdbcType=VARCHAR}, comkey4 = #{chiave4,jdbcType=VARCHAR}, comkey5 = #{chiave5,jdbcType=VARCHAR}, 
          comcodope = #{idOperatore,jdbcType=NUMERIC}, committ = #{mittente,jdbcType=VARCHAR}, comstato = #{stato,jdbcType=VARCHAR}, commsgogg = #{oggetto,jdbcType=VARCHAR}, commsgtes = #{testo,jdbcType=VARCHAR},
          compub = #{comunicazionePubblica,jdbcType=NUMERIC}, comtipo = #{tipoComunicazione,jdbcType=VARCHAR}, comdatastato = #{dataAggStato,jdbcType=TIMESTAMP}, comdatapub = #{dataPubblicazione,jdbcType=TIMESTAMP},
-         comkeysess = #{sessionKey,jdbcType=VARCHAR}, idprgris = #{applicativoRisposta,jdbcType=VARCHAR}, idcomris = #{idRisposta,jdbcType=NUMERIC}, commodello = #{modello,jdbcType=NUMERIC}, comtipma = #{tipoBusta,jdbcType=NUMERIC}
+         comkeysess = #{sessionKey,jdbcType=VARCHAR}, idprgris = #{applicativoRisposta,jdbcType=VARCHAR}, idcomris = #{idRisposta,jdbcType=NUMERIC}, commodello = #{modello,jdbcType=NUMERIC}, comtipma = #{tipoBusta,jdbcType=NUMERIC},
+         idcfg = #{stazioneAppaltante,jdbcType=VARCHAR}
   where idprg = #{applicativo} and idcom = #{id}
   </update>
   
@@ -80,17 +93,37 @@
   </select>
 
   <insert id="insertAllegato" parameterType="java.util.HashMap">
-  insert into w_docdig (idprg, iddocdig, digent, digkey1, digkey2, digkey3, digtipdoc, dignomdoc, digdesdoc, digogg, firmacheck, firmacheckts)
-  values (#{applicativo}, #{id}, #{entita}, #{idComunicazione}, #{progressivo}, #{uuid,jdbcType=VARCHAR}, #{tipo,jdbcType=VARCHAR}, #{nomeFile,jdbcType=VARCHAR}, #{descrizione,jdbcType=VARCHAR}, #{file,jdbcType=BINARY}, #{firmacheck,jdbcType=VARCHAR}, #{firmacheckts,jdbcType=TIMESTAMP})
+  insert into w_docdig (idprg, iddocdig, digent, digkey1, digkey2, digkey3, digkey4, digtipdoc, dignomdoc, digdesdoc, digogg, firmacheck, firmacheckts, bucket_uuid, bucket_ref)
+  values (
+      #{applicativo}
+      , #{id}
+      , #{entita}
+      , #{idComunicazione}
+      , #{progressivo}
+      , #{uuid,jdbcType=VARCHAR}
+      , #{cifrato,jdbcType=VARCHAR}
+      , #{tipo,jdbcType=VARCHAR}
+      , #{nomeFile,jdbcType=VARCHAR}
+      , #{descrizione,jdbcType=VARCHAR}
+      , #{file,jdbcType=BINARY}
+      , #{firmacheck,jdbcType=VARCHAR}
+      , #{firmacheckts,jdbcType=TIMESTAMP}
+      , #{bucket_info.uuid}
+      , #{bucket_info.bucket_ref}
+  )
   </insert>
   
   <insert id="updateAllegato" parameterType="java.util.HashMap">
   update w_docdig set digkey2 = #{progressivo}, digtipdoc = #{tipo,jdbcType=VARCHAR}, dignomdoc = #{nomeFile,jdbcType=VARCHAR}, digdesdoc = #{descrizione,jdbcType=VARCHAR},
-  					  <if test="file != null and file != ''"> digogg = #{file,jdbcType=BINARY}, </if>   					  
-                      digkey3 = #{uuid,jdbcType=VARCHAR}
+  					  <if test="file != null and file != '' and !has_to_force_null_digogg"> digogg = #{file,jdbcType=BINARY}, </if>
+                        <if test="has_to_force_null_digogg"> digogg = NULL, </if>
+                      digkey3 = #{uuid,jdbcType=VARCHAR},
+                      digkey4 = #{cifrato,jdbcType=VARCHAR}
                       <if test="firmacheck != null and firmacheck != ''"> , firmacheck = #{firmacheck,jdbcType=VARCHAR} </if>
                       <if test="firmacheckts != null"> , firmacheckts = #{firmacheckts,jdbcType=TIMESTAMP} </if>
-  where idprg = #{applicativo} and iddocdig = #{id} and digent = #{entita} and digkey1 = #{idComunicazione}
+                        , bucket_ref = #{info.bucket_ref,jdbcType=VARCHAR}
+                        , bucket_uuid = #{info.uuid,jdbcType=VARCHAR}
+  where idprg = #{applicativo} and iddocdig = #{id} and digent = #{entita} and digkey1 = cast(#{idComunicazione} as varchar(30))
   </insert>
   
   <delete id="deleteAllegato" parameterType="java.util.HashMap">
@@ -121,19 +154,29 @@
   </select>
   
   <select id="getAllegatiComunicazione" parameterType="java.util.HashMap" resultMap="allegatoComunicazione">
-  select iddocdig, digtipdoc, dignomdoc, digdesdoc, digogg, digkey3, firmacheck, firmacheckts
+  select iddocdig, digtipdoc, dignomdoc, digdesdoc, digogg, digkey3, digkey4, firmacheck, firmacheckts, bucket_uuid, bucket_ref
     from w_docdig
    where idprg = #{applicativo} and digent = #{entita} and digkey1 = #{idComunicazione}
    <if test="idDocumento != null and idDocumento != ''">and 
    		 ((dignomdoc = #{idDocumento} and digkey3 is null) or 
-   		  (digkey3 = #{idDocumento} and digtipdoc is null))  
+   		  (digkey3 = #{idDocumento}))  
    </if>
 order by digkey2 
   </select>
-  
-  <select id="getElencoComunicazioni"
-          parameterType="it.maggioli.eldasoft.gene.ws.DettaglioComunicazioneType"
-          resultMap="dettaglioComunicazione">
+
+<select id="getAllegatiComunicazioneNoFile" parameterType="java.util.HashMap" resultMap="allegatoComunicazione">
+    select iddocdig, digtipdoc, dignomdoc, digdesdoc, digkey3, digkey4, firmacheck, firmacheckts, bucket_uuid, bucket_ref
+    from w_docdig
+    where idprg = #{applicativo} and digent = #{entita} and digkey1 = #{idComunicazione}
+    <if test="idDocumento != null and idDocumento != ''">and
+        ((dignomdoc = #{idDocumento} and digkey3 is null) or
+        (digkey3 = #{idDocumento}))
+    </if>
+    order by digkey2
+</select>
+
+
+    <select id="getElencoComunicazioni" parameterType="java.util.HashMap" resultMap="dettaglioComunicazione">
   <include refid="selectComunicazione"/>
     from w_invcom
    where idprg = #{applicativo} 
@@ -144,6 +187,32 @@ order by digkey2
    <if test="chiave3 != null and chiave3 != ''">and comkey3 = #{chiave3}</if>
    <if test="chiave4 != null and chiave4 != ''">and comkey4 = #{chiave4}</if>
    <if test="chiave5 != null and chiave5 != ''">and comkey5 = #{chiave5}</if>
+   <if test="idOperatore != null and idOperatore != ''">and comcodope = #{idOperatore}</if>
+   <if test="mittente != null and mittente != ''">and committ = #{mittente}</if>
+   <if test="stato != null and stato != ''">and comstato = #{stato}</if>
+   <if test="oggetto != null and oggetto != ''">and commsgogg like #{oggetto}</if>
+   <if test="testo != null and testo != ''">and commsgtes like #{testo}</if>
+   <if test="comunicazionePubblica != null and comunicazionePubblica != ''">and compub = #{comunicazionePubblica}</if>
+   <if test="tipoComunicazione != null and tipoComunicazione != ''">and comtipo = #{tipoComunicazione}</if>
+   <if test="dataPubblicazione != null">and comdatapub = #{dataPubblicazione}</if>
+   <if test="modello != null and modello != ''">and commodello = #{modello}</if>
+<!-- order by idprg, comkey1, comkey2, comkey3  -->
+order by idprg, idcom
+  </select>
+  
+  <!-- NB: se si utilizza il filtro su comkey1 (like) successivamente vanno filtrati via codice i risultati della quiry 
+       per estrarre solo le comunicazioni relative allo username esatto (comkey1 = username!) -->
+  <select id="searchElencoComunicazioni" parameterType="java.util.HashMap" resultMap="dettaglioComunicazione">
+  <include refid="selectComunicazione"/>
+    from w_invcom
+   where idprg = #{applicativo} 
+   <if test="id != null and id != ''">and idcom = #{id}</if>
+   <if test="entita != null and entita != ''">and coment = #{entita}</if>
+   <if test="chiave1 != null and chiave1 != ''">and comkey1 like #{chiave1}</if>
+   <if test="chiave2 != null and chiave2 != ''">and comkey2 like #{chiave2}</if>
+   <if test="chiave3 != null and chiave3 != ''">and comkey3 like #{chiave3}</if>
+   <if test="chiave4 != null and chiave4 != ''">and comkey4 like #{chiave4}</if>
+   <if test="chiave5 != null and chiave5 != ''">and comkey5 like #{chiave5}</if>
    <if test="idOperatore != null and idOperatore != ''">and comcodope = #{idOperatore}</if>
    <if test="mittente != null and mittente != ''">and committ = #{mittente}</if>
    <if test="stato != null and stato != ''">and comstato = #{stato}</if>
@@ -180,7 +249,7 @@ order by idprg, idcom
   
   <delete id="deleteAllegatoProtocollo" parameterType="java.util.HashMap">
   delete from wsallegati 
-  where key1 = #{applicativo} and key2 = #{id}
+  where key1 = #{applicativo} and key2 = cast(#{id} as varchar(30))
   <if test="entita != null and entita != ''">and entita=#{entita}</if>
   </delete>
   
@@ -188,6 +257,32 @@ order by idprg, idcom
   update w_invcom set <if test="stato != null and stato != ''">comstato = #{stato,jdbcType=VARCHAR},</if> comkeysess = #{sessionKey,jdbcType=VARCHAR}
   where idprg = #{applicativo} and idcom = #{idComunicazione}
   </update>
-  
+
+    <select id="getStatoComunicazione" parameterType="java.util.HashMap" resultType="java.lang.String">
+        select
+            comstato
+        from
+             w_invcom i
+        where
+            i.idprg = 'PA'
+            and i.comstato &lt;&gt; '1'
+            and i.comtipo = #{bustaType,jdbcType=VARCHAR}
+            and i.comkey1  = #{usernome,jdbcType=VARCHAR}
+            and i.comkey2 = #{numGara,jdbcType=VARCHAR}
+    </select>
+
+    <select id="getRichiestaPartecipazione" parameterType="java.util.HashMap" resultMap="digogg">
+        select
+            digogg
+        from
+            w_invcom i
+            inner join w_docdig wd on wd.digkey1 = cast(i.idcom as varchar(30))
+        where
+            i.idprg = 'PA'
+            and comtipo = 'FS11'
+            and wd.digtipdoc = 'xml'
+            and comkey1 = #{username}
+            and comkey2 = #{ngara}
+    </select>
 
 </mapper>

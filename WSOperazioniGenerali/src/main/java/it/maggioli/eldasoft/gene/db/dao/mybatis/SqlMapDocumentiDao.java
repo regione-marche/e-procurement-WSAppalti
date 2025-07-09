@@ -30,7 +30,7 @@ public class SqlMapDocumentiDao implements DocumentiDao {
 	@Autowired
 	private DocumentiMapper documentiMapper;
 	@Override
-	public FileType getDocumentoDigitale(String idProgramma, long idDocumento, String username)
+	public FileType getDocumentoDigitale(String idProgramma, long idDocumento, String username, String cryptedUseranme)
 			throws DataAccessException {
 		// Idea per limitare la complessità di "v_ws_documenti_digitali"
 		// nel caso di gruppo 6,11,12 (inviti) 
@@ -46,6 +46,7 @@ public class SqlMapDocumentiDao implements DocumentiDao {
 				idDocumento
 				, idProgramma
 				, username
+				, cryptedUseranme
 		);
 		return results != null && results.size() > 0 ? results.get(0) : null;
 	}

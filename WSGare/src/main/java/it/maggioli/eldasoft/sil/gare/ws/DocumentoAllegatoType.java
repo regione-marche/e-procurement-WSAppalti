@@ -49,13 +49,14 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
     "dataPubblicazione",
     "dimensione",
     "uuid",
-    "idStampa"
+    "idStampa",
+    "ultbic"
 })
 public class DocumentoAllegatoType
     implements Serializable
 {
-
     private final static long serialVersionUID = 2L;
+    
     @XmlElement(required = true)
     protected String descrizione;
     protected String nomefile;
@@ -68,113 +69,44 @@ public class DocumentoAllegatoType
     protected Long dimensione;
     protected String uuid;
     protected String idStampa;
+    protected String ultbic;
 
-    /**
-     * Recupera il valore della proprietà descrizione.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
     public String getDescrizione() {
         return descrizione;
     }
 
-    /**
-     * Imposta il valore della proprietà descrizione.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     * Descrizione del documento 
-     */
     public void setDescrizione(String value) {
         this.descrizione = value;
     }
 
-    /**
-     * Recupera il valore della proprietà nomefile.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     * Nome del file allegato    
-     */
     public String getNomefile() {
         return nomefile;
     }
 
-    /**
-     * Imposta il valore della proprietà nomefile.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
     public void setNomefile(String value) {
         this.nomefile = value;
     }
 
-    /**
-     * Recupera il valore della proprietà id.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Long }
-     * Id da utilizzare per richiedere l'apertura del documento    
-     */
     public Long getId() {
         return id;
     }
 
-    /**
-     * Imposta il valore della proprietà id.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Long }
-     *     
-     */
     public void setId(Long value) {
         this.id = value;
     }
 
-    /**
-     * Recupera il valore della proprietà url.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     * URL del documento in rete    
-     */
     public String getUrl() {
         return url;
     }
 
-    /**
-     * Imposta il valore della proprietà url.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
     public void setUrl(String value) {
         this.url = value;
     }
 
-	/**
-	 * @return the dataPubblicazione
-	 */
 	public Date getDataPubblicazione() {
 		return dataPubblicazione;
 	}
 
-	/**
-	 * @param dataPubblicazione the dataPubblicazione to set
-	 */
 	public void setDataPubblicazione(Date dataPubblicazione) {
 		this.dataPubblicazione = dataPubblicazione;
 	}
@@ -201,6 +133,14 @@ public class DocumentoAllegatoType
 
 	public void setIdStampa(String idStampa) {
 		this.idStampa = idStampa;
+	}
+
+	public String getUltbic() {
+		return ultbic;
+	}
+
+	public void setUltbic(String ultbic) {
+		this.ultbic = ultbic;
 	}	
 	
 }

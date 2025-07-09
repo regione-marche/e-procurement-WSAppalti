@@ -13,6 +13,7 @@ public interface DocumentiMapper {
               @Param("id") Long id
             , @Param("prg") String prg
             , @Param("username") String username
+            , @Param("cryptedUsername") String cryptedUsername
     );
     public List<String> getUsernameDocumentoRiservato(
               @Param("id") Long id

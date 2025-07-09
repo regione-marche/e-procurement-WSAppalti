@@ -12,7 +12,8 @@ import javax.xml.bind.annotation.XmlType;
 	"codice",
 	"codiceLotto",
 	"progressivoOfferta",
-	"usernome"
+	"usernome",
+	"codiceCNEL"
 })
 public class InvitoGaraType implements Serializable {    
 	/**
@@ -24,6 +25,7 @@ public class InvitoGaraType implements Serializable {
 	protected String codiceLotto;
 	protected String progressivoOfferta;
 	protected String usernome;
+	protected String codiceCNEL;
 	
 	public String getCodice() {
 		return codice;
@@ -57,4 +59,12 @@ public class InvitoGaraType implements Serializable {
 		this.usernome = usernome;
 	}
 
+	public String getCodiceCNEL() {
+		return codiceCNEL;
+	}
+
+	public void setCodiceCNEL(String codiceCNEL) {
+		this.codiceCNEL = codiceCNEL;
+	}
+	
 }

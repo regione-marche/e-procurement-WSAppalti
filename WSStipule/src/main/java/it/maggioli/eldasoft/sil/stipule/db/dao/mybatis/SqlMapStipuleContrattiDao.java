@@ -13,22 +13,28 @@ package it.maggioli.eldasoft.sil.stipule.db.dao.mybatis;
 import it.eldasoft.utils.sql.comp.SqlComposer;
 import it.eldasoft.utils.sql.comp.SqlComposerException;
 import it.eldasoft.utils.sql.comp.SqlManager;
+import it.maggioli.eldasoft.gene.bean.rest.ObjectStorageClient;
+import it.maggioli.eldasoft.gene.bl.GenChiaviManager;
 import it.maggioli.eldasoft.gene.db.mapper.ComunicazioniMapper;
+import it.maggioli.eldasoft.gene.util.storage.StorageUploaderBuilder;
 import it.maggioli.eldasoft.gene.ws.AllegatoComunicazioneType;
+import it.maggioli.eldasoft.sil.gare.bl.BandiManager;
 import it.maggioli.eldasoft.sil.stipule.db.dao.StipuleContrattiDao;
 import it.maggioli.eldasoft.sil.stipule.db.mapper.StipuleContrattiMapper;
 import it.maggioli.eldasoft.sil.stipule.ws.DocumentazioneStipulaContrattiType;
 import it.maggioli.eldasoft.sil.stipule.ws.StipulaContrattoType;
+import lombok.RequiredArgsConstructor;
+import lombok.val;
 import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.util.Date;
 import java.util.List;
 
-import static it.maggioli.eldasoft.sil.gare.util.DAOUtils.*;
+import static it.maggioli.eldasoft.gene.util.storage.InsertBuilder.insert_file;
+import static it.maggioli.eldasoft.sil.gare.util.DAOUtils.getBounds;
+import static it.maggioli.eldasoft.sil.gare.util.DAOUtils.toWithPercentAndUpper;
 
 /**
  * Classe di appoggio per l'esecuzione tramite estensione del framework Spring
@@ -36,19 +42,20 @@ import static it.maggioli.eldasoft.sil.gare.util.DAOUtils.*;
  * 
  * @author
  */
+@RequiredArgsConstructor
 @Component
 public class SqlMapStipuleContrattiDao implements StipuleContrattiDao {
 
 	/** tipologia di DBMS da property */
 	@Resource
 	private String dbms;
-	@Autowired
-	private StipuleContrattiMapper stipuleContrattiMapper;
+	private final StipuleContrattiMapper stipuleContrattiMapper;
+	private final ObjectStorageClient obs_client;
 	/**
 	 * Non posso fare l'Autowired del DAO per motivi di "parametri"
 	 */
-	@Autowired
-	private ComunicazioniMapper comunicazioniMapper;
+	private final ComunicazioniMapper comunicazioniMapper;
+	private final GenChiaviManager genChiaviManager;
 
 	@Override
 	public List<StipulaContrattoType> searchStipuleContratti(
@@ -83,7 +90,7 @@ public class SqlMapStipuleContrattiDao implements StipuleContrattiDao {
 			String idstipula, String usernome) {
 		return stipuleContrattiMapper.getDettaglioStipulaContratto(
 				null
-				, idstipula
+				, BandiManager.toLong(idstipula, "Formato non valido per id stipula")
 				, usernome
 				, false
 		);
@@ -93,7 +100,7 @@ public class SqlMapStipuleContrattiDao implements StipuleContrattiDao {
 	public List<DocumentazioneStipulaContrattiType> getDocumentiRichiestiStipulaContratto(
 			String idStipula) {
 		return stipuleContrattiMapper.getDocumentiRichiestiStipulaContratto(
-				idStipula
+				(StringUtils.isNotEmpty(idStipula) ? Long.valueOf(idStipula) : null)
 		);
 	}
 
@@ -129,7 +136,7 @@ public class SqlMapStipuleContrattiDao implements StipuleContrattiDao {
 	@Override
 	public void updateStipula(String codStipula, Long stato) throws DataAccessException {
 		stipuleContrattiMapper.updateStipula(
-				  codStipula
+				  BandiManager.toLong(codStipula, "Formato non valido per id stipula")
 				, stato
 		);
 	}
@@ -137,7 +144,7 @@ public class SqlMapStipuleContrattiDao implements StipuleContrattiDao {
 	@Override
 	public void updateDocsStipula(String codStipula, Long stato) throws DataAccessException {
 		stipuleContrattiMapper.updateDocStipula(
-				  codStipula
+				  BandiManager.toLong(codStipula, "Formato non valido per id stipula")
 				, stato
 		);
 	}
@@ -151,25 +158,38 @@ public class SqlMapStipuleContrattiDao implements StipuleContrattiDao {
 	}
 
 	@Override
-	public void insertAllegato(String nomeFile, Long idDocStipula,
-							   byte[] allegato, String firmacheck, Date firmacheckts) throws DataAccessException {
+	public void insertAllegato(
+			Long idDocStipula
+			, AllegatoComunicazioneType allegato
+	) throws DataAccessException {
 		Long id = comunicazioniMapper.getMaxIdAllegato("PG");
 		id = id == null ? 1 : id + 1;
 
-		comunicazioniMapper.insertAllegato(
-				"PG"
-				, id
-				, "G1DOCSTIPULA"
-				, idDocStipula
-				, null
-				, null
-				, null
-				, nomeFile
-				, null
-				, allegato
-				, firmacheck
-				, firmacheckts
-		);
+		// Potrei farlo all'interno del builder, ma, preferisco non modificare ulteriormente la logica
+		val id_allegato = genChiaviManager.getNextId("W_DOCDIG_PA");
+
+		StorageUploaderBuilder.create(obs_client)
+			.operation(
+				insert_file((attachment, info, index) ->
+					comunicazioniMapper.insertAllegato(
+							"PG"
+							, id_allegato
+							, "G1DOCSTIPULA"
+							, idDocStipula
+							, null
+							, null
+							, null
+							, allegato.getTipo()
+							, allegato.getNomeFile()
+							, null
+							, allegato.getFile()
+							, allegato.getFirmacheck()
+							, allegato.getFirmacheckts()
+							, info
+					)
+				)
+			)
+		.start();
 	}
 
 	@Override

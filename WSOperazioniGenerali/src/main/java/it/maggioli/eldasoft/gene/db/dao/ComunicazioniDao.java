@@ -10,15 +10,15 @@
  */
 package it.maggioli.eldasoft.gene.db.dao;
 
-import java.util.Date;
-import java.util.List;
-
+import it.maggioli.eldasoft.gene.model.UploadInfo;
 import it.maggioli.eldasoft.gene.ws.AllegatoComunicazioneType;
 import it.maggioli.eldasoft.gene.ws.DettaglioComunicazioneType;
 import it.maggioli.eldasoft.gene.ws.WSAllegatoType;
 import it.maggioli.eldasoft.gene.ws.WSDocumentoType;
-
 import org.springframework.dao.DataAccessException;
+
+import java.util.Date;
+import java.util.List;
 
 /**
  * Interfaccia DAO per la gestione crud delle comunicazioni (W_INVCOM e
@@ -28,17 +28,11 @@ import org.springframework.dao.DataAccessException;
  */
 public interface ComunicazioniDao {
 
-    /**
-     * Ritorna il massimo id utilizzato come chiave nelle comunicazioni per
-     * l'applicativo in input
-     * 
-     * @param applicativo
-     *            identificativo applicativo
-     * @return massimo id utilizzato ed esistente nel db nelle comunicazioni, 0
-     *         altrimenti
-     * @throws DataAccessException
-     */
-    Long getMaxIdComunicazione(String applicativo) throws DataAccessException;
+//    /**
+//     * Ritorna il massimo id utilizzato come chiave nelle comunicazioni per
+//     * l'applicativo in input
+//     */
+//		NB: sostituito da gerNextId(W_INVCOM)
 
     /**
      * Inserisce un'occorrenza nella W_INVCOM
@@ -57,21 +51,15 @@ public interface ComunicazioniDao {
      *            comunicazione da aggiornare
      * @throws DataAccessException
      */
-    void updateComunicazione(DettaglioComunicazioneType dettaglioComunicazione)
+    void updateComunicazione(DettaglioComunicazioneType comunicazione)
 	    throws DataAccessException;
 
-    /**
-     * Ritorna il massimo id utilizzato come chiave nei documenti digitali per
-     * l'applicativo in input
-     * 
-     * @param applicativo
-     *            identificativo applicativo
-     * @return massimo id utilizzato nei documenti digitali ed esistente nel db,
-     *         0 altrimenti
-     * @throws DataAccessException
-     */
-    Long getMaxIdAllegato(String applicativo) throws DataAccessException;
-
+//    /**
+//     * Ritorna il massimo id utilizzato come chiave nei documenti digitali per
+//     * l'applicativo in input
+//     */
+//		NB: sostituito da gerNextId(W_DOCDIG)
+    
 	/**
      * Inserisce un'occorrenza nella W_DOCDIG
      * 
@@ -89,7 +77,8 @@ public interface ComunicazioniDao {
      */
     void insertAllegato(String applicativo, Long idAllegato,
 	    Long idComunicazione, int progressivoAllegato,
-	    AllegatoComunicazioneType allegato) throws DataAccessException;
+	    AllegatoComunicazioneType allegato, UploadInfo bucket_info
+	) throws DataAccessException;
 
 	/**
 	 * Aggiorna un allegato esistente relativo alla comunicazione in input.
@@ -107,7 +96,9 @@ public interface ComunicazioniDao {
 	 */
 	void updateAllegato(String applicativo, Long idAllegato,
 			Long idComunicazione, int progressivoAllegato,
-			AllegatoComunicazioneType allegato);
+			AllegatoComunicazioneType allegato,
+			UploadInfo info
+	);
 
 	/**
 	 * Elimina il singolo documento digitale individuato dalla sua chiave.
@@ -211,7 +202,11 @@ public interface ComunicazioniDao {
     List<AllegatoComunicazioneType> getAllegatiComunicazione(
 	    String applicativo, long id, String idDocumento) throws DataAccessException;
 
-    /**
+	List<AllegatoComunicazioneType> getAllegatiComunicazioneNoFile(
+			String applicativo, long id, String idDocumento) throws DataAccessException;
+
+
+	/**
      * Estrae l'elenco delle comunicazioni che soddisfano i criteri di ricerca
      * nel bean in input
      * 
@@ -222,6 +217,20 @@ public interface ComunicazioniDao {
      * @throws DataAccessException
      */
     List<DettaglioComunicazioneType> getElencoComunicazioni(
+	    DettaglioComunicazioneType criteriRicerca)
+	    throws DataAccessException;
+
+    /**
+     * Estrae l'elenco delle comunicazioni che soddisfano i criteri di ricerca (in like)
+     * nel bean in input
+     * 
+     * @param criteriRicerca
+     *            criteri di filtro, sulla W_INVCOM
+     * @return elenco delle comunicazioni che rispettano i criteri di filtro in
+     *         input
+     * @throws DataAccessException
+     */
+    List<DettaglioComunicazioneType> searchElencoComunicazioni(
 	    DettaglioComunicazioneType criteriRicerca)
 	    throws DataAccessException;
 
@@ -297,4 +306,19 @@ public interface ComunicazioniDao {
 	void updateSessionKeyComunicazione(String applicativo,
 			long id, String sessionKey, String stato);
 
+	/**
+	 * Ritorna il comstato a partire dal codice impresa e dal numero gara
+	 *
+	 * @param codImp
+	 * @param numGara
+	 * @param espletamentoBustaType
+	 * @return
+	 */
+    String getStatoComunicazione(String username, String numGara, String espletamentoBustaType);
+
+    /**
+     * ... 
+     */
+	String getRichiestaPartecipazione(String username, String ngara);
+	
 }

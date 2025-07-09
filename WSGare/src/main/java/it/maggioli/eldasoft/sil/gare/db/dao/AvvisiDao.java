@@ -34,6 +34,18 @@ public interface AvvisiDao {
 	 * @throws DataAccessException
 	 * @throws SqlComposerException
 	 */
+	List<AvvisoType> searchAvvisiGenerali(AvvisiTypeSearch filtri) throws DataAccessException, SqlComposerException;
+
+	int countAvvisiGenerali(AvvisiTypeSearch filtri) throws DataAccessException, SqlComposerException;
+	
+	/**
+	 * Ritorna l'elenco degli esiti di gara filtrati dai parametri in input.
+	 * 
+	 * @return lista di avvisi, di tipo {@link AvvisoType}
+	 * 
+	 * @throws DataAccessException
+	 * @throws SqlComposerException
+	 */
 	List<AvvisoType> searchAvvisi(AvvisiTypeSearch filtri) throws DataAccessException, SqlComposerException;
 
 	int countAvvisi(AvvisiTypeSearch filtri) throws DataAccessException, SqlComposerException;
@@ -74,7 +86,7 @@ public interface AvvisiDao {
 	StazioneAppaltanteBandoType getStazioneAppaltanteAvviso(String codice)
 	    throws DataAccessException;
 
-    /**
+	/**
      * Ritorna il dettaglio dei dati di un avviso di gara individuato dalla
      * chiave in input.
      * 
@@ -83,7 +95,17 @@ public interface AvvisiDao {
      * @return dettaglio dell'avviso
      * @throws DataAccessException
      */
-	AvvisoType getAvviso(String codiceGara) throws DataAccessException;
+	AvvisoType getAvviso(String codiceGara, int numAnniPubblicazione) throws DataAccessException; 
+
+	/**
+     * Ritorna il dettaglio dei dati di un avviso di gara individuato dal cig.
+     * 
+     * @param cig
+     *            cig relativo al bando di gara
+     * @return dettaglio dell'avviso
+     * @throws DataAccessException
+     */
+	AvvisoType getAvvisoByCig(String cig, int numAnniPubblicazione) throws DataAccessException;
 
 //	/**
 //	 * 
